@@ -7,7 +7,22 @@ import barChart from "@/assets/images/bar-chart.png";
 import whiteGradient from "@/assets/images/white-gradient.png";
 import map from "@/assets/images/map.png";
 import noResult from "@/assets/images/no-result.png";
-
+import logo from "@/assets/images/logo.png";
+import home1 from "@/assets/images/home1.png";
+import home2 from "@/assets/images/home2.png";
+import home3 from "@/assets/images/home3.png";
+import home4 from "@/assets/images/home4.png";
+import lightbulb from "@/assets/images/lightbulb.png";
+import fan from "@/assets/images/fan.png";
+import aircondition from "@/assets/images/aircondition.png";
+import user from "@/assets/images/user.png";
+import door from "@/assets/images/door.png";
+import dashboard from "@/assets/images/dashboard.png";
+import lamp from "@/assets/images/lamp.png";
+import light from "@/assets/images/light.png";
+import power from "@/assets/images/power.png";
+import auto_on from "@/assets/images/auto_on.png";
+import auto_off from "@/assets/images/auto_off.png";
 export default {
   onboarding,
   avatar,
@@ -18,4 +33,15 @@ export default {
   whiteGradient,
   map,
   noResult,
+  logo,
+  home1, 
+  home2, 
+  home3,  
+  home4,
+  lightbulb,
+  fan,
+  aircondition,
+  user, door, dashboard,
+  lamp, light, power,
+  auto_on, auto_off
 };

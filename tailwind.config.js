@@ -34,7 +34,11 @@ module.exports = {
          200: '#666876',
          300: "#191D31"
         },
-        danger: '#F755555'
+        danger: '#F755555',
+        yellow: "#FBBC05",
+        background: '#E7EDF4',
+        disable: "#EDEDED",
+        enable: "#FFD700"
       }
     },
   },

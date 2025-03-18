@@ -6,6 +6,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import "../global.css";
+import SignIn from "./sign-in";
 // import GlobalProvider from "@/lib/global-provider";
 
 export default function RootLayout() {
@@ -30,11 +31,11 @@ export default function RootLayout() {
 
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1 }} >
       <SafeAreaProvider>
-        <Stack initialRouteName="sign-in"  > 
-            <Stack.Screen name="sign-in"/>
-            <Stack.Screen name="(tabs)"/>
+        <Stack initialRouteName="sign-in" > 
+          <Stack.Screen name="sign-in" />
+          <Stack.Screen name="(tabs)"  />
         </Stack>
       </SafeAreaProvider>
     </GestureHandlerRootView>

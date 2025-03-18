@@ -12,23 +12,14 @@ export default function SignIn() {
 
     return (
         <SafeAreaView className='bg-white h-full'> 
-            <ScrollView contentContainerClassName="h-full">
-                <Image source={images.onboarding} className="w-full h-4/6" resizeMode='contain'></Image>
-
-                <View className='px-10'>
-                    <Text className='text-base text-center text--uppercase font-rubik text-black-100'>Welcome to ReState</Text>
-                    <Text className="text-3xl font-rubik-bold text-black-300 text-center mt-2">
-                        Let's Get You Close to  {"\n"}
-                        <Text className='text-primary-300'>Your Ideal home</Text>
-                    </Text>
-                    <Text className='text=lg font-rubik text-black-200 text-center mt-12'>Login to ReState with Google</Text>
-
-                    <TouchableOpacity onPress={() => {}} className='bg-white shadow-md shadow-zinc-300 w=full py-4 mt-5'>
-                        <View className='flex flex-row items-center justify-center'>
-                            <Image source={icons.google} className='w-5 h-5' resizeMode='contain'></Image>
-                            <Text className='text-lg font-rubik-mediumt text-black-300 ml-2'>Continue with Google</Text>
-                        </View>
-                    </TouchableOpacity>
+            <ScrollView contentContainerClassName="h-full mx-2">
+                <View className='mt-2 flex flex-row space-x-4 items-center '>
+                    <Image source={images.logo} className="w-16 h-16 ml-6 "></Image>
+                    <Text className='text-3xl font-rubik-bold ml-10'>Smart Home</Text>
+                </View>
+                <View className='mt-4'>
+                   <Text className='text-xl font-bold'>Đăng nhập</Text>
+                
                 </View>
             </ScrollView>
         </SafeAreaView>
