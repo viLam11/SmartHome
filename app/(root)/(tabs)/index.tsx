@@ -24,7 +24,8 @@ export default function Index() {
         <Link href="/sign-in">Sign In</Link>
         <Link href="/explore">Explore</Link>
         <Link href="/profile">Profile</Link>
-        {/* <Link href="/home/index">Room</Link> */}
+        <Link href="/fans/1">FANs</Link>
+        <Link href="/stats/1">Thống kê</Link>
         <Link href="/properties/home">Property</Link>
     </View>
   );

@@ -5,7 +5,6 @@ const styles = StyleSheet.create({})
 import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 export default function Navigation({current}){
-    current = 1;
     const [currentTab, setCurrentTab] = useState(current);
     const router = useRouter();
     function handleClick(index) {

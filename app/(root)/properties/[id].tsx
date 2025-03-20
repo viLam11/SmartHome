@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native-gesture-handler';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import images from '@/constants/images';
+import Navigation from '@/components/Navigation';
+
 
 export default function Property() {
     const router = useRouter();
@@ -12,7 +14,8 @@ export default function Property() {
 
     const {id} = useLocalSearchParams();
     return (
-        <ScrollView className='mx-2 mt-1'>
+      <View className='flex-1'>
+          <ScrollView contentContainerStyle={{ flexGrow: 1 }} className='mt-1 flex-grow mx-2 min-h-screen'>
             <View className='flex flex-row justify-between'>    
                 <View className="mx -2">
                     <TouchableOpacity onPress={() => {router.push(`/properties/home`)}}>
@@ -143,6 +146,10 @@ export default function Property() {
             </View>
 
         </ScrollView>
+        <View className="absolute bottom-2 w-full">
+                        <Navigation current={2} />
+                    </View>
+      </View>
     );
 }
 

@@ -23,6 +23,8 @@ import light from "@/assets/images/light.png";
 import power from "@/assets/images/power.png";
 import auto_on from "@/assets/images/auto_on.png";
 import auto_off from "@/assets/images/auto_off.png";
+import canh_quat from "@/assets/images/canh_quat.png";
+import than_quat from "@/assets/images/than_quat.png";
 export default {
   onboarding,
   avatar,
@@ -43,5 +45,6 @@ export default {
   aircondition,
   user, door, dashboard,
   lamp, light, power,
-  auto_on, auto_off
+  auto_on, auto_off,
+  canh_quat, than_quat
 };
