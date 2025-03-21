@@ -15,7 +15,8 @@ const MAPPING = {
   'chevron.right': 'chevron-right',
   'back': 'chevron-left',
   "add": "add",
-  "calendar": "calendar-today"
+  "calendar": "calendar-today",
+  "close": "close"
 } as Partial<
   Record<
     import('expo-symbols').SymbolViewProps['name'],

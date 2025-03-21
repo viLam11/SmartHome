@@ -3,18 +3,25 @@ import React from 'react';
 import { useRef, useEffect } from 'react';
 import { View, Image, Animated } from 'react-native';
 
-const SpinningFan = () => {
+const SpinningFan = ({speed}) => {
   const spinValue = useRef(new Animated.Value(0)).current;
 
+
   useEffect(() => {
-    Animated.loop(
+    console.log("##@", speed);
+    spinValue.setValue(0); // Reset animation value
+    const animation = Animated.loop(
       Animated.timing(spinValue, {
         toValue: 1,
-        duration: 100, // Quay 1 vòng trong 1 giây
+        duration: + speed, // Duration is controlled by `speed`
         useNativeDriver: true,
       })
-    ).start();
-  }, []);
+    );
+
+    animation.start();
+    return () => animation.stop(); // Stop animation when component unmounts or speed changes
+  }, [speed]); // Re-run effect when `speed` changes
+
 
   const spin = spinValue.interpolate({
     inputRange: [0, 1],
