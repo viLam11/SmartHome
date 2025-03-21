@@ -18,7 +18,6 @@ import rightArrow from "@/assets/icons/right-arrow.png";
 import send from "@/assets/icons/send.png";
 import bed from "@/assets/icons/bed.png";
 import bath from "@/assets/icons/bath.png";
-import area from "@/assets/icons/area.png";
 import chat from "@/assets/icons/chat.png";
 import phone from "@/assets/icons/phone.png";
 import carPark from "@/assets/icons/car-park.png";
@@ -53,7 +52,6 @@ export default {
   send,
   bed,
   bath,
-  area,
   chat,
   phone,
   carPark,

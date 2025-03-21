@@ -11,6 +11,7 @@ import Navigation from '@/components/Navigation';
 export default function Property() {
     const router = useRouter();
     const roomName = useState(["Phòng Khách", "Phòng Ngủ", "Phòng Bếp"]);  
+    const [waring, setWaring] = useState(false);
 
     const {id} = useLocalSearchParams();
     return (
@@ -18,7 +19,7 @@ export default function Property() {
           <ScrollView contentContainerStyle={{ flexGrow: 1 }} className='mt-1 flex-grow mx-2 min-h-screen'>
             <View className='flex flex-row justify-between'>    
                 <View className="mx -2">
-                    <TouchableOpacity onPress={() => {router.push(`/properties/home`)}}>
+                    <TouchableOpacity onPress={() => {router.push(`/rooms/home`)}}>
                         <IconSymbol name="back" />    
                     </TouchableOpacity>
                 </View>

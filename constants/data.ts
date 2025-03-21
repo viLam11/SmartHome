@@ -1,6 +1,45 @@
 import icons from "./icons";
 import images from "./images";
 
+export const rooms = [
+  {
+    id: 1,
+    name: "Phòng khách",
+    img: images.home1,
+    device: 6,
+    light: 4,
+    light_on: 1,
+    fan: 2,
+    fan_on: 1,
+    sensor: 2,
+    sensor_on: 1
+  },
+  {
+    id: 2,
+    name: "Phòng ngủ",
+    img: images.home2,
+    device: 3,
+    light: 1,
+    light_on: 0,
+    fan: 1,
+    fan_on: 1,
+    sensor: 1,
+    sensor_on: 1
+  },
+  {
+    id: 3,
+    name: "Phòng bếp",
+    img: images.home3,
+    device: 4,
+    light: 2,
+    light_on: 0,
+    fan: 2,
+    fan_on: 1,
+    sensor: 0,
+    sensor_on: 0
+  }
+]
+
 export const cards = [
   {
     title: "Card 1",
