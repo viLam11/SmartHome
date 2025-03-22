@@ -62,7 +62,7 @@ export default function HomeIndex() {
                             </View>
                             {roomData.map((room, index) => (
                                 <View>
-                                    <TouchableOpacity key={index} onPress={() => { router.push(`/rooms/${index}`) }}>
+                                    <TouchableOpacity key={index} onPress={() => { router.push(`/rooms/${room.id}`) }}>
                                         <Room key={index} setRoomData={setRoomData} id={room.id} deleteMode={deleteMode} img={room.img} name={room.name} device={room.device} light={room.light} light_on={room.light_on} fan={room.fan} fan_on={room.fan_on} sensor={room.sensor} sensor_on={room.sensor_on} />
                                     </TouchableOpacity>
                                 </View>
