@@ -21,7 +21,7 @@ export default function Index() {
         </View>
       </View> */}
 
-        <Link href="/sign-in">Sign In</Link>
+        <Link href="/auth/sign-in">Sign In</Link>
         <Link href="/explore">Explore</Link>
         <Link href="/profile">Profile</Link>
         <Link href="/fans/1">FANs</Link>
