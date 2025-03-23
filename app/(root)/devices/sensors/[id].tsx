@@ -21,7 +21,7 @@ const renderCell = (data, index) => {
     return <Text>{data}</Text>;
 };
 
-export default function Light() {
+export default function Sensor() {
     const router = useRouter();
     const { id } = useLocalSearchParams();
     const [color, setColor] = useState("white");
@@ -35,18 +35,18 @@ export default function Light() {
     return (
         <View className='flex-1'>
             <ScrollView className='mt-1 mx-2'>
-                <View className='flex flex-row justify-between'>
-                    <View className="mx -2">
+                <View className='flex flex-row'>
+                    <View className='w-1/6'>
                         <TouchableOpacity onPress={() => { router.back() }}>
                             <IconSymbol name="back" />
                         </TouchableOpacity>
                     </View>
-                    <Text className='text-xl font-bold'>Đèn {+id + 1}</Text>
-                    <View>
+                    <View className='w-4/6 items-center'>
+                        <Text className='text-xl font-bold'>Cảm biến nhiệt {+id + 1}</Text>
                     </View>
                 </View>
 
-                <DeviceNav current={1} id={+id} type={"light"} />
+                <DeviceNav current={1} id={+id} type={"sensor"} />
 
 
                 <View className='flex flex-row mt-4'>
