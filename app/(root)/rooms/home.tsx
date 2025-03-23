@@ -89,7 +89,7 @@ export default function HomeIndex() {
                         style={{ flex: 1, justifyContent: 'flex-end' }}
                     >
                         {imageMode ?
-                            <View className="bg-white h-2/4 w-full bottom-0 z-20 rounded-s-3xl">
+                            <View className="bg-white h-4/6 w-full bottom-0 z-20 rounded-s-3xl">
                                 <RoomImage roomData={roomData} setRoomData={setRoomData}  setImageMode={setImageMode} newRoomName={newRoomName}  setModal={setModal} />
                             </View>
                             :
