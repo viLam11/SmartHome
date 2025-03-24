@@ -9,23 +9,51 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import NewRoomModal from "@/components/NewRoomModal";
 import RoomImage from "@/components/RoomImage";
 import { rooms } from "@/constants/data";
+import axios from "axios";
 
 export default function HomeIndex() {
+    const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
     const router = useRouter();
     const [roomNum, setRoomNum] = useState(1);
     const [imgArray, setImgArray] = useState([images.home1, images.home3, images.home3, images.home4]);
     const [modal, setModal] = useState(false);
     const [imageMode, setImageMode] = useState(false);
     // Room data
-    const [roomData, setRoomData] = useState(rooms);
+    const [roomData, setRoomData] = useState([]);
     const [deleteMode, setDeleteMode] = useState(false);
     const [newRoomName, setNewRoomName] = useState('');
-
+    const [reponse, setReponse] = useState('');
+    const [count, setCount] = useState(0);
     function handleDeleteMode() {
+        setCount(count + 1);
         setDeleteMode(!deleteMode);
     }
 
+    useEffect(() => {  
+        const fetchRoomData = async () => {
+            const response = axios.get(`${base_url}/rooms`, {
+                headers: {
+                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDMzOTI5NDAsInVzZXJJRCI6IjMifQ.H_wqrHu8W-Jebi9gVj8G5Dfm44JOjdC5AHvIeQ9yQTA"
+                }
+            })
+            if (!response) throw new Error("Failed to fetch image");
+                const data = await response;
+                let rooms = data.data;
+                rooms.map((room) => {
+                    room.img = imgArray[Math.floor(Math.random() * imgArray.length)];   
+                    room.device = room.fanCount + room.lightCount + room.sensorCount + room.doorCount;
+                })
+                setReponse(data.data);
+                setRoomData(data.data);
+                console.log("### DATA :" , data.data);
+        }
+        fetchRoomData();
+    }, [count]);
+    
+
+
     return (
+
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={{ flex: 1 }}
@@ -63,7 +91,7 @@ export default function HomeIndex() {
                             {roomData.map((room, index) => (
                                 <View>
                                     <TouchableOpacity key={index} onPress={() => { router.push(`/rooms/${room.id}`) }}>
-                                        <Room key={index} setRoomData={setRoomData} id={room.id} deleteMode={deleteMode} img={room.img} name={room.name} device={room.device} light={room.light} light_on={room.light_on} fan={room.fan} fan_on={room.fan_on} sensor={room.sensor} sensor_on={room.sensor_on} />
+                                        <Room key={index} setRoomData={setRoomData} id={room.id} deleteMode={deleteMode} img={room.img} name={room.title} device={room.device} light={room.lightCount} light_on={room.light_on} fan={room.fanCount} fan_on={room.fan_on} sensor={room.sensorCount} sensor_on={room.sensor_on} />
                                     </TouchableOpacity>
                                 </View>
                             ))}
@@ -90,7 +118,7 @@ export default function HomeIndex() {
                     >
                         {imageMode ?
                             <View className="bg-white h-4/6 w-full bottom-0 z-20 rounded-s-3xl">
-                                <RoomImage roomData={roomData} setRoomData={setRoomData}  setImageMode={setImageMode} newRoomName={newRoomName}  setModal={setModal} />
+                                <RoomImage setCount={setCount} roomData={roomData} setRoomData={setRoomData}  setImageMode={setImageMode} newRoomName={newRoomName}  setModal={setModal} />
                             </View>
                             :
                             <View className="bg-white h-2/5 w-full bottom-0 z-20 rounded-s-3xl">
@@ -101,7 +129,5 @@ export default function HomeIndex() {
                 </Modal>
             </View>
         </KeyboardAvoidingView>
-
-
     )
 }

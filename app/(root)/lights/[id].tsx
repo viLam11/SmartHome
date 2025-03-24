@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { Table, Row } from "react-native-table-component";
 import DeviceNav from '@/components/DeviceNav';
 import Navigation from '@/components/Navigation';
-
+import axios from 'axios';
 
 const renderCell = (data, index) => {
     if (index === 3) {
@@ -21,16 +21,61 @@ const renderCell = (data, index) => {
     return <Text>{data}</Text>;
 };
 
+// data: {
+//     "feedId": "3023667",
+//     "feedKey": "fan",
+//     "value": "0",
+//     "type": "fan",
+//     "title": "quat tran",
+//     "created_at": "2025-03-24T07:13:51Z"
+// }
+
 export default function Light() {
     const router = useRouter();
-    const { id } = useLocalSearchParams();
+    const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
+    // const { id } = useLocalSearchParams();
+    const id = "3023666";
     const [color, setColor] = useState("white");
     const [statusAuto, setSatusAuto] = useState(true);
+    const [status, setStatus] = useState(false);
+    const [lightData, setLightData] = useState(null);
+
     const tableHead = ["Start", "End", "Brightness", "Edit"];
     const tableData = [
         ["17:00", "16:00", "nhẹ", ".."],
         ["20:00", "21:00", "nhẹ", ".."]
     ];
+
+    async function powerLight(value) {
+        try {
+            const response = await axios.post(`${base_url}/devices/${id}`, {value: value}, {
+                headers: {
+                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDMzOTI5NDAsInVzZXJJRCI6IjMifQ.H_wqrHu8W-Jebi9gVj8G5Dfm44JOjdC5AHvIeQ9yQTA"
+                }
+            })
+            console.log(response)
+            setStatus(value === 1 ? true : false)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        try {
+            axios.get(`${base_url}/devices/${id}`)
+                .then((response) => {
+                    const data = response.data;
+                    setLightData(data);
+                    console.log("Light data: ", data)
+                    setStatus(data.value === "1" ? true : false)
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+        } catch (error) {
+            console.log(error)
+        }
+    }, [])
 
     return (
         <View className='flex-1'>
@@ -41,7 +86,7 @@ export default function Light() {
                             <IconSymbol name="back" />
                         </TouchableOpacity>
                     </View>
-                    <Text className='text-xl font-bold'>Đèn {+id + 1}</Text>
+                    <Text className='text-xl font-bold'>Đèn {+id}</Text>
                     <View>
                     </View>
                 </View>
@@ -58,7 +103,12 @@ export default function Light() {
 
                     </View>
                     <View className='w-1/2 flex flex-col items-end justify-center'>
-                        <Image source={images.power} ></Image>
+                        <View className='w-40'>
+                            <Text className="px-2 w-40 font-semibold"> {status ? "Bật" : "Tắt"}     </Text>
+                        </View>
+                        <TouchableOpacity onPress={() => powerLight(1)}>
+                            <Image source={status ? images.auto_on : images.auto_off} />
+                        </TouchableOpacity>
                         <View >
                             <View className='mt-4 flex flex-row justify-center items-center'>
                                 <TouchableOpacity onPress={() => setColor("blue")}>

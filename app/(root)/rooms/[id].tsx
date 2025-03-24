@@ -25,6 +25,8 @@ export default function Room() {
         setRoom(temp[0]);
     }, []);
 
+    
+
     return (
         <View className="min-h-screen">
             <ScrollView contentContainerStyle={{ flexGrow: 1 }} className='mt-1 mx-2 min-h-screen'>
