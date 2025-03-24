@@ -27,7 +27,7 @@ const renderCell = (data, index) => {
 
 export default function Fan() {
     const router = useRouter();
-    const { id } = useLocalSearchParams();
+    const { feedId } = useLocalSearchParams();
     const [color, setColor] = useState("white");
     const [speed, setSpeed] = useState(0);
     const [status, setSatus] = useState(true);
@@ -50,11 +50,11 @@ export default function Fan() {
                         <IconSymbol name="back" />
                     </TouchableOpacity>
                 </View>
-                <Text className='text-xl font-bold'>QUẠT {+id}</Text>
+                <Text className='text-xl font-bold'>QUẠT {+feedId}</Text>
                 <View>
                 </View>
             </View>
-            <DeviceNav current={1} id={+id} type={"fan"} />
+            <DeviceNav current={1} feedId={+feedId} type={"fan"} />
 
             <View className="flex flex-row mt-10">
                 <View className='w-1/2'>
@@ -143,3 +143,4 @@ export default function Fan() {
         </ScrollView>
     )
 }
+

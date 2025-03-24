@@ -7,6 +7,8 @@ import { useState, useEffect } from 'react';
 import { Table, Row } from "react-native-table-component";
 import DeviceNav from '@/components/DeviceNav';
 import Navigation from '@/components/Navigation';
+import { getDeviceData } from '@/services/deviceService';
+import { deviceObject } from '@/types/device';
 
 
 const renderCell = (data, index) => {
@@ -23,7 +25,7 @@ const renderCell = (data, index) => {
 
 export default function Light() {
     const router = useRouter();
-    const { id } = useLocalSearchParams();
+    const { feedId } = useLocalSearchParams();
     const [color, setColor] = useState("white");
     const [statusAuto, setSatusAuto] = useState(true);
     const tableHead = ["Start", "End", "Brightness", "Edit"];
@@ -31,6 +33,15 @@ export default function Light() {
         ["17:00", "16:00", "nhẹ", ".."],
         ["20:00", "21:00", "nhẹ", ".."]
     ];
+    const [deviceData, setDeviceData] = useState<deviceObject | null>(null);
+        
+
+    useEffect(() => {
+        (async () => {
+            const response = await getDeviceData(feedId as string);
+            setDeviceData(response);
+        })();
+    }, []);
 
     return (
         <View className='flex-1'>
@@ -41,12 +52,12 @@ export default function Light() {
                             <IconSymbol name="back" />
                         </TouchableOpacity>
                     </View>
-                    <Text className='text-xl font-bold'>Đèn {+id + 1}</Text>
+                    <Text className='text-xl font-bold'>{deviceData?.name}</Text>
                     <View>
                     </View>
                 </View>
 
-                <DeviceNav current={1} id={+id} type={"light"} />
+                <DeviceNav current={1} feedId={+feedId} type={"light"} />
 
 
                 <View className='flex flex-row mt-4'>
