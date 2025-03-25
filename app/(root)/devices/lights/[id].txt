@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Image, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import images from '@/constants/images';
 import { useState, useEffect } from 'react';
@@ -55,6 +55,7 @@ export default function Light() {
     const router = useRouter();
     const { feedId } = useLocalSearchParams();
     const [color, setColor] = useState("white");
+    const [lightEnable, setLightEnable] = useState(false);
     const [statusAuto, setSatusAuto] = useState(true);
 >>>>>>> fe2
     const tableHead = ["Start", "End", "Brightness", "Edit"];
@@ -177,9 +178,10 @@ export default function Light() {
 
                 <View className='flex flex-row mt-4'>
                     <View className='w-1/2 '>
-                        <View className='w-full flex items-center'>
+                        <View className='w-full h-72 flex items-center'>
                             <Image source={images.lamp} style={{ width: "70%", height: 200 }} />
-                            <Image source={images.light} style={{ width: "50%", height: 100, tintColor: `${color}` }}></Image>
+                            { lightEnable ? 
+                                <Image source={images.light} style={{ width: "50%", height: 100, tintColor: `${color}` }}></Image> : null}
                         </View>
 
                     </View>

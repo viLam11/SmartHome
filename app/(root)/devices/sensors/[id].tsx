@@ -146,7 +146,7 @@ export default function Sensor() {
                     </View>
                 </View>
 
-                <DeviceNav current={1} id={+id} type={"sensor"} />
+                <DeviceNav current={1} feedId={+feedId} type={"sensor"} />
 
 
                 <View className='flex flex-row mt-4'>

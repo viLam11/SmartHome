@@ -9,7 +9,7 @@ import DeviceNav from '@/components/DeviceNav';
 
 export default function Statistic() {
     const router = useRouter();
-    const { id } = useLocalSearchParams();
+    const { feedId } = useLocalSearchParams();
     const [barData, setBarData] = React.useState([
         { value: 20, label: 'M' },
         { value: 30, label: 'T' },
@@ -33,11 +33,11 @@ export default function Statistic() {
                             <IconSymbol name="back" />
                         </TouchableOpacity>
                     </View>
-                    <Text className='text-xl font-bold'>Đèn {+id}</Text>
+                    <Text className='text-xl font-bold'>Đèn {+feedId}</Text>
                     <View>
                     </View>
                 </View>
-                <DeviceNav current={3} id = {+id} type="light" />
+                <DeviceNav current={3} feedId = {+feedId} type="light" />
 
                 <View>
                     <View className='w-9/12 mt-4 mx-auto border border-black rounded-md p-1 '>

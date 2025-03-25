@@ -1,17 +1,17 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React from 'react';
-import { Modal, StyleSheet, View, Text, Image, ImageBackground, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Modal, View, Text, Image, ImageBackground, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import images from '@/constants/images';
+import { room } from '@/constants/data';
 import Navigation from '@/components/Navigation';
 import { rooms } from '@/constants/data';
 import AddNewDevice from '@/components/AddNewDevice';
 import axios from 'axios';
 
 
-export default function Room() {
+export default function Property() {
     const router = useRouter();
     const roomName = useState(["Phòng Khách", "Phòng Ngủ", "Phòng Bếp"]);
     const [waring, setWaring] = useState(false);
@@ -62,8 +62,8 @@ export default function Room() {
 
     return (
         <View className="min-h-screen">
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }} className='mt-1 mx-2 min-h-screen'>
-            {modal || editMode ? <View className="absolute top-0 left-0 z-10 w-full h-full bg-black/50" /> : <></>}
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="mt-1 mx-2 min-h-screen">
+                {modal || editMode ? <View className="absolute top-0 left-0 z-10 w-full h-full bg-black/50" /> : null}
 
                 <View className='flex flex-row justify-between'>
                     <View className="mx -2">
@@ -96,12 +96,9 @@ export default function Room() {
                         }
                     </View>
                 </View>
+
                 <View className="my-4 overflow-hidden rounded-lg">
-                    <ImageBackground
-                        source={images.home1}
-                        style={{ width: "100%", height: 120, borderRadius: 12 }}
-                        resizeMode="cover"
-                    >
+                    <ImageBackground source={roomData?.img || images.home1} style={{ width: "100%", height: 120 }} resizeMode="cover">
                         <View className="p-3">
                             <Text className="text-2xl font-bold text-white">{room ? room.title : ""}</Text>
                             <Text className="text-white">{room ? room.device : '0'} thiết bị</Text>
@@ -196,6 +193,9 @@ export default function Room() {
                 </View>
             </ScrollView>
 
+            <View className="absolute bottom-2 w-full">
+                <Navigation current={2} />
+            </View>
 
             <Modal
                 animationType="slide"
@@ -218,11 +218,11 @@ export default function Room() {
                                 </TouchableOpacity>
                             </View>
                         </View>
-                        :
+                    ) : (
                         <View className="bg-white h-1/2 w-full bottom-0 z-20 rounded-s-3xl">
-                            <AddNewDevice setModal={setModal} room={room} />
+                            <AddNewDevice setModal={setModal} room={roomData} />
                         </View>
-                    }
+                    )}
                 </KeyboardAvoidingView>
             </Modal>
         </View>

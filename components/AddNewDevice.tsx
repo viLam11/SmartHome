@@ -1,6 +1,7 @@
 import { View, Text, TouchableOpacity, Image, KeyboardAvoidingView, Platform, TextInput } from 'react-native';
 import { useState, useEffect } from 'react';
 import { IconSymbol } from './ui/IconSymbol';
+import { DEVICE_FORMAT, roomObject, deviceCreateObject } from '@/types/device';
 import images from '@/constants/images';
 import axios from 'axios';
 
@@ -82,9 +83,6 @@ export default function AddNewDevice({ setModal, room }) {
                                 </TouchableOpacity>
                             </View>
                         </View>
-                        <View className='mt-auto'>
-                            <Text className='text-lg font-bold'>Đèn</Text>
-                        </View>
                     </View>
                 </View>
                 <View className="flex flex-row w-full justify-between mx-auto mt-2">
@@ -123,6 +121,7 @@ export default function AddNewDevice({ setModal, room }) {
                         <Text className="text-center font-bold">Tiếp tục</Text>
                     </View>
                 </TouchableOpacity>
+
             </View>
 
         </View>
@@ -209,6 +208,7 @@ const SetNewName = ({ feedKey, setFeedKey, feedID, setFeedID, setFinishMode, set
     )
 }
 
+
 const FinishModal = ({ setFinishMode, feedKey, feedID, setModal, deviceName, deviceType, roomID }) => {
     const [textType, setTextType] = useState('');
     const [type, setType] = useState('');
@@ -259,12 +259,8 @@ const FinishModal = ({ setFinishMode, feedKey, feedID, setModal, deviceName, dev
     }
     return (
         <View className='min-h-screen h-full w-full'>
-            <View className='h-1/3  mb-10'>
-                <View className="flex items-end m-4 ">
-                    <TouchableOpacity onPress={() => setModal(false)} className='bg-black rounded-full'>
-                        <IconSymbol name="close" color="white" />
-                    </TouchableOpacity>
-                </View>
+            <View className='h-1/3 mb-10'>
+                <Header title="" setModal={setModal} />
                 <View className="flex items-center justify-center">
                     <Image source={images.done} style={{ width: 100, height: 100 }} />
                 </View>
@@ -283,5 +279,5 @@ const FinishModal = ({ setFinishMode, feedKey, feedID, setModal, deviceName, dev
 
             </View>
         </View>
-    )
+    );
 }

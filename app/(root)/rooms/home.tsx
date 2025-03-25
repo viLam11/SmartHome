@@ -1,10 +1,10 @@
 import { ScrollView, Text, View, Image, TouchableOpacity, Alert, Modal, KeyboardAvoidingView, Platform } from "react-native";
 import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
-import icons from "@/constants/icons";
+// import icons from "@/constants/icons";
 import Room from "@/components/Room";
 import Navigation from "@/components/Navigation";
-import images from "@/constants/images";
+// import images from "@/constants/images";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import NewRoomModal from "@/components/NewRoomModal";
 import RoomImage from "@/components/RoomImage";
@@ -14,8 +14,8 @@ import axios from "axios";
 export default function HomeIndex() {
     const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
     const router = useRouter();
-    const [roomNum, setRoomNum] = useState(1);
-    const [imgArray, setImgArray] = useState([images.home1, images.home3, images.home3, images.home4]);
+    // const [roomNum, setRoomNum] = useState(1);
+    // const [imgArray, setImgArray] = useState([images.home1, images.home3, images.home3, images.home4]);
     const [modal, setModal] = useState(false);
     const [imageMode, setImageMode] = useState(false);
     // Room data

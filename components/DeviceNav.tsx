@@ -7,25 +7,25 @@ type DeviceType = "light" | "fan" | "sensor";
 
 interface DeviceNavProps {
     status?: number;
-    feedID?: number;
+    feedId?: number;
     type: DeviceType;
 }
 
-export default function DeviceNav({ status = 1, feedID = 1, type }: DeviceNavProps) {
+export default function DeviceNav({ status = 1, feedId = 1, type }: DeviceNavProps) {
     const router = useRouter();
     function hanldeNav(index: number) {
         if (index == status) return;
         switch (index) {
             case 1:
-                if (type == "light") router.replace(`/devices/lights/${feedID}`);
-                if (type == "fan") router.replace(`/devices/fans/${feedID}`);
-                if (type == "sensor") router.replace(`/sensors/${feedID}`);
+                if (type == "light") router.replace(`/devices/lights/${feedId}`);
+                if (type == "fan") router.replace(`/devices/fans/${feedId}`);
+                if (type == "sensor") router.replace(`/devices/sensors/${feedId}`);
                 break;
             case 2:
-                router.replace(`/hist/${feedID}`);
+                router.replace(`/hist/${feedId}`);
                 break;
             case 3:
-                router.replace(`/stats/${feedID}`);
+                router.replace(`/devices/stats/${feedId}`);
                 break;
         }
     }
