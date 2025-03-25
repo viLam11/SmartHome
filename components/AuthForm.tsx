@@ -1,12 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, Image } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert, ActivityIndicator } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { Link } from 'expo-router';
+import { useRouter, Link } from 'expo-router';
 import images from '@/constants/images';
+import { signInService, registerService } from '@/services/authService';
 
 export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
     const isSignIn = type === 'sign-in';
+    const router = useRouter();
+
+    // State cho form
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    // Xử lý đăng nhập & đăng ký
+    const handleAuth = async () => {
+        if (!email || !password || (!isSignIn && !name)) {
+            Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            if (isSignIn) {
+                await signInService({ email, password });
+                router.replace('/rooms/home'); // Chuyển hướng sau khi đăng nhập thành công
+            } else {
+                await registerService({ username: name, email, password });
+                Alert.alert('Thành công', 'Đăng ký thành công, vui lòng đăng nhập');
+                router.replace('/auth/sign-in');
+            }
+        } catch (error) {
+            Alert.alert('Lỗi', 'Đăng nhập hoặc đăng ký thất bại');
+        }
+        setLoading(false);
+    };
+
     return (
         <SafeAreaView className="bg-white h-full">
             <ScrollView contentContainerClassName="h-full mx-2 items-center">
@@ -18,17 +50,40 @@ export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
                 <Text className="text-xl font-bold text-center mt-10">{isSignIn ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ'}</Text>
 
                 <View className="mt-4 w-5/6">
-                    {!isSignIn && <TextInput placeholder="Họ và tên" className="border border-gray-300 p-3 rounded-lg" />}
-                    <TextInput placeholder="Email" className="border border-gray-300 p-3 rounded-lg" keyboardType="email-address" />
-                    <TextInput placeholder="Mật khẩu" className="border border-gray-300 p-3 rounded-lg" secureTextEntry />
+                    {!isSignIn && (
+                        <TextInput
+                            placeholder="Họ và tên"
+                            className="border border-gray-300 p-3 rounded-lg"
+                            value={name}
+                            onChangeText={setName}
+                        />
+                    )}
+                    <TextInput
+                        placeholder="Email"
+                        className="border border-gray-300 p-3 rounded-lg"
+                        keyboardType="email-address"
+                        value={email}
+                        onChangeText={setEmail}
+                    />
+                    <TextInput
+                        placeholder="Mật khẩu"
+                        className="border border-gray-300 p-3 rounded-lg"
+                        secureTextEntry
+                        value={password}
+                        onChangeText={setPassword}
+                    />
                 </View>
-                
-                <View className="w-3/6 mt-4 bg-orange-500 p-3 rounded-lg items-center">
-                    <Link href={"/rooms/home"}>
-                        <TouchableOpacity className="">
+
+                <View className="w-3/6 mt-4 justify-center items-center">
+                    <TouchableOpacity onPress={handleAuth} disabled={loading}>
+                        <View className="w-48 bg-orange-500 p-3 rounded-lg flex items-center">
+                            {loading ? (
+                                <ActivityIndicator color="white" />
+                            ) : (
                                 <Text className="text-center font-bold text-white">{isSignIn ? 'LOGIN' : 'REGISTER'}</Text>
-                        </TouchableOpacity>
-                    </Link>
+                            )}
+                        </View>
+                    </TouchableOpacity>
                 </View>
 
                 <View className="flex flex-row items-center my-4 w-5/6">
@@ -38,8 +93,8 @@ export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
                 </View>
 
                 {[
-                    { name: "google", color: "red", text: "Sign Up with Google" },
-                    { name: "apple", color: "black", text: "Sign Up with Apple" }
+                    { name: 'google', color: 'red', text: 'Sign Up with Google' },
+                    { name: 'apple', color: 'black', text: 'Sign Up with Apple' }
                 ].map(({ name, color, text }) => (
                     <TouchableOpacity key={name} className="flex flex-row w-5/6 items-center justify-center border border-gray-300 p-3 rounded-lg mt-2">
                         <FontAwesome name={name} size={20} color={color} />
@@ -52,9 +107,9 @@ export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
                 </TouchableOpacity>
 
                 <View className="flex flex-row justify-center items-center my-4">
-                    <Text className="text-gray-500">{isSignIn ? "New here?" : "Already have an account?"}</Text>
-                    <Link href={isSignIn ? "/auth/register" : "/auth/sign-in"} className="ml-2 bg-red-500 p-3 rounded-lg">
-                        <Text className="font-medium text-white">{isSignIn ? "Register" : "Sign In"}</Text>
+                    <Text className="text-gray-500">{isSignIn ? 'New here?' : 'Already have an account?'}</Text>
+                    <Link href={isSignIn ? '/auth/register' : '/auth/sign-in'} className="ml-2 bg-red-500 p-3 rounded-lg">
+                        <Text className="font-medium text-white">{isSignIn ? 'Register' : 'Sign In'}</Text>
                     </Link>
                 </View>
             </ScrollView>
