@@ -229,6 +229,3 @@ export default function Room() {
 
     );
 }
-
-const styles = StyleSheet.create({})
-
