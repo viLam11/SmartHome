@@ -1,10 +1,11 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
+const API_URL = "https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1";
 
-export const registerService = async (userData: { FirstName: string, LastName: string, email: string, password: string }) => {
+export const registerService = async (userData: { firstname: string, lastname: string, email: string, password: string }) => {
     try {
+        console.log(userData);
         const response = await axios.post(`${API_URL}/register`, userData);
         const { token } = response.data;
         await AsyncStorage.setItem('authToken', token);

@@ -4,10 +4,14 @@ import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert, Acti
 import { FontAwesome } from '@expo/vector-icons';
 import { useRouter, Link } from 'expo-router';
 import images from '@/constants/images';
-import { signInService, registerService } from '@/services/authService';
+// import { signInService, registerService } from '@/services/authService';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
+
+const base_url = "https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1"
 export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
-    const isSignIn = type === 'sign-in';
+    const isSignIn = type == 'sign-in';
     const router = useRouter();
 
     // State cho form
@@ -18,31 +22,74 @@ export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
     const [loading, setLoading] = useState(false);
 
     // Xử lý đăng nhập & đăng ký
-    const handleAuth = async () => {
-        if (!email || !password || (!isSignIn && !firstName && !lastName)) {
-            Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin');
-            return;
+    // const handleAuth = async () => {
+    //     if (!email || !password || (!isSignIn && !firstName && !lastName)) {
+    //         Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin');
+    //         return;
+    //     }
+
+    //     setLoading(true);
+    //     try {
+    //         if (isSignIn) {
+    //             const response = await signInService({ email, password });
+    //             setTimeout(() => {
+    //                 router.replace('/rooms/home');
+    //             }, 3000);
+    //         } else {
+    //             const response = await registerService({ firstname: firstName, lastname: lastName, email, password });
+    //             Alert.alert('Thành công', 'Đăng ký thành công');
+    //             setTimeout(() => {
+    //                 router.replace('/rooms/home');
+    //             }, 3000);
+    //         }
+    //     } catch (error) {
+    //         Alert.alert('Lỗi', 'Đăng nhập hoặc đăng ký thất bại');
+    //     }
+    //     setLoading(false);
+    // };
+
+    async function handleAuth() {
+        console.log("Is sign in: ", isSignIn);  
+        console.log("Base url: ", base_url);
+        console.log("Email: ", email);
+        console.log("Password: ", password);
+        if (isSignIn) {
+            axios.post(`${base_url}/login`, {
+                "email": email,
+                "password": password,
+            })
+                .then((response) => {
+                    console.log(response)
+                    AsyncStorage.setItem('authToken', response.data.token);
+                    router.replace('/rooms/home');
+                })
+                .catch((error) => {
+                    console.log(error.response)
+                    if (error.response.status == 400) {
+                        alert("Email hoặc mật khẩu không đúng");
+                    }
+                })
+        } else {
+            axios.post(`${base_url}/register`, {
+                "firstname": firstName,
+                "lastname": lastName,
+                "email": email,
+                "password": password,
+            })
+                .then((response) => {
+                    console.log(response)
+                    alert("Đăng ký thành công");
+                    router.replace('/auth/login');
+                })
+                .catch((error) => {
+                    console.log(error.response)
+                    if (error.response.status == 400) {
+                        alert("Email đã tồn tại");
+                    }
+                })
         }
 
-        setLoading(true);
-        try {
-            if (isSignIn) {
-                const response = await signInService({ email, password });
-                setTimeout(() => {
-                    router.replace('/rooms/home');
-                }, 3000);
-            } else {
-                const response = await registerService({ FirstName: firstName, LastName: lastName, email, password });
-                Alert.alert('Thành công', 'Đăng ký thành công');
-                setTimeout(() => {
-                    router.replace('/rooms/home');
-                }, 3000);
-            }
-        } catch (error) {
-            Alert.alert('Lỗi', 'Đăng nhập hoặc đăng ký thất bại');
-        }
-        setLoading(false);
-    };
+    }
 
     return (
         <SafeAreaView className="bg-white h-full">
@@ -56,33 +103,33 @@ export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
 
                 <View className="mt-4 w-5/6">
                     {!isSignIn && (<>
-                            <TextInput
-                                placeholder="FirstName"
-                                className="border border-gray-300 p-3 rounded-lg"
-                                value={firstName}
-                                onChangeText={setFirstName}
-                            />
-                            <TextInput
-                                placeholder="LastName"
-                                className="border border-gray-300 p-3 rounded-lg"
-                                value={lastName}
-                                onChangeText={setLastName}
-                            />                    
-                        </>
+                        <TextInput
+                            placeholder="FirstName"
+                            className="border border-gray-300 p-3 rounded-lg"
+                            value={firstName}
+                            onChangeText={setFirstName}
+                        />
+                        <TextInput
+                            placeholder="LastName"
+                            className="border border-gray-300 p-3 rounded-lg"
+                            value={lastName}
+                            onChangeText={setLastName}
+                        />
+                    </>
                     )}
                     <TextInput
                         placeholder="Email"
                         className="border border-gray-300 p-3 rounded-lg"
                         keyboardType="email-address"
                         value={email}
-                        onChangeText={setEmail}
+                        onChangeText={(text) => setEmail(text)}
                     />
                     <TextInput
                         placeholder="Mật khẩu"
                         className="border border-gray-300 p-3 rounded-lg"
                         secureTextEntry
                         value={password}
-                        onChangeText={setPassword}
+                        onChangeText={(pass) => setPassword(pass)}
                     />
                 </View>
 
