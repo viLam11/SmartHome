@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
-export const registerService = async (userData: { username: string, email: string, password: string }) => {
+export const registerService = async (userData: { FirstName: string, LastName: string, email: string, password: string }) => {
     try {
         const response = await axios.post(`${API_URL}/register`, userData);
         const { token } = response.data;

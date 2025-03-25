@@ -11,14 +11,15 @@ export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
     const router = useRouter();
 
     // State cho form
-    const [name, setName] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
 
     // Xử lý đăng nhập & đăng ký
     const handleAuth = async () => {
-        if (!email || !password || (!isSignIn && !name)) {
+        if (!email || !password || (!isSignIn && !firstName && !lastName)) {
             Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin');
             return;
         }
@@ -26,12 +27,16 @@ export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
         setLoading(true);
         try {
             if (isSignIn) {
-                await signInService({ email, password });
-                router.replace('/rooms/home'); // Chuyển hướng sau khi đăng nhập thành công
+                const response = await signInService({ email, password });
+                setTimeout(() => {
+                    router.replace('/rooms/home');
+                }, 3000);
             } else {
-                await registerService({ username: name, email, password });
-                Alert.alert('Thành công', 'Đăng ký thành công, vui lòng đăng nhập');
-                router.replace('/auth/sign-in');
+                const response = await registerService({ FirstName: firstName, LastName: lastName, email, password });
+                Alert.alert('Thành công', 'Đăng ký thành công');
+                setTimeout(() => {
+                    router.replace('/rooms/home');
+                }, 3000);
             }
         } catch (error) {
             Alert.alert('Lỗi', 'Đăng nhập hoặc đăng ký thất bại');
@@ -50,13 +55,20 @@ export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
                 <Text className="text-xl font-bold text-center mt-10">{isSignIn ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ'}</Text>
 
                 <View className="mt-4 w-5/6">
-                    {!isSignIn && (
-                        <TextInput
-                            placeholder="Họ và tên"
-                            className="border border-gray-300 p-3 rounded-lg"
-                            value={name}
-                            onChangeText={setName}
-                        />
+                    {!isSignIn && (<>
+                            <TextInput
+                                placeholder="FirstName"
+                                className="border border-gray-300 p-3 rounded-lg"
+                                value={firstName}
+                                onChangeText={setFirstName}
+                            />
+                            <TextInput
+                                placeholder="LastName"
+                                className="border border-gray-300 p-3 rounded-lg"
+                                value={lastName}
+                                onChangeText={setLastName}
+                            />                    
+                        </>
                     )}
                     <TextInput
                         placeholder="Email"
