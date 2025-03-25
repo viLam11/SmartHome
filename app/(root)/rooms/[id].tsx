@@ -8,24 +8,57 @@ import images from '@/constants/images';
 import Navigation from '@/components/Navigation';
 import { rooms } from '@/constants/data';
 import AddNewDevice from '@/components/AddNewDevice';
+import axios from 'axios';
+
 
 export default function Room() {
     const router = useRouter();
     const roomName = useState(["Phòng Khách", "Phòng Ngủ", "Phòng Bếp"]);
     const [waring, setWaring] = useState(false);
     const [room, setRoom] = useState(null);
+    const [fanList, setFanList] = useState([]);
+    const [lightList, setLightList] = useState([]);
+    const [sensorList, setSensorList] = useState([]);
+    const [doorList, setDoorList] = useState([]);
     const { id } = useLocalSearchParams();
     const [editMode, setEditMode] = useState(false);
     const [modal, setModal] = useState(false);
-
+    const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
 
     useEffect(() => {
-        // alert(id);  
-        let temp = rooms.filter(room => room.id == id);
-        setRoom(temp[0]);
-    }, []);
-
-    
+        console.log("### ROOM ID: ", id);
+        const fetchDeviceInRoom = async () => {
+            const response = await axios.get(`${base_url}/devices/room/${id}`, {
+                headers: {
+                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDM0ODI5OTQsInVzZXJJRCI6IjEifQ.9Gt8rqLKmePlnbc2MpkCofnGSK_gmf0WqoXlNuv75EE"
+                }
+            })
+            if (response.status != 200) {
+                console.log("### ERROR: ", response.data);  
+            }
+            // console.log("### DATA: ", response.data);
+            setFanList(response.data.fanList);
+            setLightList(response.data.lightList);
+            setSensorList(response.data.sensorList);
+            setDoorList(response.data.doorList);
+            // console.log("## Fan list: ", fanList);
+        }
+        const fetchRoomData = async () => {
+            const response = await axios.get(`${base_url}/rooms`, {
+                headers: {
+                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDM0ODI5OTQsInVzZXJJRCI6IjEifQ.9Gt8rqLKmePlnbc2MpkCofnGSK_gmf0WqoXlNuv75EE"
+                }
+            })
+            let room = response.data.find((room) => room.id == id);
+            room = {...room, device: room.fanCount + room.lightCount + room.sensorCount + room.doorCount};  
+            setRoom(room);
+        }
+        fetchDeviceInRoom();        
+        fetchRoomData();
+        const interval = setInterval(fetchDeviceInRoom, 5000);
+        return () => clearInterval(interval);
+        
+    }, [modal, editMode]);
 
     return (
         <View className="min-h-screen">
@@ -39,7 +72,7 @@ export default function Room() {
                         </TouchableOpacity>
                     </View>
                     <View>
-                        <Text className="text-2xl font-bold">{room ? room.name : ""}</Text>
+                        <Text className="text-2xl font-bold">{room ? room.title : ""}</Text>
                     </View>
                     <View className="flex flex-row space-x-2">
                         {editMode ?
@@ -70,7 +103,7 @@ export default function Room() {
                         resizeMode="cover"
                     >
                         <View className="p-3">
-                            <Text className="text-2xl font-bold text-white">{room ? room.name : ""}</Text>
+                            <Text className="text-2xl font-bold text-white">{room ? room.title : ""}</Text>
                             <Text className="text-white">{room ? room.device : '0'} thiết bị</Text>
                         </View>
                     </ImageBackground>
@@ -81,7 +114,7 @@ export default function Room() {
                         <View className="bg-white m-2 p-2 rounded-lg">
                             <View className="flex flex-row items-center">
                                 <View className='w-1/3'>
-                                    <Image source={images.fan} style={{ width: 40, height: 40, tintColor: (room && room.fan_on != 0) ? "#F5BA0B" : "black" }} />
+                                    <Image source={images.fan} style={{ width: 40, height: 40, tintColor: (room && room.fan_on) ? "#F5BA0B" : "black" }} />
                                 </View>
                                 <View className='w-2/3'>
                                     <Text className='ml-4 text-xl font-bold'>Quạt</Text>
@@ -90,10 +123,10 @@ export default function Room() {
                             </View>
 
                             <View className='mt-2'>
-                                {Array.from({ length: room ? room.fan : 0 }).map((_, index) => (
-                                    <View key={index} className="w-2/3 mt-2 bg-disable p-2 rounded-xl">
-                                        <TouchableOpacity onPress={() => { router.push(`/fans/${id}`) }}>
-                                            <Text className='font-semibold'>Quạt trần {index + 1}</Text>
+                                {fanList.length > 0 && fanList.map((fan, index) => (
+                                    <View key={index} className={`mt-2 ${fan.value == 0 ? "bg-disable": "bg-enable" } p-2 rounded-xl `}>
+                                        <TouchableOpacity onPress={() => { router.push(`/devices/fans/${fan.feedId}`) }}>
+                                            <Text className='font-semibold'>Quạt {fan.title}</Text>
                                         </TouchableOpacity>
 
                                     </View>
@@ -107,19 +140,19 @@ export default function Room() {
                         <View className="bg-white m-2 p-2 rounded-lg">
                             <View className="flex flex-row items-center">
                                 <View className='w-1/3'>
-                                    <Image source={images.lightbulb} style={{ width: 40, height: 40, tintColor: (room && room.light_on != 0) ? "#F5BA0B" : "black" }} />
+                                    <Image source={images.lightbulb} style={{ width: 40, height: 40, tintColor: (room && room.light_on) ? "#F5BA0B" : "black" }} />
                                 </View>
                                 <View className='w-2/3'>
                                     <Text className='ml-4 text-xl font-bold'>Đèn</Text>
-                                    <Text className='ml-4 color-gray-500'>{room ? room.light : '0'} thiết bị</Text>
+                                    <Text className='ml-4 color-gray-500'>{ lightList.length} thiết bị</Text>
                                 </View>
                             </View>
 
                             <View className='mt-2'>
-                                {Array.from({ length: room ? room.light : 0 }).map((_, index) => (
-                                    <View key={index} className="w-2/3 mt-2 bg-enable p-2 rounded-xl">
-                                        <TouchableOpacity onPress={() => { router.push(`/lights/${id}`) }}>
-                                            <Text className='font-semibold'>Đèn trần {index + 1}</Text>
+                                {lightList.length > 0 && lightList.map((light, index) => (
+                                    <View key={index} className={`mt-2 ${light.value == "#000000" ? "bg-disable": "bg-enable" } p-2 rounded-xl `}>
+                                        <TouchableOpacity onPress={() => { router.push(`/devices/lights/${light.feedId}`) }}>
+                                            <Text className='font-semibold'>Đèn {light.title}</Text>
                                         </TouchableOpacity>
                                     </View>
                                 ))}
@@ -136,7 +169,7 @@ export default function Room() {
                         <View className="bg-white m-2 p-2 rounded-lg">
                             <View className="flex flex-row items-center">
                                 <View className='w-1/3'>
-                                    <Image source={images.aircondition} style={{ width: 40, height: 40, tintColor: (room && room.sensor_on != 0) ? "#F5BA0B" : "black" }} />
+                                    <Image source={images.aircondition} style={{ width: 40, height: 40, tintColor: (room && room.sensor_on) ? "#F5BA0B" : "black" }} />
                                 </View>
                                 <View className='w-2/3'>
                                     <Text className='ml-4 text-xl font-bold'>Cảm biến</Text>
@@ -145,10 +178,12 @@ export default function Room() {
                             </View>
 
                             <View className='mt-2'>
-                                {Array.from({ length: 2 }).map((_, index) => (
-                                    <View key={index} className="w-2/3 mt-2 bg-enable p-2 rounded-xl">
-                                        <Text className='font-semibold'>Cảm biến {index + 1}</Text>
-                                    </View>
+                                {sensorList.length > 0 && sensorList.map((sensor, index) => (
+                                      <View key={index} className={`mt-2 ${sensor.value == 0 ? "bg-disable": "bg-enable" } p-2 rounded-xl `}>
+                                      <TouchableOpacity onPress={() => { router.push(`/devices/sensors/${id}`) }}>
+                                          <Text className='font-semibold'>Đèn trần {index + 1}</Text>
+                                      </TouchableOpacity>
+                                  </View>
                                 ))}
                             </View>
 
@@ -177,7 +212,6 @@ export default function Room() {
                 >
                     {editMode ?
                         <View className="bg-white h-2/4 w-full bottom-0 z-20 rounded-s-3xl">
-                            <Text>dfasdf</Text>
                             <View>
                                 <TouchableOpacity onPress={() => setModal(false)}>
                                     <Text>Close</Text>

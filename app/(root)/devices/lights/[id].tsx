@@ -33,8 +33,8 @@ const renderCell = (data, index) => {
 export default function Light() {
     const router = useRouter();
     const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
-    // const { id } = useLocalSearchParams();
-    const id = "3023666";
+    const { id } = useLocalSearchParams();
+
     const [color, setColor] = useState("white");
     const [statusAuto, setSatusAuto] = useState(true);
     const [status, setStatus] = useState(false);
@@ -48,33 +48,66 @@ export default function Light() {
 
     async function powerLight(value) {
         try {
-            const response = await axios.post(`${base_url}/devices/${id}`, {value: value}, {
+            const response = await axios.post(`${base_url}/devices/${id}`, { value: value }, {
                 headers: {
-                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDMzOTI5NDAsInVzZXJJRCI6IjMifQ.H_wqrHu8W-Jebi9gVj8G5Dfm44JOjdC5AHvIeQ9yQTA"
+                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDM0ODI5OTQsInVzZXJJRCI6IjEifQ.9Gt8rqLKmePlnbc2MpkCofnGSK_gmf0WqoXlNuv75EE"
+                }
+            })
+            if (value === "#000000") {
+                setColor("#F2F2F2")
+            } else {
+                setColor("white")
+            }
+            console.log(response.data)
+            setStatus(!status)
+        } catch (error) {
+            console.log(error)
+        }
+
+    }
+
+    async function controlLight(value) {
+        try {
+            const response = await axios.post(`${base_url}/devices/${id}`, { value: value }, {
+                headers: {
+                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDM0ODE5NDksInVzZXJJRCI6IjEifQ.7p08PVx626gl4dmeRDWa8KO9K_RDm8sN66AQQMvs4DQ"
                 }
             })
             console.log(response)
-            setStatus(value === 1 ? true : false)
+            setColor(value)
+            // setStatus(value === 1 ? true : false)
         } catch (error) {
             console.log(error)
         }
     }
 
     useEffect(() => {
-        try {
-            axios.get(`${base_url}/devices/${id}`)
-                .then((response) => {
-                    const data = response.data;
-                    setLightData(data);
-                    console.log("Light data: ", data)
-                    setStatus(data.value === "1" ? true : false)
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
-        } catch (error) {
-            console.log(error)
+        console.log("Light ID:", id);
+        const fetchCurrentStatus = async () => {
+            try {
+                axios.get(`${base_url}/devices/${id}`)
+                    .then((response) => {
+                        const data = response.data;
+                        setLightData(data);
+                        console.log("Light data: ", data)
+                        setStatus(data.value === "#000000" ? false : true)
+                        if (data.value === "#000000") {
+                            setColor("#F2F2F2")
+                        } else {
+                            setColor(data.value)
+                        }
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                    })
+            } catch (error) {
+                console.log(error)
+            }
         }
+        fetchCurrentStatus();
+        const interval = setInterval(fetchCurrentStatus, 5000);
+        return () => clearInterval(interval);
+        
     }, [])
 
     return (
@@ -86,7 +119,7 @@ export default function Light() {
                             <IconSymbol name="back" />
                         </TouchableOpacity>
                     </View>
-                    <Text className='text-xl font-bold'>Đèn {+id}</Text>
+                    <Text className='text-xl font-bold'>Đèn  {lightData && lightData.title}</Text>
                     <View>
                     </View>
                 </View>
@@ -106,19 +139,19 @@ export default function Light() {
                         <View className='w-40'>
                             <Text className="px-2 w-40 font-semibold"> {status ? "Bật" : "Tắt"}     </Text>
                         </View>
-                        <TouchableOpacity onPress={() => powerLight(1)}>
+                        <TouchableOpacity onPress={() => { if (status) { powerLight("#000000") } else { powerLight("#FFFFFF") } }} >
                             <Image source={status ? images.auto_on : images.auto_off} />
                         </TouchableOpacity>
                         <View >
                             <View className='mt-4 flex flex-row justify-center items-center'>
-                                <TouchableOpacity onPress={() => setColor("blue")}>
-                                    <View className={`rounded-full mx-2 bg-blue-500  ${color === "blue" ? "w-8 h-8" : "w-4 h-4"}`}></View>
+                                <TouchableOpacity onPress={() => controlLight("#3C82F6")}>
+                                    <View className={`rounded-full mx-2 bg-blue-500  ${color === "#3C82F6" ? "w-8 h-8" : "w-4 h-4"}`}></View>
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={() => setColor("white")}>
+                                <TouchableOpacity onPress={() => controlLight("white")}>
                                     <View className={`rounded-full mx-2 bg-white  ${color === "white" ? "w-8 h-8" : "w-4 h-4"}`}></View>
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={() => setColor("yellow")}>
-                                    <View className={`rounded-full mx-2 bg-yellow  ${color === "yellow" ? "w-8 h-8" : "w-4 h-4"}`}></View>
+                                <TouchableOpacity onPress={() => controlLight("#FFD700")}>
+                                    <View className={`rounded-full mx-2 bg-yellow  ${color === "#FFD700" ? "w-8 h-8" : "w-4 h-4"}`}></View>
                                 </TouchableOpacity>
                             </View>
                         </View>

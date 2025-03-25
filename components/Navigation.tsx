@@ -8,9 +8,9 @@ export default function Navigation({current}){
     const [currentTab, setCurrentTab] = useState(current);
     const router = useRouter();
     function handleClick(index) {
-        setCurrentTab(+index);
+        setCurrentTab(index);
         if (index === 2) {
-            router.navigate('/properties/home'); 
+            router.navigate('/rooms/home'); 
         }
     }
 

@@ -7,7 +7,7 @@ import axios from 'axios';
 
 const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
 
-export default function RoomImage({ setCount, roomData, setRoomData, newRoomName, setImageMode, setModal }) {
+export default function RoomImage({ count, setCount, roomData, setRoomData, newRoomName, setImageMode, setModal }) {
     const [img, setImage] = useState(images.home1);
     const [imgNo, setImgNo] = useState(-1);
 
@@ -20,21 +20,24 @@ export default function RoomImage({ setCount, roomData, setRoomData, newRoomName
     }
 
     function addNewRoom() {
+        console.log("adding new room...: ", newRoomName)
         if (!newRoomName) {
             alert("Please enter room name");
             return;
         }
         let newRoom = {
-            "title": "sdfad"
+            "title": newRoomName
         }
+        console.log("### New room: ", newRoom);
         const response = axios.post(`${base_url}/rooms`, newRoom, {
             headers: {
-                "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDMzOTI5NDAsInVzZXJJRCI6IjMifQ.H_wqrHu8W-Jebi9gVj8G5Dfm44JOjdC5AHvIeQ9yQTA"
+                "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDM0ODE5NDksInVzZXJJRCI6IjEifQ.7p08PVx626gl4dmeRDWa8KO9K_RDm8sN66AQQMvs4DQ"
             }
         })
+        console.log("### Response add new room: ", response);
         setModal(false);
         setImageMode(false);
-
+        setCount(count + 1);
     }
 
     return (

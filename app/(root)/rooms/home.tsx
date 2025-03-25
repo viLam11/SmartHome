@@ -30,14 +30,15 @@ export default function HomeIndex() {
     }
 
     useEffect(() => {  
+        console.log("fetching data");
         const fetchRoomData = async () => {
-            const response = axios.get(`${base_url}/rooms`, {
+            const response = await axios.get(`${base_url}/rooms`, {
                 headers: {
-                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDMzOTI5NDAsInVzZXJJRCI6IjMifQ.H_wqrHu8W-Jebi9gVj8G5Dfm44JOjdC5AHvIeQ9yQTA"
+                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDM0ODE5NDksInVzZXJJRCI6IjEifQ.7p08PVx626gl4dmeRDWa8KO9K_RDm8sN66AQQMvs4DQ"
                 }
             })
             if (!response) throw new Error("Failed to fetch image");
-                const data = await response;
+                const data =  response;
                 let rooms = data.data;
                 rooms.map((room) => {
                     room.img = imgArray[Math.floor(Math.random() * imgArray.length)];   
@@ -91,7 +92,7 @@ export default function HomeIndex() {
                             {roomData.map((room, index) => (
                                 <View>
                                     <TouchableOpacity key={index} onPress={() => { router.push(`/rooms/${room.id}`) }}>
-                                        <Room key={index} setRoomData={setRoomData} id={room.id} deleteMode={deleteMode} img={room.img} name={room.title} device={room.device} light={room.lightCount} light_on={room.light_on} fan={room.fanCount} fan_on={room.fan_on} sensor={room.sensorCount} sensor_on={room.sensor_on} />
+                                        <Room key={index} setRoomData={setRoomData} deleteMode={deleteMode} id={room.id} img={room.img} name={room.title} device={room.device} light={room.lightCount} light_on={room.light_on} fan={room.fanCount} fan_on={room.fan_on} sensor={room.sensorCount} sensor_on={room.sensor_on} />
                                     </TouchableOpacity>
                                 </View>
                             ))}
@@ -117,11 +118,11 @@ export default function HomeIndex() {
                         style={{ flex: 1, justifyContent: 'flex-end' }}
                     >
                         {imageMode ?
-                            <View className="bg-white h-4/6 w-full bottom-0 z-20 rounded-s-3xl">
-                                <RoomImage setCount={setCount} roomData={roomData} setRoomData={setRoomData}  setImageMode={setImageMode} newRoomName={newRoomName}  setModal={setModal} />
+                            <View className="bg-white h-1/2 w-full bottom-0 z-20 rounded-s-3xl">
+                                <RoomImage count={count} setCount={setCount} roomData={roomData} setRoomData={setRoomData}  setImageMode={setImageMode} newRoomName={newRoomName}  setModal={setModal} />
                             </View>
                             :
-                            <View className="bg-white h-2/5 w-full bottom-0 z-20 rounded-s-3xl">
+                            <View className="bg-white h-1/3 w-full bottom-0 z-20 rounded-s-3xl">
                                 <NewRoomModal setModal={setModal} newRoomName={newRoomName} setNewRoomName={setNewRoomName} setImageMode={setImageMode} />
                             </View>
                         }

@@ -8,7 +8,9 @@ import { Table, Row } from "react-native-table-component";
 import DeviceNav from '@/components/DeviceNav';
 import Navigation from '@/components/Navigation';
 import SpinningFan from '@/components/SpinningFan';
+import axios from 'axios';
 
+const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
 
 const renderCell = (data, index) => {
     if (index === 3) {
@@ -30,17 +32,65 @@ export default function Fan() {
     const { id } = useLocalSearchParams();
     const [color, setColor] = useState("white");
     const [speed, setSpeed] = useState(0);
-    const [status, setSatus] = useState(true);
-    const [statusAuto, setSatusAuto] = useState(true);  
+    const [status, setStatus] = useState(false);
+    const [statusAuto, setSatusAuto] = useState(false);  
+    const [fanData, setFanData] = useState(null);
 
     const tableHead = ["Start", "End", "Brightness", "Edit"];
     const tableData = [
         ["17:00", "16:00", "nhẹ", ".."],
         ["20:00", "21:00", "nhẹ", ".."]
     ];
-    function handleFanSpeed(speed) {
-        if (status) setSpeed(speed);
+
+    useEffect(() => {
+        const fetchCurrentStatus = async () => {
+            console.log("## Feed ID: ", id);
+            const response = await axios.get(`${base_url}/devices/${id}`);
+            setFanData(response.data)
+            const fanTemp = response.data;
+            if (fanTemp.value == 1) {
+                setSpeed(150);
+                setStatus(true);
+            } else if (fanTemp.value == 2) {
+                setSpeed(100);
+                setStatus(true);
+            } else if (fanTemp.value == 3) {
+                setSpeed(25);
+                setStatus(true);
+            }
+        }
+        fetchCurrentStatus();
+    }, [id]);
+
+    async function handleFanSpeed(level) {
+        if(!status) return;
+        
+        // if (status) setSpeed(speed);
+        try {
+            const respone = await axios.post(`${base_url}/devices/${id}`, { value: level.toString() }, {
+                headers: {
+                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDM0ODI5OTQsInVzZXJJRCI6IjEifQ.9Gt8rqLKmePlnbc2MpkCofnGSK_gmf0WqoXlNuv75EE"
+                }
+            });
+
+            if (level == 1) {
+                setSpeed(150);
+                setStatus(true);
+            } else if (level == 2) {
+                setSpeed(100);
+                setStatus(true);
+            } else if (level == 3) {
+                setSpeed(25);
+                setStatus(true);
+            } else if (level == 0) {
+                setSpeed(0);
+                setStatus(false);
+            }
+        } catch(e) {
+            console.log("Error: ", e);
+        }   
     }
+
 
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} className='min-h-screen flex flex-col m-2'>
@@ -60,13 +110,13 @@ export default function Fan() {
                 <View className='w-1/2'>
                     <SpinningFan speed={speed} />
                     <View className="flex flex-row items-center justify-center ">
-                        <TouchableOpacity onPress={() => handleFanSpeed(150)} className={`w-6 h-6 mx-1 rounded-full ${speed == 150 ? "bg-yellow" : "bg-gray-500"}  flex items-center justify-center`}>
+                        <TouchableOpacity onPress={() => handleFanSpeed(1)} className={`w-6 h-6 mx-1 rounded-full ${speed == 150 ? "bg-yellow" : "bg-gray-500"}  flex items-center justify-center`}>
                             <Text className="text-white">1</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => handleFanSpeed(100)} className={`w-6 h-6 mx-1 rounded-full ${speed == 100 ? "bg-yellow" : "bg-gray-500"}  flex items-center justify-center`}>
+                        <TouchableOpacity onPress={() => handleFanSpeed(2)} className={`w-6 h-6 mx-1 rounded-full ${speed == 100 ? "bg-yellow" : "bg-gray-500"}  flex items-center justify-center`}>
                             <Text className="text-white">2</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => handleFanSpeed(25)} className={`w-6 h-6 mx-1 rounded-full ${speed == 25 ? "bg-yellow" : "bg-gray-500"}  flex items-center justify-center`}>
+                        <TouchableOpacity onPress={() => handleFanSpeed(3)} className={`w-6 h-6 mx-1 rounded-full ${speed == 25 ? "bg-yellow" : "bg-gray-500"}  flex items-center justify-center`}>
                             <Text className="text-white">3</Text>
                         </TouchableOpacity>
                     </View>
@@ -74,7 +124,7 @@ export default function Fan() {
                 <View className='w-1/2 flex flex-col items-end px-4 '>
                     <View className=' flex flex-row'>
                         {status ? <Text className="px-2 w-20 font-semibold">Bật</Text> : <Text className="px-2 w-20 font-semibold">Tắt</Text>}
-                        <TouchableOpacity onPress={() => { if (status) { setSatus(!status); setSpeed(0) } else { setSatus(!status) } }}>
+                        <TouchableOpacity onPress={() => { if (status) { handleFanSpeed(0) } else { setStatus(true),handleFanSpeed(1) } }}>
                             <Image source={status ? images.auto_on : images.auto_off} />
                         </TouchableOpacity>
                     </View>
