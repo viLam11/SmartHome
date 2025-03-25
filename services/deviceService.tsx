@@ -10,7 +10,7 @@ const getAuthHeaders = async () => {
     const token = await getAuthToken();
     return {
         headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
             'Content-Type': 'application/json',
         },
     };

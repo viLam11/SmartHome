@@ -8,7 +8,10 @@ import Navigation from "@/components/Navigation";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import NewRoomModal from "@/components/NewRoomModal";
 import RoomImage from "@/components/RoomImage";
-import { rooms } from "@/constants/data";
+import { getAllRoomService } from "@/services/roomService";
+import { RoomObject } from "@/types/room";
+import images from "@/constants/images";
+
 
 export default function HomeIndex() {
     const router = useRouter();
@@ -17,15 +20,30 @@ export default function HomeIndex() {
     const [modal, setModal] = useState(false);
     const [imageMode, setImageMode] = useState(false);
     // Room data
-    const [roomData, setRoomData] = useState(rooms);
+    const [allRoomData, setAllRoomData] = useState<RoomObject[]>();
     const [deleteMode, setDeleteMode] = useState(false);
     const [newRoomName, setNewRoomName] = useState('');
-
+    const [count, setCount] = useState(0);
     function handleDeleteMode() {
+        setCount(count + 1);
         setDeleteMode(!deleteMode);
     }
 
+    useEffect(() => {
+        const fetchRoomData = async () => {
+            const response = await getAllRoomService();
+            if (!response) throw new Error("Failed to fetch image");
+                setAllRoomData(response);
+        }
+        fetchRoomData();
+    }, [count]);
+
+    const caculateDeviceNumber = (room: RoomObject) => {
+        return (room.fanCount ?? 0) + (room.lightCount ?? 0) + (room.sensorCount ?? 0) + (room.doorCount ?? 0);
+    }
+
     return (
+
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={{ flex: 1 }}
@@ -60,10 +78,10 @@ export default function HomeIndex() {
                                     }
                                 </View>
                             </View>
-                            {roomData.map((room, index) => (
+                            {allRoomData && allRoomData.map((room, index) => (
                                 <View>
                                     <TouchableOpacity key={index} onPress={() => { router.push(`/rooms/${room.id}`) }}>
-                                        <Room key={index} setRoomData={setRoomData} id={room.id} deleteMode={deleteMode} img={room.img} name={room.name} device={room.device} light={room.light} light_on={room.light_on} fan={room.fan} fan_on={room.fan_on} sensor={room.sensor} sensor_on={room.sensor_on} />
+                                        <Room key={index} setRoomData={setAllRoomData} deleteMode={deleteMode} id={room.id} img={images.home1} name={room.title} allDeviceCount={caculateDeviceNumber(room)} light={room.lightCount} lightStatus={room.lightStatus} fan={room.fanCount} fanStatus={room.fanStatus} sensor={room.sensorCount} sensorStatus={room.sensorStatus} />
                                     </TouchableOpacity>
                                 </View>
                             ))}
@@ -89,11 +107,11 @@ export default function HomeIndex() {
                         style={{ flex: 1, justifyContent: 'flex-end' }}
                     >
                         {imageMode ?
-                            <View className="bg-white h-4/6 w-full bottom-0 z-20 rounded-s-3xl">
-                                <RoomImage roomData={roomData} setRoomData={setRoomData}  setImageMode={setImageMode} newRoomName={newRoomName}  setModal={setModal} />
+                            <View className="bg-white h-1/2 w-full bottom-0 z-20 rounded-s-3xl">
+                                <RoomImage count={count} setCount={setCount} roomData={allRoomData} setRoomData={setAllRoomData}  setImageMode={setImageMode} newRoomName={newRoomName}  setModal={setModal} />
                             </View>
                             :
-                            <View className="bg-white h-2/5 w-full bottom-0 z-20 rounded-s-3xl">
+                            <View className="bg-white h-1/3 w-full bottom-0 z-20 rounded-s-3xl">
                                 <NewRoomModal setModal={setModal} newRoomName={newRoomName} setNewRoomName={setNewRoomName} setImageMode={setImageMode} />
                             </View>
                         }
@@ -101,7 +119,5 @@ export default function HomeIndex() {
                 </Modal>
             </View>
         </KeyboardAvoidingView>
-
-
     )
 }
