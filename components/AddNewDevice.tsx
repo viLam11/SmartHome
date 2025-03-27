@@ -1,28 +1,70 @@
 import { View, Text, TouchableOpacity, Image, KeyboardAvoidingView, Platform, TextInput } from 'react-native';
 import { useState, useEffect } from 'react';
 import { IconSymbol } from './ui/IconSymbol';
+import { DEVICE_FORMAT, deviceCreateObject } from '@/types/device';
+import { RoomObject } from '@/types/room';
 import images from '@/constants/images';
+import { addNewDeviceService } from '@/services/deviceService';
+ 
 
-// deviceType: 0 - Fan, 1 - Light, 2 - Sensor
-
-export default function AddNewDevice({ setModal, room }) {
+export default function AddNewDevice({ setModal, room }: { setModal: any, room: RoomObject | null }) {
     const [nameMode, setNameMode] = useState(false);
     const [finishMode, setFinishMode] = useState(false);
-    const [deviceType, setDeviceType] = useState(1);   
+    const [deviceType, setDeviceType] = useState('');
     const [deviceName, setDeviceName] = useState('');
-    if (nameMode) { 
-        return <SetNewName setNameMode={setNameMode} setFinishMode={setFinishMode} deviceType={deviceType} setModal={setModal} setDeviceName={setDeviceName} deviceName={deviceName} />
+    const [feedID, setFeedID] = useState(-1);
+    const [feedKey, setFeedKey] = useState('');
+    const [roomID, setRoomID] = useState(room?.id || -1);
+
+    const newNameProps = {
+        feedID,
+        feedKey,
+        deviceType,
+        deviceName,
+        setModal,
+        setFeedID,
+        setFeedKey,
+        setNameMode,
+        setFinishMode,
+        setDeviceName,
+    };
+
+    const newDevice: deviceCreateObject = {
+        feedId: feedID,
+        feedKey: feedKey,
+        type: deviceType,
+        title: deviceName,
+        roomID: roomID
+    };
+    console.log(feedID, newDevice);
+    const addDevice = async (newDevice: deviceCreateObject) => {
+        try {
+            await addNewDeviceService(newDevice as deviceCreateObject);
+            setModal(false);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    
+    if (nameMode) {
+        return <SetNewName {...newNameProps}/>
     } else if (finishMode) {
-        return <FinishModal setModal={setModal} deviceName={deviceName} deviceType={deviceType} />
-    } 
+        const addNewDevice = async () => {
+            await addDevice(newDevice);
+        }
+        addNewDevice();
+        return <FinishModal setModal={setModal} newDevice={newDevice}/>
+    }
 
     function hanldeContinueName() {
-        if (deviceType == -1) {
+        if (deviceType == '') {
             alert('Chọn thiết bị');
             return;
         }
         setNameMode(true);
     }
+
+
 
     return (
         <View>
@@ -37,166 +79,119 @@ export default function AddNewDevice({ setModal, room }) {
                     </TouchableOpacity>
                 </View>
             </View>
-            <View className="mt-4">
-                <View className="flex flex-row w-full justify-between mx-auto">
-                    <View className="bg-gray-200 w-5/12 h-24 p-2 rounded-lg mx-auto">
-                        <View className='flex flex-row justify-between'>
-                            <View className="p-2 bg-white rounded-full">
-                                <Image source={images.fan} style={{ width: 20, height: 20, tintColor: "black" }} />
-                            </View>
-                            <View className="">
-                                <TouchableOpacity onPress={() => setDeviceType(0)}>
-                                   {deviceType == 0 ? 
-                                    <View className=" border-green-400 border-2 rounded-full w-8 h-8">
-                                        <View className="bg-green-400 rounded-full w-4 h-4 m-auto"></View>
-                                    </View>
-                                    :
-                                   <View className=" border-black border-2 rounded-full w-8 h-8"></View>
-                                   }  
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                        <View className='mt-auto'>
-                            <Text className='text-lg font-bold'>Quạt</Text>
-                        </View>
-                    </View>
-                    <View className="bg-gray-200 w-5/12 mx-auto h-24 p-2 rounded-lg">
-                        <View className='flex flex-row justify-between'>
-                            <View className="p-2 bg-white rounded-full">
-                                <Image source={images.lightbulb} style={{ width: 20, height: 20, tintColor: "black" }} />
-                            </View>
-                            <View className="">
-                            <TouchableOpacity onPress={() => setDeviceType(1)}>
-                                   {deviceType == 1 ? 
-                                    <View className=" border-green-400 border-2 rounded-full w-8 h-8">
-                                        <View className="bg-green-400 rounded-full w-4 h-4 m-auto"></View>
-                                    </View>
-                                    :
-                                   <View className=" border-black border-2 rounded-full w-8 h-8"></View>
-                                   }  
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                        <View className='mt-auto'>
-                            <Text className='text-lg font-bold'>Đèn</Text>
-                        </View>
-                    </View>
-                </View>
-                <View className="flex flex-row w-full justify-between mx-auto mt-2">
-                    <View className="bg-gray-200 w-5/12 h-24 p-2 rounded-lg mx-auto">
-                        <View className='flex flex-row justify-between'>
-                            <View className="p-2 bg-white rounded-full">
-                                <Image source={images.aircondition} style={{ width: 20, height: 20, tintColor: "black" }} />
-                            </View>
-                            <View className="">
-                                <TouchableOpacity onPress={() => setDeviceType(2)}>
-                                   {deviceType == 2 ? 
-                                    <View className=" border-green-400 border-2 rounded-full w-8 h-8">
-                                        <View className="bg-green-400 rounded-full w-4 h-4 m-auto"></View>
-                                    </View>
-                                    :
-                                   <View className=" border-black border-2 rounded-full w-8 h-8"></View>
-                                   }  
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                        <View className='mt-auto'>
-                            <Text className='text-lg font-bold'>Cảm biến</Text>
-                        </View>
-                    </View>
-                        <View className="bg-white w-5/12 mx-auto p-2 rounded-lg">
-                    </View>
-                </View>
-                
-            </View>
 
-        {/* Button */}
-            <View className='w-11/12 mx-auto mt-2'>
-                <TouchableOpacity onPress={() => hanldeContinueName() }>
-                    <View className="bg-green-300 p-2 rounded-lg">
+            <DeviceSelection deviceType={deviceType} setDeviceType={setDeviceType} />
+
+            <View className='w-11/12 mx-auto mt-2 h-full'>
+                <View className='h-20'></View>
+                <TouchableOpacity onPress={() => hanldeContinueName()}>
+                    <View className="bg-green-300 p-2 rounded-lg ">
                         <Text className="text-center font-bold">Tiếp tục</Text>
                     </View>
                 </TouchableOpacity>
             </View>
- 
+
         </View>
-    )
+    );
 }
 
-const SetNewName = ({setFinishMode, setNameMode, setModal, setDeviceName, deviceName, deviceType}) => {  
-    const [textType, setTextType] = useState('');
-    useEffect(() => {
-        if (deviceType == 0) {
-            setTextType('Quạt');
-        }
-        else if (deviceType == 1) {
-            setTextType('Đèn');
-        } else if (deviceType == 2) {
-            setTextType('Cảm biến');
-        }
-    }, [deviceType])
+const DeviceSelection = ({ deviceType, setDeviceType }: { deviceType: string | null, setDeviceType: any }) => (
+    <View className="mt-4 flex flex-row flex-wrap justify-start">
+        {Object.entries(DEVICE_FORMAT).map(([key, device], index) => (
+            <View className='w-2/5 bg-gray-200 h-24 p-2 rounded-lg mx-auto mb-2'>
+                <TouchableOpacity onPress={() => setDeviceType(device.type)} >
+                    <View className='flex flex-row justify-between'>
+                        <View className="p-2 bg-white rounded-full">
+                            <Image source={device.img} style={{ width: 20, height: 20, tintColor: "black" }} />
+                        </View>
+                        <View className="">
+                            <View className={`border-2 rounded-full w-8 h-8 ${deviceType === device.type ? 'border-green-400' : 'border-black'}`}>
+                                {deviceType === device.type && <View className="bg-green-400 rounded-full w-4 h-4 m-auto"></View>}
+                            </View>
+                        </View>
+                    </View>
+                    <Text className='text-lg font-bold mt-auto'>{device.displayTittle}</Text>
+                </TouchableOpacity>
 
+            </View>
+        ))}
+    </View>
+);
+
+const SetNewName = ({ feedID, feedKey, deviceType, deviceName, setModal, setFeedID, setFeedKey, setNameMode, setFinishMode, setDeviceName }: any) => {
+    const device = Object.values(DEVICE_FORMAT).find(d => d.type === deviceType);
     return (
-           <KeyboardAvoidingView
-                    behavior={Platform.OS === "ios" ? "padding" : "height"}
-                    style={{ flex: 1 }}
-                >
-                    <View className='w-full h-full'>
-                        <View className="flex items-end m-4 ">
-                            <TouchableOpacity onPress={() => setModal(false)} className='bg-black rounded-full'>
-                                <IconSymbol name="close" color="white" />
+        <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{ flex: 1 }}
+        >
+            <View className='w-full h-full'>
+                <View className="flex items-end m-4 ">
+                    <TouchableOpacity onPress={() => setModal(false)} className='bg-black rounded-full'>
+                        <IconSymbol name="close" color="white" />
+                    </TouchableOpacity>
+                </View>
+
+                <View className='w-11/12 mx-auto flex-col flex-grow'>
+                    <View className='flex-grow'>
+                        <Text className='font-bold text-2xl mb-2'>Đặt tên {device?.displayTittle}</Text>
+                        <TextInput
+                            className="border border-gray-300 p-3 min-w-80 w-full rounded-md mx-auto"
+                            placeholder="Nhập tên thiết bị..."
+                            keyboardType="visible-password"
+                            value={deviceName}
+                            onChangeText={(text) => setDeviceName(text)}
+                        />
+                    </View>
+                    <View className='flex w-full flex-row h-24 mb-2 justify-between mt-2'>
+                        <View className="w-1/3  flex flex-col">
+                            <Text className="text-md font-bold">FeedID</Text>
+                            <TextInput
+                                className="border border-gray-300 w-full p-2 h-1/2 rounded-md mx-auto"
+                                placeholder=""
+                                keyboardType="visible-password"
+                                value={String(feedID)}
+                                onChangeText={(text) => setFeedID(Number(text))}
+                            />
+                        </View>
+                        <View className="w-1/3 flex flex-col">
+                            <Text className="text-md font-bold">FeedKey</Text>
+                            <TextInput
+                                className="border border-gray-300 w-full p- h-1/2 rounded-md mx-auto"
+                                placeholder=""
+                                keyboardType="visible-password"
+                                value={feedKey}
+                                onChangeText={(text) => setFeedKey(text)}
+                            />
+                        </View>
+                    </View>
+
+
+
+                    <View className="h-32">
+                        <View className="bg-green-300 bottom-4 rounded-md mt-4 p-2 w-full mx-auto">
+                            <TouchableOpacity onPress={(() => { setNameMode(false); setFinishMode(true); })}>
+                                <Text className="text-black text-center font-bold">Tiếp tục</Text>
                             </TouchableOpacity>
                         </View>
-        
-                        <View className='w-11/12 mx-auto flex-col flex-grow'>
-                            <View className='flex-grow'>
-                                <Text className='font-bold text-2xl mb-2'>Đặt tên {textType}</Text>
-                                <TextInput
-                                    className="border border-gray-300 p-3 min-w-80 w-full rounded-md mx-auto"
-                                    placeholder="Nhập tên thiết bị..."
-                                    keyboardType="visible-password"
-                                    value={deviceName}
-                                    onChangeText={(text) => setDeviceName(text)}
-                                />
-                            </View>
-                            <View className="h-32">
-                                <View className="bg-green-300 bottom-4 rounded-md mt-4 p-2 w-full mx-auto">
-                                    <TouchableOpacity onPress={(() => { setNameMode(false); setFinishMode(true); })}>
-                                        <Text className="text-black text-center font-bold">Tiếp tục</Text>
-                                    </TouchableOpacity>
-                                </View>
-                                <View className="bg-gray-300 bottom-4 rounded-md mt-4 p-2 w-full mx-auto">
-                                    <TouchableOpacity onPress={(() => { setNameMode(false)})}>
-                                        <Text className="text-black text-center font-bold">Quay lại</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
+                        <View className="bg-gray-300 bottom-4 rounded-md mt-4 p-2 w-full mx-auto">
+                            <TouchableOpacity onPress={(() => { setNameMode(false) })}>
+                                <Text className="text-black text-center font-bold">Quay lại</Text>
+                            </TouchableOpacity>
                         </View>
-        
                     </View>
-                </KeyboardAvoidingView>
-    )
+                </View>
+
+            </View>
+        </KeyboardAvoidingView>
+    );
 }
 
-const FinishModal = ({setModal, deviceName, deviceType}) => {
-    const [textType, setTextType] = useState('');
-    useEffect(() => {
-        if (deviceType == 0) {
-            setTextType('Quạt');
-        }
-        else if (deviceType == 1) {
-            setTextType('Đèn');
-        } else if (deviceType == 2) {
-            setTextType('Cảm biến');
-        }
-    }, [deviceType])
-
-    function hanldeAddNewDevice() {
-        setModal(false);
-    }   
+const FinishModal = ({ setModal, newDevice }: { setModal: any, newDevice: deviceCreateObject }) => {
+    const device = Object.values(DEVICE_FORMAT).find(d => d.type === newDevice.type);
     return (
         <View className='min-h-screen h-full w-full'>
-            <View className='h-1/3  mb-10'>
+            <View className='h-1/3 mb-10'>
                 <View className="flex items-end m-4 ">
                     <TouchableOpacity onPress={() => setModal(false)} className='bg-black rounded-full'>
                         <IconSymbol name="close" color="white" />
@@ -205,20 +200,13 @@ const FinishModal = ({setModal, deviceName, deviceType}) => {
                 <View className="flex items-center justify-center">
                     <Image source={images.done} style={{ width: 100, height: 100 }} />
                 </View>
-                <View>
-                    <Text className='text-center text-2xl font-bold mt-6'>   
-                        {textType} {deviceName} đã được thêm vào
-                    </Text>
-                </View>
-    
+                <Text className='text-center text-2xl font-bold mt-6'>
+                    {device?.name} {newDevice.title} đã được thêm vào
+                </Text>
             </View>
-           
-            <View className="w-11/12 mx-auto h-30 bottom-0 h-12 bg-green-300 p-2 rounded-lg">
-                <TouchableOpacity onPress={() => hanldeAddNewDevice()}>
-                    <Text className='text-center text-xl font-bold m-auto'>Xong</Text>
-                </TouchableOpacity>
-                
-            </View>
+            <TouchableOpacity onPress={() => setModal(false)} className="w-11/12 mx-auto h-12 bg-green-300 p-2 rounded-lg">
+                <Text className='text-center text-xl font-bold m-auto'>Xong</Text>
+            </TouchableOpacity>
         </View>
-    )
+    );
 }

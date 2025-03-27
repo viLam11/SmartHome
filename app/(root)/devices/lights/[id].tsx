@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Image, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import images from '@/constants/images';
 import { useState, useEffect } from 'react';
 import { Table, Row } from "react-native-table-component";
 import DeviceNav from '@/components/DeviceNav';
 import Navigation from '@/components/Navigation';
+import { getDeviceData, controlDevice } from '@/services/deviceService';
+import { deviceStatusObject } from '@/types/device';
 
 
 const renderCell = (data, index) => {
@@ -23,14 +25,31 @@ const renderCell = (data, index) => {
 
 export default function Light() {
     const router = useRouter();
-    const { id } = useLocalSearchParams();
+    const { feedId } = useLocalSearchParams();
     const [color, setColor] = useState("white");
+    const [lightEnable, setLightEnable] = useState(false);
     const [statusAuto, setSatusAuto] = useState(true);
     const tableHead = ["Start", "End", "Brightness", "Edit"];
     const tableData = [
         ["17:00", "16:00", "nhẹ", ".."],
         ["20:00", "21:00", "nhẹ", ".."]
     ];
+    const [deviceData, setDeviceData] = useState<deviceStatusObject | null>(null);
+    
+    const controlLight = async () => {
+        try {
+            await controlDevice(feedId as string, "None", true);
+            setLightEnable(!lightEnable);
+        } catch (error) {
+            console.error("Error fetching device data:", error);
+        }
+    };
+    useEffect(() => {
+        (async () => {
+            const response = await getDeviceData(feedId as string);
+            setDeviceData(response);
+        })();
+    }, []);
 
     return (
         <View className='flex-1'>
@@ -41,24 +60,30 @@ export default function Light() {
                             <IconSymbol name="back" />
                         </TouchableOpacity>
                     </View>
-                    <Text className='text-xl font-bold'>Đèn {+id + 1}</Text>
+                    <Text className='text-xl font-bold'>{deviceData?.name}</Text>
                     <View>
                     </View>
                 </View>
 
-                <DeviceNav current={1} id={+id} type={"light"} />
+                <DeviceNav current={1} feedId={+feedId} type={"light"} />
 
 
                 <View className='flex flex-row mt-4'>
                     <View className='w-1/2 '>
-                        <View className='w-full flex items-center'>
+                        <View className='w-full h-72 flex items-center'>
                             <Image source={images.lamp} style={{ width: "70%", height: 200 }} />
-                            <Image source={images.light} style={{ width: "50%", height: 100, tintColor: `${color}` }}></Image>
+                            { lightEnable ? 
+                                <Image source={images.light} style={{ width: "50%", height: 100, tintColor: `${color}` }}></Image> : null}
                         </View>
 
                     </View>
                     <View className='w-1/2 flex flex-col items-end justify-center'>
-                        <Image source={images.power} ></Image>
+                        <View>
+                            <TouchableOpacity onPress={() => controlLight()}>
+                                <Image source={images.power} ></Image>
+                            </TouchableOpacity>
+                        </View>
+
                         <View >
                             <View className='mt-4 flex flex-row justify-center items-center'>
                                 <TouchableOpacity onPress={() => setColor("blue")}>

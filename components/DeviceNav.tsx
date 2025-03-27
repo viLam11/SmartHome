@@ -3,39 +3,48 @@ import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { IconSymbol } from './ui/IconSymbol';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 
-export default function DeviceNav({ current = 1, id = 1, type }) {
+type DeviceType = "light" | "fan" | "sensor";
+
+interface DeviceNavProps {
+    status?: number;
+    feedId?: number;
+    type: DeviceType;
+}
+
+export default function DeviceNav({ status = 1, feedId = 1, type }: DeviceNavProps) {
     const router = useRouter();
-    function hanldeNav(index) {
-        if (index == current) return;
+    function hanldeNav(index: number) {
+        if (index == status) return;
         switch (index) {
             case 1:
-                if (type == "light") router.replace(`/lights/${id}`);
-                if (type == "fan") router.replace(`/fans/${id}`);
+                if (type == "light") router.replace(`/devices/lights/${feedId}`);
+                if (type == "fan") router.replace(`/devices/fans/${feedId}`);
+                if (type == "sensor") router.replace(`/devices/sensors/${feedId}`);
                 break;
             case 2:
-                router.replace(`/hist/${id}`);
+                router.replace(`/hist/${feedId}`);
                 break;
             case 3:
-                router.replace(`/stats/${id}`);
+                router.replace(`/devices/stats/${feedId}`);
                 break;
         }
     }
     return (
         <View>
             <View className='flex flex-row  justify-between mt-2 mx-6'>
-                <View className={`w-1/ p-1 rounded-lg ${current == 1? 'bg-enable' : 'bg-disale'}`}>
+                <View className={`w-1/ p-1 rounded-lg ${status == 1? 'bg-enable' : 'bg-disale'}`}>
                     <TouchableOpacity onPress={() => hanldeNav(1)}>
-                        <Text className={`text-center font-semibold ${current == 1 ? 'color-black' : 'color-slate-600'}`}>Cài đặt</Text>
+                        <Text className={`text-center font-semibold ${status == 1 ? 'color-black' : 'color-slate-600'}`}>Cài đặt</Text>
                     </TouchableOpacity>
                 </View>
-                <View className={`w-1/ p-1 rounded-lg ${current == 2 ? 'bg-enable' : 'bg-disale'}`}>
+                <View className={`w-1/ p-1 rounded-lg ${status == 2 ? 'bg-enable' : 'bg-disale'}`}>
                     <TouchableOpacity onPress={() => {hanldeNav(2)}} >
-                        <Text className={`text-center font-semibold ${current == 2 ? 'color-black' : 'color-slate-600'}`}>Lịch sử</Text>
+                        <Text className={`text-center font-semibold ${status == 2 ? 'color-black' : 'color-slate-600'}`}>Lịch sử</Text>
                     </TouchableOpacity>
                 </View>
-                <View className={`w-1/ p-1 rounded-lg ${current == 3 ? 'bg-enable' : 'bg-disale'}`}>
+                <View className={`w-1/ p-1 rounded-lg ${status == 3 ? 'bg-enable' : 'bg-disale'}`}>
                     <TouchableOpacity onPress={() => {hanldeNav(3)}} >
-                        <Text className={`text-center font-semibold ${current == 3 ? 'color-black' : 'color-slate-600'}`}>Thống kê</Text> 
+                        <Text className={`text-center font-semibold ${status == 3 ? 'color-black' : 'color-slate-600'}`}>Thống kê</Text> 
                     </TouchableOpacity>
                 </View>
             </View>
