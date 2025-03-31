@@ -50,7 +50,7 @@ export default function Light() {
         try {
             const response = await axios.post(`${base_url}/devices/${id}`, { value: value }, {
                 headers: {
-                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDM0ODI5OTQsInVzZXJJRCI6IjEifQ.9Gt8rqLKmePlnbc2MpkCofnGSK_gmf0WqoXlNuv75EE"
+                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDQwNDM5MjUsInVzZXJJRCI6IjEifQ.KBPm3b4JE7082jm7bm3gZBrFfrAyccvZSmTlAnDaJJ8"
                 }
             })
             if (value === "#000000") {
@@ -70,7 +70,7 @@ export default function Light() {
         try {
             const response = await axios.post(`${base_url}/devices/${id}`, { value: value }, {
                 headers: {
-                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDM0ODE5NDksInVzZXJJRCI6IjEifQ.7p08PVx626gl4dmeRDWa8KO9K_RDm8sN66AQQMvs4DQ"
+                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDQwNDM5MjUsInVzZXJJRCI6IjEifQ.KBPm3b4JE7082jm7bm3gZBrFfrAyccvZSmTlAnDaJJ8"
                 }
             })
             console.log(response)

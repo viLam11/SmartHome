@@ -1,25 +1,18 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, Image, ImageBackground, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import React from 'react';
+import { Modal, StyleSheet, View, Text, Image, ImageBackground, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native-gesture-handler';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import images from '@/constants/images';
 import Navigation from '@/components/Navigation';
-import AddNewDevice from '@/components/AddNewDevice';
-import { deviceListObject, DEVICE_FORMAT } from '@/types/device';
-import { RoomObject } from '@/types/room';
-import { getRoomDevices } from '@/services/deviceService';
-import { getAllRoomService } from '@/services/roomService';
 import { rooms } from '@/constants/data';
 import AddNewDevice from '@/components/AddNewDevice';
 import axios from 'axios';
 
 
-export default function Property() {
+export default function Room() {
     const router = useRouter();
-    const [room, setRoom] = useState<RoomObject | null>(null);
-    const [deviceList, setDeviceList] = useState<deviceListObject | null>(null);
-    const [deviceCount, setDeviceCount] = useState(0);
     const roomName = useState(["Phòng Khách", "Phòng Ngủ", "Phòng Bếp"]);
     const [waring, setWaring] = useState(false);
     const [room, setRoom] = useState(null);
@@ -30,55 +23,30 @@ export default function Property() {
     const { id } = useLocalSearchParams();
     const [editMode, setEditMode] = useState(false);
     const [modal, setModal] = useState(false);
-
-    const roomId = useLocalSearchParams().id;
-    const [modal, setModal] = useState(false);
     const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
 
     useEffect(() => {
-        if (!roomId) return;    
-        (async () => {
-            const response = await getRoomDevices(roomId as string);
-            setDeviceList(response);
-            const roomList = await getAllRoomService();
-            const room = roomList.find((room: RoomObject) => room.id === Number(roomId));
-            if (room) {
-                setRoom(room);
-                setDeviceCount((room.fanCount ?? 0) + (room.lightCount ?? 0) + (room.sensorCount ?? 0) + (room.doorCount ?? 0));
-            } else {
-                console.warn(`Room with ID ${roomId} not found`);
-            }
-
-        })();
-    }, [roomId]); 
-    
-    // useEffect(() => {
-    //     if (!deviceList) return;
-    //     (async () => {
-            
-    //     })();
-    // }, [deviceList]);
         console.log("### ROOM ID: ", id);
         const fetchDeviceInRoom = async () => {
             const response = await axios.get(`${base_url}/devices/room/${id}`, {
                 headers: {
-                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDM0ODI5OTQsInVzZXJJRCI6IjEifQ.9Gt8rqLKmePlnbc2MpkCofnGSK_gmf0WqoXlNuv75EE"
+                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDMzOTI5NDAsInVzZXJJRCI6IjMifQ.H_wqrHu8W-Jebi9gVj8G5Dfm44JOjdC5AHvIeQ9yQTA"
                 }
             })
             if (response.status != 200) {
                 console.log("### ERROR: ", response.data);  
             }
-            // console.log("### DATA: ", response.data);
+            console.log("### DATA: ", response.data);
             setFanList(response.data.fanList);
             setLightList(response.data.lightList);
             setSensorList(response.data.sensorList);
             setDoorList(response.data.doorList);
-            // console.log("## Fan list: ", fanList);
+            console.log("## Fan list: ", fanList);
         }
         const fetchRoomData = async () => {
             const response = await axios.get(`${base_url}/rooms`, {
                 headers: {
-                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDM0ODI5OTQsInVzZXJJRCI6IjEifQ.9Gt8rqLKmePlnbc2MpkCofnGSK_gmf0WqoXlNuv75EE"
+                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDM0MTcxMTIsInVzZXJJRCI6IjIifQ.IpG5AFBVe0BQ9LO3h9W2ZhkxgjmMg7iDIwzQdHZwLm4"
                 }
             })
             let room = response.data.find((room) => room.id == id);
@@ -86,47 +54,19 @@ export default function Property() {
             setRoom(room);
         }
         fetchDeviceInRoom();        
-        fetchRoomData();
+        // fetchRoomData();
         const interval = setInterval(fetchDeviceInRoom, 5000);
         return () => clearInterval(interval);
         
     }, [modal, editMode]);
 
+    
+
     return (
         <View className="min-h-screen">
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="mt-1 mx-2 min-h-screen">
-                {modal || editMode ? <View className="absolute top-0 left-0 z-10 w-full h-full bg-black/50" /> : null}
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }} className='mt-1 mx-2 min-h-screen'>
+            {modal || editMode ? <View className="absolute top-0 left-0 z-10 w-full h-full bg-black/50" /> : <></>}
 
-                <View className='flex flex-row justify-between'>
-                    <View className="mx -2">
-                        <TouchableOpacity onPress={() => { router.push(`/rooms/home`) }}>
-                            <IconSymbol name="back" />
-                        </TouchableOpacity>
-                    </View>
-                    <View>
-                        <Text className="text-2xl font-bold">{room ? room.title : ""}</Text>
-                    </View>
-                    <View className="flex flex-row space-x-2">
-                        {editMode ?
-                            <View>
-                                <TouchableOpacity className="bg-black rounded-full p-1" onPress={() => { }}>
-                                    <IconSymbol name="save" size={18} color="white" />
-                                </TouchableOpacity>
-                            </View>
-                            :
-                            <> <View className="mr-2">
-                                <TouchableOpacity className="bg-black rounded-full" onPress={() => {setModal(!modal)}}>
-                                    <IconSymbol name="add" color="white" />
-                                </TouchableOpacity>
-                            </View>
-                                <View>
-                                    <TouchableOpacity className="bg-black rounded-full p-1" onPress={() => {setEditMode(!editMode) }}>
-                                        <IconSymbol name="edit" size={18} color="white" />
-                                    </TouchableOpacity>
-                                </View>
-                            </>
-                        }
-                    </View>
                 <View className='flex flex-row justify-between'>
                     <View className="mx -2">
                         <TouchableOpacity onPress={() => { router.push(`/rooms/home`) }}>
@@ -158,12 +98,13 @@ export default function Property() {
                         }
                     </View>
                 </View>
-
                 <View className="my-4 overflow-hidden rounded-lg">
-                    <ImageBackground source={images.home1} style={{ width: "100%", height: 120 }} resizeMode="cover">
+                    <ImageBackground
+                        source={images.home1}
+                        style={{ width: "100%", height: 120, borderRadius: 12 }}
+                        resizeMode="cover"
+                    >
                         <View className="p-3">
-                            <Text className="text-2xl font-bold text-white">{room ? room.title : ""}</Text>
-                            <Text className="text-white">{room ? deviceCount : '0'} thiết bị</Text>
                             <Text className="text-2xl font-bold text-white">{room ? room.title : ""}</Text>
                             <Text className="text-white">{room ? room.device : '0'} thiết bị</Text>
                         </View>
@@ -187,7 +128,7 @@ export default function Property() {
                                 {fanList.length > 0 && fanList.map((fan, index) => (
                                     <View key={index} className={`mt-2 ${fan.value == 0 ? "bg-disable": "bg-enable" } p-2 rounded-xl `}>
                                         <TouchableOpacity onPress={() => { router.push(`/devices/fans/${fan.feedId}`) }}>
-                                            <Text className='font-semibold'>Quạt {fan.title}</Text>
+                                            <Text className='font-semibold'>Quạt trần {fan.title}</Text>
                                         </TouchableOpacity>
 
                                     </View>
@@ -213,7 +154,7 @@ export default function Property() {
                                 {lightList.length > 0 && lightList.map((light, index) => (
                                     <View key={index} className={`mt-2 ${light.value == "#000000" ? "bg-disable": "bg-enable" } p-2 rounded-xl `}>
                                         <TouchableOpacity onPress={() => { router.push(`/devices/lights/${light.feedId}`) }}>
-                                            <Text className='font-semibold'>Đèn {light.title}</Text>
+                                            <Text className='font-semibold'>Đèn trần {index + 1}</Text>
                                         </TouchableOpacity>
                                     </View>
                                 ))}
@@ -239,12 +180,10 @@ export default function Property() {
                             </View>
 
                             <View className='mt-2'>
-                                {sensorList.length > 0 && sensorList.map((sensor, index) => (
-                                      <View key={index} className={`mt-2 ${sensor.value == 0 ? "bg-disable": "bg-enable" } p-2 rounded-xl `}>
-                                      <TouchableOpacity onPress={() => { router.push(`/devices/sensors/${id}`) }}>
-                                          <Text className='font-semibold'>Đèn trần {index + 1}</Text>
-                                      </TouchableOpacity>
-                                  </View>
+                                {sensorList.length > 0 && sensorList.map((_, index) => (
+                                    <View key={index} className="w-2/3 mt-2 bg-enable p-2 rounded-xl">
+                                        <Text className='font-semibold'>Cảm biến {index + 1}</Text>
+                                    </View>
                                 ))}
                             </View>
 
@@ -257,9 +196,6 @@ export default function Property() {
                 </View>
             </ScrollView>
 
-            <View className="absolute bottom-2 w-full">
-                <Navigation current={2} />
-            </View>
 
             <Modal
                 animationType="slide"
@@ -274,13 +210,6 @@ export default function Property() {
                     behavior={Platform.OS === "ios" ? "padding" : "height"}
                     style={{ flex: 1, justifyContent: 'flex-end' }}
                 >
-                    {editMode ? (
-                        <View className="bg-white h-2/4 w-full bottom-0 z-20 rounded-s-3xl">
-                            <View>
-                                <TouchableOpacity onPress={() => setModal(false)}>
-                                    <Text>Close</Text>
-                                </TouchableOpacity>
-                            </View>
                     {editMode ?
                         <View className="bg-white h-2/4 w-full bottom-0 z-20 rounded-s-3xl">
                             <View>
@@ -289,12 +218,9 @@ export default function Property() {
                                 </TouchableOpacity>
                             </View>
                         </View>
-                    ) : (
-                         <View className="bg-white h-1/2 w-full bottom-0 z-20 rounded-s-3xl">
-                            <AddNewDevice setModal={setModal} room={room} />
-                    : 
+                        :
                         <View className="bg-white h-1/2 w-full bottom-0 z-20 rounded-s-3xl">
-                            <AddNewDevice setModal={setModal} room={roomData} />
+                            <AddNewDevice setModal={setModal} room={room} />
                         </View>
                     }
                 </KeyboardAvoidingView>
@@ -303,3 +229,6 @@ export default function Property() {
 
     );
 }
+
+const styles = StyleSheet.create({})
+

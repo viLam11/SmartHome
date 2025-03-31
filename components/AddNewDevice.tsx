@@ -1,8 +1,6 @@
 import { View, Text, TouchableOpacity, Image, KeyboardAvoidingView, Platform, TextInput } from 'react-native';
 import { useState, useEffect } from 'react';
 import { IconSymbol } from './ui/IconSymbol';
-import { DEVICE_FORMAT, deviceCreateObject } from '@/types/device';
-import { RoomObject } from '@/types/room';
 import images from '@/constants/images';
 import axios from 'axios';
 
@@ -12,61 +10,24 @@ const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
 export default function AddNewDevice({ setModal, room }) {
     const [nameMode, setNameMode] = useState(false);
     const [finishMode, setFinishMode] = useState(false);
-    const [deviceType, setDeviceType] = useState(-1);
+    const [deviceType, setDeviceType] = useState(1);
     const [deviceName, setDeviceName] = useState('');
-    const [feedID, setFeedID] = useState(-1);
+    const [feedID, setFeedID] = useState('');
     const [feedKey, setFeedKey] = useState('');
-    const [roomID, setRoomID] = useState(room?.id || -1);
-
-    const newNameProps = {
-        feedID,
-        feedKey,
-        deviceType,
-        deviceName,
-        setModal,
-        setFeedID,
-        setFeedKey,
-        setNameMode,
-        setFinishMode,
-        setDeviceName,
-    };
-
-    const newDevice: deviceCreateObject = {
-        feedId: feedID,
-        feedKey: feedKey,
-        type: deviceType,
-        title: deviceName,
-        roomID: roomID
-    };
-    console.log(feedID, newDevice);
-    const addDevice = async (newDevice: deviceCreateObject) => {
-        try {
-            await addNewDeviceService(newDevice as deviceCreateObject);
-            setModal(false);
-        } catch (error) {
-            console.log(error);
-        }
-    }
-    
+    const [roomID, setRoomID] = useState(room.id);
     if (nameMode) {
-        return <SetNewName {...newNameProps}/>
+        return <SetNewName feedID={feedID} setFeedID={setFeedID} feedKey={feedKey} setFeedKey={setFeedKey} setNameMode={setNameMode} setFinishMode={setFinishMode} deviceType={deviceType} setModal={setModal} setDeviceName={setDeviceName} deviceName={deviceName} />
     } else if (finishMode) {
-        const addNewDevice = async () => {
-            await addDevice(newDevice);
-        }
-        addNewDevice();
-        return <FinishModal setModal={setModal} newDevice={newDevice}/>
+        return <FinishModal setFinishMode={setFinishMode} setModal={setModal} deviceName={deviceName} deviceType={deviceType} feedID={feedID} feedKey={feedKey} roomID={roomID} />
     }
 
     function hanldeContinueName() {
-        if (deviceType == '') {
+        if (deviceType == -1) {
             alert('Chọn thiết bị');
             return;
         }
         setNameMode(true);
     }
-
-
 
     return (
         <View>
@@ -121,6 +82,9 @@ export default function AddNewDevice({ setModal, room }) {
                                 </TouchableOpacity>
                             </View>
                         </View>
+                        <View className='mt-auto'>
+                            <Text className='text-lg font-bold'>Đèn</Text>
+                        </View>
                     </View>
                 </View>
                 <View className="flex flex-row w-full justify-between mx-auto mt-2">
@@ -152,14 +116,12 @@ export default function AddNewDevice({ setModal, room }) {
             </View>
 
             {/* Button */}
-            <View className='w-11/12 mx-auto mt-2 h-full'>
-                <View className='h-20'></View>
+            <View className='w-11/12 mx-auto mt-2'>
                 <TouchableOpacity onPress={() => hanldeContinueName()}>
-                    <View className="bg-green-300 p-2 rounded-lg ">
+                    <View className="bg-green-300 p-2 rounded-lg">
                         <Text className="text-center font-bold">Tiếp tục</Text>
                     </View>
                 </TouchableOpacity>
-
             </View>
 
         </View>
@@ -180,10 +142,6 @@ const SetNewName = ({ feedKey, setFeedKey, feedID, setFeedID, setFinishMode, set
     }, [deviceType])
 
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{ flex: 1 }}
-        >
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={{ flex: 1 }}
@@ -242,19 +200,8 @@ const SetNewName = ({ feedKey, setFeedKey, feedID, setFeedID, setFinishMode, set
                                 <Text className="text-black text-center font-bold">Quay lại</Text>
                             </TouchableOpacity>
                         </View>
-                        <View className="bg-green-300 bottom-4 rounded-md mt-4 p-2 w-full mx-auto">
-                            <TouchableOpacity onPress={(() => { setNameMode(false); setFinishMode(true); })}>
-                                <Text className="text-black text-center font-bold">Tiếp tục</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <View className="bg-gray-300 bottom-4 rounded-md mt-4 p-2 w-full mx-auto">
-                            <TouchableOpacity onPress={(() => { setNameMode(false) })}>
-                                <Text className="text-black text-center font-bold">Quay lại</Text>
-                            </TouchableOpacity>
-                        </View>
                     </View>
                 </View>
-
 
             </View>
         </KeyboardAvoidingView>
@@ -298,7 +245,7 @@ const FinishModal = ({ setFinishMode, feedKey, feedID, setModal, deviceName, dev
 
             const response = await axios.post(`${base_url}/devices`, device, {
                 headers: {
-                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDM0ODE5NDksInVzZXJJRCI6IjEifQ.7p08PVx626gl4dmeRDWa8KO9K_RDm8sN66AQQMvs4DQ"
+                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDM0MDczOTAsInVzZXJJRCI6IjIifQ.6fFn0S08s8L65ruv5JtRVYWJAAgAZRNELW4iuIj6dUU"
                 }
             });
             // console.log(response);
@@ -311,7 +258,7 @@ const FinishModal = ({ setFinishMode, feedKey, feedID, setModal, deviceName, dev
     }
     return (
         <View className='min-h-screen h-full w-full'>
-            <View className='h-1/3 mb-10'>
+            <View className='h-1/3  mb-10'>
                 <View className="flex items-end m-4 ">
                     <TouchableOpacity onPress={() => setModal(false)} className='bg-black rounded-full'>
                         <IconSymbol name="close" color="white" />
@@ -335,5 +282,5 @@ const FinishModal = ({ setFinishMode, feedKey, feedID, setModal, deviceName, dev
 
             </View>
         </View>
-    );
+    )
 }

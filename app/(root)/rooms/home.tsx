@@ -33,25 +33,25 @@ export default function HomeIndex() {
     useEffect(() => {  
         console.log("fetching data");
         const fetchRoomData = async () => {
-            const response = await axios.get(`${base_url}/rooms`, {
+            const response = await axios.get(`https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1/rooms`, {
                 headers: {
-                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDM0ODE5NDksInVzZXJJRCI6IjEifQ.7p08PVx626gl4dmeRDWa8KO9K_RDm8sN66AQQMvs4DQ"
+                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDQwNDE1MDgsInVzZXJJRCI6IjEifQ.kkBRsVUps-4CmU5a0rGkVxpdpdLZ62biaRiD9tJ9yf0"
                 }
             })
-            console.log(reponse)
-            if (!response) throw new Error("Failed to fetch image");
-           
-            let rooms = reponse.data;
-            rooms = rooms.map((room) => {
-                room.img = imgArray[Math.floor(Math.random() * imgArray.length)];   
-                room.device = room.fanCount + room.lightCount + room.sensorCount + room.doorCount;
-            })
+            // if (!response) throw new Error("Failed to fetch image");
+            console.log("### RESPONSE : ", response.data);   
+            let x = response.data;
+            let rooms = []
+            rooms = x.map((room) => ({
+                ...room,  // Giữ nguyên dữ liệu cũ của room
+                img: imgArray[Math.floor(Math.random() * imgArray.length)],   
+                device: room.fanCount + room.lightCount + room.sensorCount + room.doorCount
+            }));
             console.log("### DATA :" , rooms);
             setRoomData(rooms);
         }
         fetchRoomData();
-        // let interval = setInterval(() => {fetchRoomData()}, 10000); 
-
+        let interval = setInterval(() => {fetchRoomData()}, 10000); 
     }, [count]);
     
 
@@ -92,7 +92,7 @@ export default function HomeIndex() {
                                     }
                                 </View>
                             </View>
-                            {allRoomData && allRoomData.map((room, index) => (
+                            {roomData && roomData.map((room, index) => (
                                 <View>
                                     <TouchableOpacity key={index} onPress={() => { router.push(`/rooms/${room.id}`) }}>
                                         <Room key={index} setRoomData={setRoomData} deleteMode={deleteMode} id={room.id} img={room.img} name={room.title} device={room.device} light={room.lightCount} light_on={room.light_on} fan={room.fanCount} fan_on={room.fan_on} sensor={room.sensorCount} sensor_on={room.sensor_on} />

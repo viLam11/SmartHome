@@ -20,7 +20,7 @@ export default function Room(props: {setRoomData: any, deleteMode: boolean, img:
                     </TouchableOpacity>
                 </View>
                 : <></>}
-            <ImageBackground source={require(props.img)} style={{ width: '100%', height: 120 }}  >
+            <ImageBackground source={props.img} style={{ width: '100%', height: 120 }}  >
                 <Text className='text-2xl font-bold text-white mt-4 ml-2'>{props.name}</Text>
                 <Text className='text-white ml-2'>{props.device} thiết bị</Text>
             </ImageBackground>

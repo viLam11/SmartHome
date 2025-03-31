@@ -33,9 +33,9 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }} >
       <SafeAreaProvider>
-        <Stack initialRouteName="index" > 
-          <Stack.Screen name="sign-in" />
-          <Stack.Screen name="(tabs)"  />
+        <Stack initialRouteName="index" screenOptions={{ headerShown: false }}> 
+          <Stack.Screen name="sign-in" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }}  />
           <Stack.Screen name="index" options={{ headerShown: false }}/>
         </Stack>
       </SafeAreaProvider>
