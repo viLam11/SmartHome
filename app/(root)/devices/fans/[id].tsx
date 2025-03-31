@@ -9,9 +9,6 @@ import DeviceNav from '@/components/DeviceNav';
 import Navigation from '@/components/Navigation';
 import SpinningFan from '@/components/SpinningFan';
 import axios from 'axios';
-import axios from 'axios';
-
-const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
 const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
 
 const renderCell = (data: string, index: number) => {

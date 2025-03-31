@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, Text, Image, Alert } from 'react-native';
+import { View, TouchableOpacity, Text, Image, Alert, StyleSheet } from 'react-native';
 import { IconSymbol } from './ui/IconSymbol';
 import images from '@/constants/images';
 import { addNewRoomService } from '@/services/roomService';
+import axios from 'axios';
 
 interface RoomImageProps {
     count: number;
@@ -11,19 +12,19 @@ interface RoomImageProps {
     setModal: (modal: boolean) => void;
     newRoomName: string;
 }
-
-export default function RoomImage({ count, setCount, setImageMode, setModal, newRoomName }: RoomImageProps) {
-    const [imgNo, setImgNo] = useState<number | null>(null);
-import axios from 'axios';
-
 const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
 
-export default function RoomImage({ count, setCount, roomData, setRoomData, newRoomName, setImageMode, setModal }) {
+export default function RoomImage(props: { count: number, setCount: number, roomData: object, setRoomData: void, newRoomName: string, setImageMode: boolean, setModal: void }) {
     const [img, setImage] = useState(images.home1);
     const [imgNo, setImgNo] = useState(-1);
+    const [newRoomName, setNewRoomName] = useState(props.newRoomName);  
+    const [imageMode, setImageMode] = useState(props.setImageMode);
+    const [modal, setModal] = useState(false);
+    const [num, setNum] = useState(0);
+    const [count, setCount] = useState(props.count);
 
     function handleSelectImage(num: number) {
-        setImgNo(prev => (prev === num ? null : num));
+        setImgNo((prev) => (prev == num ? 0 : num));
     }
 
     function addNewRoom() {
@@ -47,6 +48,7 @@ export default function RoomImage({ count, setCount, roomData, setRoomData, newR
         setCount(count + 1);
     }
 
+
     return (
         <View className="w-full h-full">
             {/* Đóng modal */}
@@ -60,7 +62,7 @@ export default function RoomImage({ count, setCount, roomData, setRoomData, newR
                 <View >
                     <View className="flex flex-row justify-between">
                         <View className='mb-2'>
-                            <TouchableOpacity onPress={() => hanldeSelectImage(1)}>
+                            <TouchableOpacity onPress={() => handleSelectImage(1)}>
                                 <Image source={images.home1} style={{ width: 150, height: 70 }} resizeMode='contain' className={imgNo == 1 ? 'opacity-60 rounded-md bg-black-100' : ''}></Image>
                                 {imgNo == 1 ?
                                     <View className="absolute bg-white rounded-full bottom-3 right-2">
@@ -71,7 +73,7 @@ export default function RoomImage({ count, setCount, roomData, setRoomData, newR
                             </TouchableOpacity>
                         </View>
                         <View className='mb-2'>
-                            <TouchableOpacity onPress={() => hanldeSelectImage(2)}>
+                            <TouchableOpacity onPress={() => handleSelectImage(2)}>
                                 <Image source={images.home2} style={{ width: 150, height: 70, borderRadius: 10 }} className={imgNo == 2 ? 'opacity-60 rounded-md bg-black-100' : ''}></Image>
                                 {imgNo == 2 ?
                                     <View className="absolute bg-white rounded-full bottom-3 right-2">
@@ -85,7 +87,7 @@ export default function RoomImage({ count, setCount, roomData, setRoomData, newR
 
                     <View className="flex flex-row justify-between">
                         <View className='mb-2'>
-                            <TouchableOpacity onPress={() => hanldeSelectImage(3)}>
+                            <TouchableOpacity onPress={() => handleSelectImage(3)}>
                                 <Image source={images.home3} style={{ width: 150, height: 70 }} resizeMode='contain' className={imgNo == 3 ? 'opacity-60 rounded-md bg-black-100' : ''}></Image>
                                 {imgNo == 3 ?
                                     <View className="absolute bg-white rounded-full bottom-3 right-2">
@@ -96,7 +98,7 @@ export default function RoomImage({ count, setCount, roomData, setRoomData, newR
                             </TouchableOpacity>
                         </View>
                         <View className='mb-2'>
-                            <TouchableOpacity onPress={() => hanldeSelectImage(4)}>
+                            <TouchableOpacity onPress={() => handleSelectImage(4)}>
                                 <Image source={images.home4} style={{ width: 150, height: 70, borderRadius: 10 }} className={imgNo == 2 ? 'opacity-60 rounded-md bg-black-100' : ''}></Image>
                                 {imgNo == 4 ?
                                     <View className="absolute bg-white rounded-full bottom-3 right-2">
@@ -109,7 +111,7 @@ export default function RoomImage({ count, setCount, roomData, setRoomData, newR
                     </View>
                     <View className="flex flex-row justify-between">
                         <View>
-                            <TouchableOpacity onPress={() => hanldeSelectImage(5)}>
+                            <TouchableOpacity onPress={() => handleSelectImage(5)}>
                                 <Image source={images.home1} style={{ width: 150, height: 70 }} resizeMode='contain' className={imgNo == 5 ? 'opacity-60 rounded-md bg-black-100' : ''}></Image>
                                 {imgNo == 5 ?
                                     <View className="absolute bg-white rounded-full bottom-3 right-2">
@@ -120,7 +122,7 @@ export default function RoomImage({ count, setCount, roomData, setRoomData, newR
                             </TouchableOpacity>
                         </View>
                         <View>
-                            <TouchableOpacity onPress={() => hanldeSelectImage(2)}>
+                            <TouchableOpacity onPress={() => handleSelectImage(2)}>
                                 <Image source={images.home4} style={{ width: 150, height: 70, borderRadius: 10 }} className={imgNo == 4 ? 'opacity-60 rounded-md bg-black-100' : ''}></Image>
                                 {imgNo == 4 ?
                                     <View className="absolute bg-white rounded-full bottom-3 right-2">
@@ -147,7 +149,7 @@ export default function RoomImage({ count, setCount, roomData, setRoomData, newR
                     </View>
                 </View>
 
-            </View>
+ 
         </View>
     );
 }
