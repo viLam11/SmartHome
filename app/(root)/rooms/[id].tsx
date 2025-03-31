@@ -218,11 +218,11 @@ export default function Property() {
                                 </TouchableOpacity>
                             </View>
                         </View>
-                    ) : (
+                    : 
                         <View className="bg-white h-1/2 w-full bottom-0 z-20 rounded-s-3xl">
                             <AddNewDevice setModal={setModal} room={roomData} />
                         </View>
-                    )}
+                    }
                 </KeyboardAvoidingView>
             </Modal>
         </View>

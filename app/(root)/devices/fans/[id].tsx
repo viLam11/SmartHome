@@ -12,7 +12,7 @@ import axios from 'axios';
 
 const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
 
-const renderCell = (data, index) => {
+const renderCell = (data: string, index: number) => {
     if (index === 3) {
         // Nếu là cột "Edit", thêm button
         return (
@@ -44,8 +44,8 @@ export default function Fan() {
 
     useEffect(() => {
         const fetchCurrentStatus = async () => {
-            console.log("## Feed ID: ", id);
-            const response = await axios.get(`${base_url}/devices/${id}`);
+            console.log("## Feed ID: ", feedId);
+            const response = await axios.get(`${base_url}/devices/${feedId}`);
             setFanData(response.data)
             const fanTemp = response.data;
             if (fanTemp.value == 1) {
@@ -60,12 +60,11 @@ export default function Fan() {
             }
         }
         fetchCurrentStatus();
-    }, [id]);
+    }, [feedId]);
 
-    async function handleFanSpeed(level) {
+    async function handleFanSpeed( id: string | string[], level: number) {
         if(!status) return;
-        
-        // if (status) setSpeed(speed);
+
         try {
             const respone = await axios.post(`${base_url}/devices/${id}`, { value: level.toString() }, {
                 headers: {
@@ -97,26 +96,26 @@ export default function Fan() {
             <View className='flex flex-row justify-between'>
                 <View className="mx -2">
                     <TouchableOpacity onPress={() => { router.back() }}>
-                        <IconSymbol name="back" />
+                        <IconSymbol name="back" color="black" />
                     </TouchableOpacity>
                 </View>
                 <Text className='text-xl font-bold'>QUẠT {+feedId}</Text>
                 <View>
                 </View>
             </View>
-            <DeviceNav current={1} feedId={+feedId} type={"fan"} />
+            <DeviceNav status={1} feedId={+feedId} type={"fan"} />
 
             <View className="flex flex-row mt-10">
                 <View className='w-1/2'>
                     <SpinningFan speed={speed} />
                     <View className="flex flex-row items-center justify-center ">
-                        <TouchableOpacity onPress={() => handleFanSpeed(1)} className={`w-6 h-6 mx-1 rounded-full ${speed == 150 ? "bg-yellow" : "bg-gray-500"}  flex items-center justify-center`}>
+                        <TouchableOpacity onPress={() => handleFanSpeed(feedId, 1)} className={`w-6 h-6 mx-1 rounded-full ${speed == 150 ? "bg-yellow" : "bg-gray-500"}  flex items-center justify-center`}>
                             <Text className="text-white">1</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => handleFanSpeed(2)} className={`w-6 h-6 mx-1 rounded-full ${speed == 100 ? "bg-yellow" : "bg-gray-500"}  flex items-center justify-center`}>
+                        <TouchableOpacity onPress={() => handleFanSpeed(feedId, 2)} className={`w-6 h-6 mx-1 rounded-full ${speed == 100 ? "bg-yellow" : "bg-gray-500"}  flex items-center justify-center`}>
                             <Text className="text-white">2</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => handleFanSpeed(3)} className={`w-6 h-6 mx-1 rounded-full ${speed == 25 ? "bg-yellow" : "bg-gray-500"}  flex items-center justify-center`}>
+                        <TouchableOpacity onPress={() => handleFanSpeed(feedId, 3)} className={`w-6 h-6 mx-1 rounded-full ${speed == 25 ? "bg-yellow" : "bg-gray-500"}  flex items-center justify-center`}>
                             <Text className="text-white">3</Text>
                         </TouchableOpacity>
                     </View>
@@ -124,7 +123,7 @@ export default function Fan() {
                 <View className='w-1/2 flex flex-col items-end px-4 '>
                     <View className=' flex flex-row'>
                         {status ? <Text className="px-2 w-20 font-semibold">Bật</Text> : <Text className="px-2 w-20 font-semibold">Tắt</Text>}
-                        <TouchableOpacity onPress={() => { if (status) { handleFanSpeed(0) } else { setStatus(true),handleFanSpeed(1) } }}>
+                        <TouchableOpacity onPress={() => { if (status) { handleFanSpeed(feedId, 0) } else { setStatus(true),handleFanSpeed(feedId, 1) } }}>
                             <Image source={status ? images.auto_on : images.auto_off} />
                         </TouchableOpacity>
                     </View>

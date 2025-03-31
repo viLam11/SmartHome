@@ -7,12 +7,7 @@ import { useState, useEffect } from 'react';
 import { Table, Row } from "react-native-table-component";
 import DeviceNav from '@/components/DeviceNav';
 import Navigation from '@/components/Navigation';
-<<<<<<< HEAD
 import axios from 'axios';
-=======
-import { deviceObject, getDeviceData } from '@/services/deviceService';
-
->>>>>>> fe2
 
 const renderCell = (data, index) => {
     if (index === 3) {
@@ -26,8 +21,6 @@ const renderCell = (data, index) => {
     return <Text>{data}</Text>;
 };
 
-<<<<<<< HEAD
-<<<<<<<< HEAD:app/(root)/devices/lights/[id].tsx
 // data: {
 //     "feedId": "3023667",
 //     "feedKey": "fan",
@@ -38,9 +31,6 @@ const renderCell = (data, index) => {
 // }
 
 export default function Light() {
-========
-export default function Sensor() {
->>>>>>>> fe2:app/(root)/devices/sensors/[id].tsx
     const router = useRouter();
     const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
     const { id } = useLocalSearchParams();
@@ -50,20 +40,11 @@ export default function Sensor() {
     const [status, setStatus] = useState(false);
     const [lightData, setLightData] = useState(null);
 
-=======
-export default function Light() {
-    const router = useRouter();
-    const { feedId } = useLocalSearchParams();
-    const [color, setColor] = useState("white");
-    const [lightEnable, setLightEnable] = useState(false);
-    const [statusAuto, setSatusAuto] = useState(true);
->>>>>>> fe2
     const tableHead = ["Start", "End", "Brightness", "Edit"];
     const tableData = [
         ["17:00", "16:00", "nhẹ", ".."],
         ["20:00", "21:00", "nhẹ", ".."]
     ];
-<<<<<<< HEAD
 
     async function powerLight(value) {
         try {
@@ -128,69 +109,38 @@ export default function Light() {
         return () => clearInterval(interval);
         
     }, [])
-=======
-    const [deviceData, setDeviceData] = useState<deviceObject | null>(null);
-        
 
-    useEffect(() => {
-        (async () => {
-            const response = await getDeviceData(feedId as string);
-            setDeviceData(response);
-        })();
-    }, []);
->>>>>>> fe2
 
-    return (
+   return(
         <View className='flex-1'>
             <ScrollView className='mt-1 mx-2'>
-<<<<<<< HEAD
-                <View className='flex flex-row'>
-                    <View className='w-1/6'>
-=======
                 <View className='flex flex-row justify-between'>
                     <View className="mx -2">
->>>>>>> fe2
                         <TouchableOpacity onPress={() => { router.back() }}>
                             <IconSymbol name="back" />
                         </TouchableOpacity>
                     </View>
-<<<<<<< HEAD
-<<<<<<<< HEAD:app/(root)/devices/lights/[id].tsx
-                    <Text className='text-xl font-bold'>Đèn  {lightData && lightData.title}</Text>
-                    <View>
-========
-                    <View className='w-4/6 items-center'>
-                        <Text className='text-xl font-bold'>Cảm biến nhiệt {+id + 1}</Text>
->>>>>>>> fe2:app/(root)/devices/sensors/[id].tsx
-                    </View>
-                </View>
-
-                <DeviceNav current={1} id={+id} type={"sensor"} />
-=======
-                    <Text className='text-xl font-bold'>{deviceData?.name}</Text>
+                    <Text className='text-xl font-bold'>Đèn {+id}</Text>
                     <View>
                     </View>
                 </View>
 
-                <DeviceNav current={1} id={+feedId} type={"light"} />
->>>>>>> fe2
+                <DeviceNav current={1} id={+id} type={"light"} />
 
 
                 <View className='flex flex-row mt-4'>
                     <View className='w-1/2 '>
-                        <View className='w-full h-72 flex items-center'>
+                        <View className='w-full flex items-center'>
                             <Image source={images.lamp} style={{ width: "70%", height: 200 }} />
-                            { lightEnable ? 
-                                <Image source={images.light} style={{ width: "50%", height: 100, tintColor: `${color}` }}></Image> : null}
+                            <Image source={images.light} style={{ width: "50%", height: 100, tintColor: `${color}` }}></Image>
                         </View>
 
                     </View>
                     <View className='w-1/2 flex flex-col items-end justify-center'>
-<<<<<<< HEAD
                         <View className='w-40'>
                             <Text className="px-2 w-40 font-semibold"> {status ? "Bật" : "Tắt"}     </Text>
                         </View>
-                        <TouchableOpacity onPress={() => { if (status) { powerLight("#000000") } else { powerLight("#FFFFFF") } }} >
+                        <TouchableOpacity onPress={() => { if(status) {powerLight("#000000")} else{ powerLight("#F2F2F2")} }}>
                             <Image source={status ? images.auto_on : images.auto_off} />
                         </TouchableOpacity>
                         <View >
@@ -203,19 +153,6 @@ export default function Light() {
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={() => controlLight("#FFD700")}>
                                     <View className={`rounded-full mx-2 bg-yellow  ${color === "#FFD700" ? "w-8 h-8" : "w-4 h-4"}`}></View>
-=======
-                        <Image source={images.power} ></Image>
-                        <View >
-                            <View className='mt-4 flex flex-row justify-center items-center'>
-                                <TouchableOpacity onPress={() => setColor("blue")}>
-                                    <View className={`rounded-full mx-2 bg-blue-500  ${color === "blue" ? "w-8 h-8" : "w-4 h-4"}`}></View>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => setColor("white")}>
-                                    <View className={`rounded-full mx-2 bg-white  ${color === "white" ? "w-8 h-8" : "w-4 h-4"}`}></View>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => setColor("yellow")}>
-                                    <View className={`rounded-full mx-2 bg-yellow  ${color === "yellow" ? "w-8 h-8" : "w-4 h-4"}`}></View>
->>>>>>> fe2
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -278,5 +215,5 @@ export default function Light() {
                 <Navigation current={2} />
             </View>
         </View>
-    )
+   )
 }

@@ -10,12 +10,13 @@ import NewRoomModal from "@/components/NewRoomModal";
 import RoomImage from "@/components/RoomImage";
 import { rooms } from "@/constants/data";
 import axios from "axios";
+import images from "@/constants/images";
 
 export default function HomeIndex() {
     const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
     const router = useRouter();
     // const [roomNum, setRoomNum] = useState(1);
-    // const [imgArray, setImgArray] = useState([images.home1, images.home3, images.home3, images.home4]);
+    const [imgArray, setImgArray] = useState([images.home1, images.home3, images.home3, images.home4]);
     const [modal, setModal] = useState(false);
     const [imageMode, setImageMode] = useState(false);
     // Room data
@@ -37,18 +38,20 @@ export default function HomeIndex() {
                     "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDM0ODE5NDksInVzZXJJRCI6IjEifQ.7p08PVx626gl4dmeRDWa8KO9K_RDm8sN66AQQMvs4DQ"
                 }
             })
+            console.log(reponse)
             if (!response) throw new Error("Failed to fetch image");
-                const data =  response;
-                let rooms = data.data;
-                rooms.map((room) => {
-                    room.img = imgArray[Math.floor(Math.random() * imgArray.length)];   
-                    room.device = room.fanCount + room.lightCount + room.sensorCount + room.doorCount;
-                })
-                setReponse(data.data);
-                setRoomData(data.data);
-                console.log("### DATA :" , data.data);
+           
+            let rooms = reponse.data;
+            rooms = rooms.map((room) => {
+                room.img = imgArray[Math.floor(Math.random() * imgArray.length)];   
+                room.device = room.fanCount + room.lightCount + room.sensorCount + room.doorCount;
+            })
+            console.log("### DATA :" , rooms);
+            setRoomData(rooms);
         }
         fetchRoomData();
+        // let interval = setInterval(() => {fetchRoomData()}, 10000); 
+
     }, [count]);
     
 
