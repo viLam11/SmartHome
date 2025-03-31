@@ -4,8 +4,12 @@ import { Modal, View, Text, Image, ImageBackground, TouchableOpacity, KeyboardAv
 import { ScrollView } from 'react-native-gesture-handler';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import images from '@/constants/images';
-import { room } from '@/constants/data';
 import Navigation from '@/components/Navigation';
+import AddNewDevice from '@/components/AddNewDevice';
+import { deviceListObject, DEVICE_FORMAT } from '@/types/device';
+import { RoomObject } from '@/types/room';
+import { getRoomDevices } from '@/services/deviceService';
+import { getAllRoomService } from '@/services/roomService';
 import { rooms } from '@/constants/data';
 import AddNewDevice from '@/components/AddNewDevice';
 import axios from 'axios';
@@ -13,6 +17,9 @@ import axios from 'axios';
 
 export default function Property() {
     const router = useRouter();
+    const [room, setRoom] = useState<RoomObject | null>(null);
+    const [deviceList, setDeviceList] = useState<deviceListObject | null>(null);
+    const [deviceCount, setDeviceCount] = useState(0);
     const roomName = useState(["Phòng Khách", "Phòng Ngủ", "Phòng Bếp"]);
     const [waring, setWaring] = useState(false);
     const [room, setRoom] = useState(null);
@@ -23,9 +30,34 @@ export default function Property() {
     const { id } = useLocalSearchParams();
     const [editMode, setEditMode] = useState(false);
     const [modal, setModal] = useState(false);
+
+    const roomId = useLocalSearchParams().id;
+    const [modal, setModal] = useState(false);
     const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
 
     useEffect(() => {
+        if (!roomId) return;    
+        (async () => {
+            const response = await getRoomDevices(roomId as string);
+            setDeviceList(response);
+            const roomList = await getAllRoomService();
+            const room = roomList.find((room: RoomObject) => room.id === Number(roomId));
+            if (room) {
+                setRoom(room);
+                setDeviceCount((room.fanCount ?? 0) + (room.lightCount ?? 0) + (room.sensorCount ?? 0) + (room.doorCount ?? 0));
+            } else {
+                console.warn(`Room with ID ${roomId} not found`);
+            }
+
+        })();
+    }, [roomId]); 
+    
+    // useEffect(() => {
+    //     if (!deviceList) return;
+    //     (async () => {
+            
+    //     })();
+    // }, [deviceList]);
         console.log("### ROOM ID: ", id);
         const fetchDeviceInRoom = async () => {
             const response = await axios.get(`${base_url}/devices/room/${id}`, {
@@ -95,11 +127,43 @@ export default function Property() {
                             </>
                         }
                     </View>
+                <View className='flex flex-row justify-between'>
+                    <View className="mx -2">
+                        <TouchableOpacity onPress={() => { router.push(`/rooms/home`) }}>
+                            <IconSymbol name="back" />
+                        </TouchableOpacity>
+                    </View>
+                    <View>
+                        <Text className="text-2xl font-bold">{room ? room.title : ""}</Text>
+                    </View>
+                    <View className="flex flex-row space-x-2">
+                        {editMode ?
+                            <View>
+                                <TouchableOpacity className="bg-black rounded-full p-1" onPress={() => { }}>
+                                    <IconSymbol name="save" size={18} color="white" />
+                                </TouchableOpacity>
+                            </View>
+                            :
+                            <> <View className="mr-2">
+                                <TouchableOpacity className="bg-black rounded-full" onPress={() => {setModal(!modal)}}>
+                                    <IconSymbol name="add" color="white" />
+                                </TouchableOpacity>
+                            </View>
+                                <View>
+                                    <TouchableOpacity className="bg-black rounded-full p-1" onPress={() => {setEditMode(!editMode) }}>
+                                        <IconSymbol name="edit" size={18} color="white" />
+                                    </TouchableOpacity>
+                                </View>
+                            </>
+                        }
+                    </View>
                 </View>
 
                 <View className="my-4 overflow-hidden rounded-lg">
-                    <ImageBackground source={roomData?.img || images.home1} style={{ width: "100%", height: 120 }} resizeMode="cover">
+                    <ImageBackground source={images.home1} style={{ width: "100%", height: 120 }} resizeMode="cover">
                         <View className="p-3">
+                            <Text className="text-2xl font-bold text-white">{room ? room.title : ""}</Text>
+                            <Text className="text-white">{room ? deviceCount : '0'} thiết bị</Text>
                             <Text className="text-2xl font-bold text-white">{room ? room.title : ""}</Text>
                             <Text className="text-white">{room ? room.device : '0'} thiết bị</Text>
                         </View>
@@ -210,6 +274,13 @@ export default function Property() {
                     behavior={Platform.OS === "ios" ? "padding" : "height"}
                     style={{ flex: 1, justifyContent: 'flex-end' }}
                 >
+                    {editMode ? (
+                        <View className="bg-white h-2/4 w-full bottom-0 z-20 rounded-s-3xl">
+                            <View>
+                                <TouchableOpacity onPress={() => setModal(false)}>
+                                    <Text>Close</Text>
+                                </TouchableOpacity>
+                            </View>
                     {editMode ?
                         <View className="bg-white h-2/4 w-full bottom-0 z-20 rounded-s-3xl">
                             <View>
@@ -218,6 +289,9 @@ export default function Property() {
                                 </TouchableOpacity>
                             </View>
                         </View>
+                    ) : (
+                         <View className="bg-white h-1/2 w-full bottom-0 z-20 rounded-s-3xl">
+                            <AddNewDevice setModal={setModal} room={room} />
                     : 
                         <View className="bg-white h-1/2 w-full bottom-0 z-20 rounded-s-3xl">
                             <AddNewDevice setModal={setModal} room={roomData} />

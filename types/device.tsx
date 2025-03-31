@@ -1,10 +1,4 @@
 import images from '@/constants/images';
-export type roomObject = {
-    id: string,
-    name: string,
-    img: string,
-    devices: deviceStatusObject[]
-};
 
 export type deviceStatusObject = {
     feedId: number,
@@ -20,7 +14,7 @@ export type deviceCreateObject = {
     feedKey: string,
     type: string,
     title: string,
-    roomID: string,
+    roomID: number,
 };
 
 export type deviceListObject = {

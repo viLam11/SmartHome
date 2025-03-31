@@ -1,8 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, TouchableOpacity, Text, Image, Alert } from 'react-native';
 import { IconSymbol } from './ui/IconSymbol';
-import { TextInput } from 'react-native-gesture-handler';
 import images from '@/constants/images';
+import { addNewRoomService } from '@/services/roomService';
+
+interface RoomImageProps {
+    count: number;
+    setCount: (count: number) => void;
+    setImageMode: (mode: boolean) => void;
+    setModal: (modal: boolean) => void;
+    newRoomName: string;
+}
+
+export default function RoomImage({ count, setCount, setImageMode, setModal, newRoomName }: RoomImageProps) {
+    const [imgNo, setImgNo] = useState<number | null>(null);
 import axios from 'axios';
 
 const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
@@ -11,12 +22,8 @@ export default function RoomImage({ count, setCount, roomData, setRoomData, newR
     const [img, setImage] = useState(images.home1);
     const [imgNo, setImgNo] = useState(-1);
 
-    function hanldeSelectImage(num) {
-        if (num == imgNo) {
-            setImgNo(-1);
-            return;
-        }
-        setImgNo(num);
+    function handleSelectImage(num: number) {
+        setImgNo(prev => (prev === num ? null : num));
     }
 
     function addNewRoom() {
@@ -41,9 +48,10 @@ export default function RoomImage({ count, setCount, roomData, setRoomData, newR
     }
 
     return (
-        <View className='w-full h-full'>
-            <View className="flex items-end m-4 ">
-                <TouchableOpacity onPress={() => setImageMode(false)} className='bg-black rounded-full '>
+        <View className="w-full h-full">
+            {/* Đóng modal */}
+            <View className="flex items-end m-4">
+                <TouchableOpacity onPress={() => setImageMode(false)} className="bg-black rounded-full">
                     <IconSymbol name="close" color="white" />
                 </TouchableOpacity>
             </View>
@@ -124,12 +132,13 @@ export default function RoomImage({ count, setCount, roomData, setRoomData, newR
                         </View>
                     </View>
                 </View>
-                <View >
-                    <View className="bg-green-300 rounded-md mt-4 p-2 w-full mx-auto">
-                        <TouchableOpacity onPress={() => addNewRoom()}>
-                            <Text className="text-black text-center font-bold">Xong</Text>
-                        </TouchableOpacity>
-                    </View>
+
+                {/* Nút hành động */}
+                <View className="bg-green-300 rounded-md mt-4 p-2 w-full mx-auto">
+                    <TouchableOpacity onPress={addNewRoom}>
+                        <Text className="text-black text-center font-bold">Xong</Text>
+                    </TouchableOpacity>
+                </View>
 
                     <View className="bg-gray-200 rounded-md mt-4 p-2 w-full mx-auto">
                         <TouchableOpacity onPress={() => { setImageMode(false); setModal(true) }}>
@@ -139,7 +148,6 @@ export default function RoomImage({ count, setCount, roomData, setRoomData, newR
                 </View>
 
             </View>
-
         </View>
     );
 }
