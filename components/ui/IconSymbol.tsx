@@ -20,7 +20,11 @@ const MAPPING = {
   "checkmark": "check",
   "edit": "edit",
   "delete": "delete",
-  "save": "save"
+  "save": "save",
+  "notification": "notifications",
+  "user":"person",
+  "support": "support-agent",
+  "exit": "logout",
 } as const;
   // } as Partial<
 //   Record<

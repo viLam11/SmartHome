@@ -26,8 +26,9 @@ import auto_off from "@/assets/images/auto_off.png";
 import canh_quat from "@/assets/images/canh_quat.png";
 import than_quat from "@/assets/images/than_quat.png";
 import done from "@/assets/images/done.png";
-
-export default {
+import sensor from "@/assets/images/sensor.png";
+export default {  
+  sensor,
   onboarding,
   avatar,
   newYork,

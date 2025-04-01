@@ -7,6 +7,7 @@ type DeviceType = "light" | "fan" | "sensor";
 
 interface DeviceNavProps {
     status?: number;
+    id?: number;
     feedId?: number;
     type: DeviceType;
 }

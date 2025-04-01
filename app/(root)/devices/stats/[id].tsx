@@ -37,7 +37,7 @@ export default function Statistic() {
                     <View>
                     </View>
                 </View>
-                <DeviceNav current={3} feedId = {+feedId} type="light" />
+                <DeviceNav status={3} current={3} feedId = {+feedId} type="light" />
 
                 <View>
                     <View className='w-9/12 mt-4 mx-auto border border-black rounded-md p-1 '>

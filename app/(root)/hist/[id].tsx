@@ -18,7 +18,7 @@ const renderCell = (data, index) => {
 };
 
 export default function History({}) {
-    const { feedId } = useLocalSearchParams();
+    const { id } = useLocalSearchParams();
     const router = useRouter();
     const tableHead = ["Hoạt động", "Thời gian", "Người thực hiện"];
     const tableData = [
@@ -37,12 +37,12 @@ export default function History({}) {
                                 <IconSymbol name="back" />
                             </TouchableOpacity>
                         </View>
-                        <Text className='text-xl font-bold'>Đèn {+feedId}</Text>
+                        <Text className='text-xl font-bold'>Đèn {+id}</Text>
                         <View>
                         </View>
                     </View>
 
-                    <DeviceNav current={2} feedId={+feedId} type="light" />
+                    <DeviceNav status={2} current={1} id={+id} type="light" />
                     
 
                     <View className='my-10'>

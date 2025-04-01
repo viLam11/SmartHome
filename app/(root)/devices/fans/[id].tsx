@@ -20,7 +20,7 @@ const renderCell = (data: string, index: number) => {
             </TouchableOpacity>
         );
     }
-    return <Text>{data}</Text>;
+    return <Text className='text-center'>{data}</Text>;
 };
 
 
@@ -28,11 +28,11 @@ const renderCell = (data: string, index: number) => {
 
 export default function Fan() {
     const router = useRouter();
-    const { feedId } = useLocalSearchParams();
+    const { id } = useLocalSearchParams();
     const [color, setColor] = useState("white");
     const [speed, setSpeed] = useState(0);
     const [status, setStatus] = useState(false);
-    const [statusAuto, setSatusAuto] = useState(false);  
+    const [statusAuto, setSatusAuto] = useState(false);
     const [fanData, setFanData] = useState(null);
 
     const tableHead = ["Start", "End", "Brightness", "Edit"];
@@ -43,8 +43,8 @@ export default function Fan() {
 
     useEffect(() => {
         const fetchCurrentStatus = async () => {
-            console.log("## Feed ID: ", feedId);
-            const response = await axios.get(`${base_url}/devices/${feedId}`);
+            console.log("## Feed ID: ", id);
+            const response = await axios.get(`${base_url}/devices/${id}`);
             setFanData(response.data)
             const fanTemp = response.data;
             if (fanTemp.value == 1) {
@@ -59,11 +59,10 @@ export default function Fan() {
             }
         }
         fetchCurrentStatus();
-    }, [feedId]);
+    }, [id]);
 
-    async function handleFanSpeed( id: string | string[], level: number) {
-        if(!status) return;
-
+    async function handleFanSpeed(id: string | string[], level: number) {
+        console.log("check :", level)
         try {
             const respone = await axios.post(`${base_url}/devices/${id}`, { value: level.toString() }, {
                 headers: {
@@ -84,57 +83,63 @@ export default function Fan() {
                 setSpeed(0);
                 setStatus(false);
             }
-        } catch(e) {
+        } catch (e) {
             console.log("Error: ", e);
-        }   
+        }
     }
 
 
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} className='min-h-screen flex flex-col m-2'>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} className='min-h-screen flex-1 m-2'>
             <View className='flex flex-row justify-between'>
                 <View className="mx -2">
                     <TouchableOpacity onPress={() => { router.back() }}>
                         <IconSymbol name="back" color="black" />
                     </TouchableOpacity>
                 </View>
-                <Text className='text-xl font-bold'>QUẠT {+feedId}</Text>
+                <Text className='text-xl font-bold'>QUẠT {+id}</Text>
                 <View>
                 </View>
             </View>
-            <DeviceNav status={1} feedId={+feedId} type={"fan"} />
+            <DeviceNav status={1} id={+id} type={"fan"} />
 
             <View className="flex flex-row mt-10">
-                <View className='w-1/2'>
+                <View className='w-full h-80 '>
                     <SpinningFan speed={speed} />
                     <View className="flex flex-row items-center justify-center ">
-                        <TouchableOpacity onPress={() => handleFanSpeed(feedId, 1)} className={`w-6 h-6 mx-1 rounded-full ${speed == 150 ? "bg-yellow" : "bg-gray-500"}  flex items-center justify-center`}>
+                        <View className=' flex flex-row'>
+                            {/* {status ? <Text className="px-2 w-20 font-semibold">Bật</Text> : <Text className="px-2 w-20 font-semibold">Tắt</Text>} */}
+                            <TouchableOpacity onPress={() => { if (status) { handleFanSpeed(id, 0) } else { setStatus(true), handleFanSpeed(id, 1) } }}>
+                                <Image source={status ? images.power : images.power} style={{width: 46, height: 40}} />
+                            </TouchableOpacity>
+                        </View>
+                        <TouchableOpacity onPress={() => handleFanSpeed(id, 1)} className={`w-6 h-6 mx-1 rounded-full ${speed == 150 ? "bg-yellow" : "bg-gray-500"}  flex items-center justify-center`}>
                             <Text className="text-white">1</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => handleFanSpeed(feedId, 2)} className={`w-6 h-6 mx-1 rounded-full ${speed == 100 ? "bg-yellow" : "bg-gray-500"}  flex items-center justify-center`}>
+                        <TouchableOpacity onPress={() => handleFanSpeed(id, 2)} className={`w-6 h-6 mx-1 rounded-full ${speed == 100 ? "bg-yellow" : "bg-gray-500"}  flex items-center justify-center`}>
                             <Text className="text-white">2</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => handleFanSpeed(feedId, 3)} className={`w-6 h-6 mx-1 rounded-full ${speed == 25 ? "bg-yellow" : "bg-gray-500"}  flex items-center justify-center`}>
+                        <TouchableOpacity onPress={() => handleFanSpeed(id, 3)} className={`w-6 h-6 mx-1 rounded-full ${speed == 25 ? "bg-yellow" : "bg-gray-500"}  flex items-center justify-center`}>
                             <Text className="text-white">3</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
-                <View className='w-1/2 flex flex-col items-end px-4 '>
+                {/* <View className='w-1/2 flex flex-col items-end px-4 '>
                     <View className=' flex flex-row'>
                         {status ? <Text className="px-2 w-20 font-semibold">Bật</Text> : <Text className="px-2 w-20 font-semibold">Tắt</Text>}
-                        <TouchableOpacity onPress={() => { if (status) { handleFanSpeed(feedId, 0) } else { setStatus(true),handleFanSpeed(feedId, 1) } }}>
+                        <TouchableOpacity onPress={() => { if (status) { handleFanSpeed(id, 0) } else { setStatus(true),handleFanSpeed(id, 1) } }}>
                             <Image source={status ? images.auto_on : images.auto_off} />
                         </TouchableOpacity>
                     </View>
-                </View>
+                </View> */}
             </View>
 
 
 
-            <View className='mx-2 mt-4'>
+            <View className='mx-2 mt-4 flex-grow'>
                 <View className="flex flex-row">
                     <View className='w-40'>
-                        <Text className="px-2 w-40 font-semibold">Tự động:     </Text>
+                        <Text className="w-32 font-semibold">Tự động:  </Text>
                     </View>
                     <TouchableOpacity onPress={() => setSatusAuto(!statusAuto)}>
                         <Image source={statusAuto ? images.auto_on : images.auto_off} />
@@ -182,9 +187,8 @@ export default function Fan() {
             </View>
 
 
-            <View className="flex-grow"></View>
-            <View className="h-32">
-                <View className=" bottom-8 w-full">
+            <View className="h-20">
+                <View className=" bottom-6 w-full">
                     <Navigation current={2} />
                 </View>
             </View>

@@ -11,6 +11,9 @@ export default function Navigation({current}){
         setCurrentTab(index);
         if (index === 2) {
             router.navigate('/rooms/home'); 
+        } 
+        if (index == 3) {
+            router.navigate('/profile/profile');
         }
     }
 

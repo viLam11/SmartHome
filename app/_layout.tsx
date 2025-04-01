@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Stack } from "expo-router";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
@@ -7,9 +7,11 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import "../global.css";
 import SignIn from "./(root)/auth/sign-in";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 // import GlobalProvider from "@/lib/global-provider";
 
 export default function RootLayout() {
+  const [token, setToken] = useState(null); 
   const [fontsLoaded] = useFonts({
     "Rubik-Bold": require("../assets/fonts/Rubik-Bold.ttf"),
     "Rubik-ExtraBold": require("../assets/fonts/Rubik-ExtraBold.ttf"),
@@ -29,8 +31,30 @@ export default function RootLayout() {
     return null;
   }
 
+  // useEffect(() => {
+  //   var fetchToken = async () => {
+  //     const token = await AsyncStorage.getItem("authToken");
+  //     if (token) {
+  //       console.log("Token found:", token);
+  //       setToken(token);
+  //     }
+  //   }
+  //   fetchToken();
+  // }, []);
 
+  // if(token) {
+  //   return (
+  //     <GestureHandlerRootView style={{ flex: 1 }} >
+  //       <SafeAreaProvider>
+  //         <Stack initialRouteName="(tabs)" screenOptions={{ headerShown: false }}> 
+  //           <Stack.Screen name="(tabs)" options={{ headerShown: false }}  />
+  //         </Stack>
+  //       </SafeAreaProvider>
+  //     </GestureHandlerRootView>
+  //   ) 
+  // }
   return (
+    
     <GestureHandlerRootView style={{ flex: 1 }} >
       <SafeAreaProvider>
         <Stack initialRouteName="index" screenOptions={{ headerShown: false }}> 

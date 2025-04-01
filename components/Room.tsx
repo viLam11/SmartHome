@@ -5,7 +5,7 @@ import { IconSymbol } from './ui/IconSymbol';
 import { rooms } from '@/constants/data';
 
 
-export default function Room(props: {setRoomData: any, deleteMode: boolean, img: string, id: number, name: string, light: string, fan: string, sensor: string, device: number, light_on: number, fan_on: number}) {
+export default function Room(props: {setRoomData: any, deleteMode: boolean, img: string, id: number, name: string, light: number, fan: number, sensor: number, device: number, light_on: number, fan_on: number}) {
     // deleteMode = true;
     function handleDeleteRoom() {
         const updateRoom = rooms.filter(room => room.id !== props.id);
@@ -43,8 +43,8 @@ export default function Room(props: {setRoomData: any, deleteMode: boolean, img:
                 </View>
                 <View className='w-12 flex flex-col items-center'>
                     <View className='bg-white w-11 h-11 rounded-full flex items-center justify-center'>
-                        <Image source={images.aircondition}
-                            style={{ tintColor: props.fan_on !== 0 ? "#F5BA0B" : "black" }}
+                        <Image source={images.sensor}
+                            style={{width: 20, height: 20,  tintColor: props.fan_on !== 0 ? "#F5BA0B" : "black" }}
                         />
                     </View>
                     <Text className='font-semibold text-lg'>{props.sensor}</Text>

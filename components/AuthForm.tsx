@@ -58,11 +58,12 @@ export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
             axios.post(`${base_url}/login`, {
                 "email": email,
                 "password": password,
-            })
+            },{ timeout: 5000 })
                 .then((response) => {
                     console.log(response)
                     alert("Đăng nhập thành công");
                     AsyncStorage.setItem('authToken', response.data.token);
+                    console.log("Token: ", response.data.token);
                     router.replace('/rooms/home');
                 })
                 .catch((error) => {

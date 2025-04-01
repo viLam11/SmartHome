@@ -11,9 +11,13 @@ import RoomImage from "@/components/RoomImage";
 import { rooms } from "@/constants/data";
 import axios from "axios";
 import images from "@/constants/images";
+import AsyncStorage, { useAsyncStorage } from "@react-native-async-storage/async-storage";
+// import {API_URL} from "@env";
+
 
 export default function HomeIndex() {
     const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
+    // const base_url = API_URL;
     const router = useRouter();
     // const [roomNum, setRoomNum] = useState(1);
     const [imgArray, setImgArray] = useState([images.home1, images.home3, images.home3, images.home4]);
@@ -25,6 +29,8 @@ export default function HomeIndex() {
     const [newRoomName, setNewRoomName] = useState('');
     const [reponse, setReponse] = useState('');
     const [count, setCount] = useState(0);
+    const [token, setToken] = useState<string | null>(null);
+
     function handleDeleteMode() {
         setCount(count + 1);
         setDeleteMode(!deleteMode);
@@ -33,25 +39,31 @@ export default function HomeIndex() {
     useEffect(() => {  
         console.log("fetching data");
         const fetchRoomData = async () => {
+            const authToken = await AsyncStorage.getItem("authToken");
+            setToken(authToken);
             const response = await axios.get(`https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1/rooms`, {
                 headers: {
-                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDQwNDE1MDgsInVzZXJJRCI6IjEifQ.kkBRsVUps-4CmU5a0rGkVxpdpdLZ62biaRiD9tJ9yf0"
+                    "Authorization": authToken
                 }
             })
             // if (!response) throw new Error("Failed to fetch image");
             console.log("### RESPONSE : ", response.data);   
             let x = response.data;
             let rooms = []
-            rooms = x.map((room) => ({
+            rooms = x.map((room: {fanCount: number, lightCount: number, sensorCount: number, doorCount: number}) => ({
                 ...room,  // Giữ nguyên dữ liệu cũ của room
                 img: imgArray[Math.floor(Math.random() * imgArray.length)],   
                 device: room.fanCount + room.lightCount + room.sensorCount + room.doorCount
             }));
             console.log("### DATA :" , rooms);
+            let token = await AsyncStorage.getItem("authToken");
+            console.log("Token: ", token);
             setRoomData(rooms);
         }
         fetchRoomData();
-        let interval = setInterval(() => {fetchRoomData()}, 10000); 
+        
+
+        // let interval = setInterval(() => {fetchRoomData()}, 10000); 
     }, [count]);
     
 
@@ -92,7 +104,7 @@ export default function HomeIndex() {
                                     }
                                 </View>
                             </View>
-                            {roomData && roomData.map((room, index) => (
+                            {roomData && roomData.map((room : {id: number, img: string, title: string, device: number, lightCount: number, light_on: number, fanCount: number, fan_on: number, sensorCount: number, sensor_on: number}, index) => (
                                 <View>
                                     <TouchableOpacity key={index} onPress={() => { router.push(`/rooms/${room.id}`) }}>
                                         <Room key={index} setRoomData={setRoomData} deleteMode={deleteMode} id={room.id} img={room.img} name={room.title} device={room.device} light={room.lightCount} light_on={room.light_on} fan={room.fanCount} fan_on={room.fan_on} sensor={room.sensorCount} sensor_on={room.sensor_on} />
