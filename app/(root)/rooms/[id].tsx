@@ -11,56 +11,57 @@ import AddNewDevice from '@/components/AddNewDevice';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-type Fan = {
-    title: string;
-    feedId: number;
-    id: number;
-    name: string;
-    value: number;
-};
+// type Fan = {
+//     title: string;
+//     feedId: number;
+//     id: number;
+//     name: string;
+//     value: number;
+// };
 
-type Light = {
-    id: number;
-    name: string;
-    value: number;
-};
+// type Light = {
+//     id: number;
+//     name: string;
+//     value: number;
+// };
 
-type Sensor = {
-    id: number;
-    name: string;
-    value: number;
-};
+// type Sensor = {
+//     id: number;
+//     name: string;
+//     value: number;
+// };
 
 export default function Room() {
     const router = useRouter();
     const roomName = useState(["Phòng Khách", "Phòng Ngủ", "Phòng Bếp"]);
     const [waring, setWaring] = useState(false);
     const [room, setRoom] = useState(null);
-    const [fanList, setFanList] = useState<Fan[]>([]);
-    const [lightList, setLightList] = useState<Light[]>([]);
-    const [sensorList, setSensorList] = useState<Sensor[]>([]);
+    const [fanList, setFanList] = useState([]);
+    const [lightList, setLightList] = useState([]);
+    const [sensorList, setSensorList] = useState([]);
     const [doorList, setDoorList] = useState([]);
     const { id } = useLocalSearchParams();
     const [editMode, setEditMode] = useState(false);
     const [modal, setModal] = useState(false);
     const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
-    const [token, setToken] = useState<string | null>(null);    
+    const [token, setToken] = useState(null);    
+    const [isTokenLoaded, setIsTokenLoaded] = useState(false);
 
     useEffect(() => {
         const fetchToken = async () => {
             const token = await AsyncStorage.getItem("authToken");
             setToken(token);
+            setIsTokenLoaded(true);
         }
         fetchToken();
     }, []);
 
     useEffect(() => {
+        if (!isTokenLoaded) return;
         console.log("### ROOM ID: ", id);
         const fetchDeviceInRoom = async () => {
-            const response = await axios.get(`${base_url}/devices/room/${id}`, {
-                headers: {
-                    "Authorization": token,
-            }})
+            const response = await axios.get(`${base_url}/devices/room/${id}`)
+            console.log("fetch device in room: ", response);   
             if (response.status != 200) {
                 console.log("### ERROR: ", response.data);
             }
@@ -71,25 +72,23 @@ export default function Room() {
             setDoorList(response.data.doorList);
             console.log("## Fan list: ", fanList);
         }
+        fetchDeviceInRoom();
         const fetchRoomData = async () => {
             const response = await axios.get(`${base_url}/rooms`, {
                 headers: {
                     "Authorization": token
                 }
             })
+            console.log("fetch room data: ", response); 
             let room = response.data.find((room) => room.id == id);
             room = { ...room, device: room.fanCount + room.lightCount + room.sensorCount + room.doorCount };
             setRoom(room);
         }
-        fetchDeviceInRoom();
         fetchRoomData();
-        // const interval = setInterval(fetchDeviceInRoom, 5000);
-        // return () => clearInterval(interval);
-
     }, [modal, editMode, token]);
 
 
-
+    if (!token) return
     return (
         <View className="min-h-screen">
             <ScrollView contentContainerStyle={{ flexGrow: 1 }} className='mt-1 mx-2 min-h-screen'>

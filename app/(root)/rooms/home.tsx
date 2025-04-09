@@ -12,6 +12,7 @@ import { rooms } from "@/constants/data";
 import axios from "axios";
 import images from "@/constants/images";
 import AsyncStorage, { useAsyncStorage } from "@react-native-async-storage/async-storage";
+import React from "react";
 // import {API_URL} from "@env";
 
 
