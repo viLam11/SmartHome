@@ -8,6 +8,7 @@ import { Table, Row } from "react-native-table-component";
 import DeviceNav from '@/components/DeviceNav';
 import Navigation from '@/components/Navigation';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const renderCell = (data, index) => {
     if (index === 3) {
@@ -38,6 +39,7 @@ export default function Light() {
     const [color, setColor] = useState("white");
     const [statusAuto, setSatusAuto] = useState(true);
     const [status, setStatus] = useState(false);
+    const [token, setToken] = useState<string | null>(null);
     const [lightData, setLightData] = useState(null);
 
     const tableHead = ["Start", "End", "Brightness", "Edit"];
@@ -46,7 +48,15 @@ export default function Light() {
         ["20:00", "21:00", "nhẹ", ".."]
     ];
 
-    async function powerLight(value) {
+    useEffect(() => {
+        const fetchToken = async () => {   
+            let t = await AsyncStorage.getItem("authToken")
+            setToken(t)
+        }
+        fetchToken()
+    }, [])
+
+    async function powerLight(value: number | string) {
         try {
             const response = await axios.post(`${base_url}/devices/${id}`, { value: value }, {
                 headers: {
@@ -125,7 +135,7 @@ export default function Light() {
                     </View>
                 </View>
 
-                <DeviceNav current={1} id={+id} type={"light"} />
+                <DeviceNav status={1} id={+id} type={"light"} />
 
 
                 <View className='flex flex-row mt-4'>

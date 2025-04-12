@@ -31,7 +31,7 @@ export default function RootLayout() {
     return null;
   }
 
-  return  <GestureHandlerRootView>
+  return <GestureHandlerRootView>
           <Slot/>
       </GestureHandlerRootView>
 }

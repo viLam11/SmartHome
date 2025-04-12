@@ -15,5 +15,5 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "nativewind-env.d.ts"
-, "app/(root)/rooms/[id].tsx"  ]
+, "app/(root)/rooms/[id].tsx", "app/(root)/hist/[id].js"  ]
 }
