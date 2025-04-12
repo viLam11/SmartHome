@@ -54,6 +54,7 @@ export default function Room() {
             setIsTokenLoaded(true);
         }
         fetchToken();
+        setEditMode(false);
     }, []);
 
     useEffect(() => {
@@ -155,7 +156,7 @@ export default function Room() {
                                 {fanList.length > 0 && fanList.map((fan, index) => (
                                     <View key={index} className={`mt-2 ${fan.value == 0 ? "bg-disable" : "bg-enable"} p-2 rounded-xl `}>
                                         <TouchableOpacity onPress={() => { router.push(`/devices/fans/${fan.feedId}`) }}>
-                                            <Text className='font-semibold'>Quạt trần {fan.title}</Text>
+                                            <Text className='font-semibold'>Quạt {fan.title}</Text>
                                         </TouchableOpacity>
 
                                     </View>
@@ -198,7 +199,7 @@ export default function Room() {
                         <View className="bg-white m-2 p-2 rounded-lg">
                             <View className="flex flex-row items-center">
                                 <View className='w-1/3'>
-                                    <Image source={images.sensor} style={{ width: 40, height: 40 , opacity: 0.8, tintColor: (room && room.sensor_on) ? "#F5BA0B" : "#F5BA0B" }} />
+                                    <Image source={images.sensor} style={{ width: 40, height: 40 , opacity: 0.8, tintColor: (room && room.sensor_on) ? "#F5BA0B" : "black" }} />
                                 </View>
                                 <View className='w-2/3'>
                                     <Text className='ml-4 text-xl font-bold'>Cảm biến</Text>
@@ -207,9 +208,33 @@ export default function Room() {
                             </View>
 
                             <View className='mt-2'>
-                                {sensorList.length > 0 && sensorList.map((_, index) => (
+                                {sensorList.length > 0 && sensorList.map((sensor, index) => (
                                     <View key={index} className="w-2/3 mt-2 bg-enable p-2 rounded-xl">
-                                        <Text className='font-semibold'>Cảm biến {index + 1}</Text>
+                                        <Text className='font-semibold'>Cảm biến {sensor.title}</Text>
+                                    </View>
+                                ))}
+                            </View>
+
+                        </View>
+                    </View>
+                    <View className='w-1/2 flex flex-col  '>
+                        <View className="bg-white m-2 p-2 rounded-lg">
+                            <View className="flex flex-row items-center">
+                                <View className='w-1/3'>
+                                    <Image source={images.door} style={{ width: 40, height: 40 , opacity: 0.8, tintColor: (room && room.door_on > 0) ? "#F5BA0B" : "black" }} />
+                                </View>
+                                <View className='w-2/3'>
+                                    <Text className='ml-4 text-xl font-bold'>Cửa</Text>
+                                    <Text className='ml-4 color-gray-500'>{ doorList.length} thiết bị</Text>
+                                </View>
+                            </View>
+
+                            <View className='mt-2'>
+                                {doorList.length > 0 && doorList.map((door, index) => (
+                                    <View key={index} className="mt-2 bg-enable p-2 rounded-xl">
+                                        <TouchableOpacity onPress={() => { router.push(`/devices/doors/${door.feedId}`) }}> 
+                                            <Text className='font-semibold'>{door.title}</Text>
+                                        </TouchableOpacity>
                                     </View>
                                 ))}
                             </View>
@@ -218,7 +243,7 @@ export default function Room() {
                     </View>
 
                 </View>
-                <View className="absolute bottom-2 w-full">
+                <View className="absolute bottom-2 w-full h-24">
                     <Navigation current={2} />
                 </View>
             </ScrollView>
@@ -240,8 +265,8 @@ export default function Room() {
                     {editMode ?
                         <View className="bg-white h-2/4 w-full bottom-0 z-20 rounded-s-3xl">
                             <View>
-                                <TouchableOpacity onPress={() => setModal(false)}>
-                                    <Text>Close</Text>
+                                <TouchableOpacity onPress={() => { setEditMode(false) }} className="absolute top-2 right-2">
+                                    <Text>Close hhhhh</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -258,4 +283,3 @@ export default function Room() {
 }
 
 const styles = StyleSheet.create({})
-

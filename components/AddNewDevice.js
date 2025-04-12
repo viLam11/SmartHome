@@ -3,9 +3,9 @@ import { useState, useEffect } from 'react';
 import { IconSymbol } from './ui/IconSymbol';
 import images from '@/constants/images';
 import axios from 'axios';
-
+import React from 'react';
 // deviceType: 0 - Fan, 1 - Light, 2 - Sensor
-const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';   
+const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
 
 export default function AddNewDevice({ setModal, room }) {
     const [nameMode, setNameMode] = useState(false);
@@ -30,94 +30,119 @@ export default function AddNewDevice({ setModal, room }) {
     }
 
     return (
-        <View>
-            <View className="flex flex-row">
-                <View className="flex-grow w-2/3 mt-4">
-                    <Text className="text-xl text-center font-semibold">Thêm thiết bị vào</Text>
-                    <Text className="text-xl text-center font-semibold">{room ? room.name : ""}</Text>
-                </View>
-                <View className="flex items-end mt-4 m-4">
-                    <TouchableOpacity onPress={() => setModal(false)} className='bg-black rounded-full'>
-                        <IconSymbol name="close" color="white" />
-                    </TouchableOpacity>
-                </View>
-            </View>
-            <View className="mt-4">
-                <View className="flex flex-row w-full justify-between mx-auto">
-                    <View className="bg-gray-200 w-5/12 h-24 p-2 rounded-lg mx-auto">
-                        <View className='flex flex-row justify-between'>
-                            <View className="p-2 bg-white rounded-full">
-                                <Image source={images.fan} style={{ width: 20, height: 20, tintColor: "black" }} />
-                            </View>
-                            <View className="">
-                                <TouchableOpacity onPress={() => setDeviceType(0)}>
-                                    {deviceType == 0 ?
-                                        <View className=" border-green-400 border-2 rounded-full w-8 h-8">
-                                            <View className="bg-green-400 rounded-full w-4 h-4 m-auto"></View>
-                                        </View>
-                                        :
-                                        <View className=" border-black border-2 rounded-full w-8 h-8"></View>
-                                    }
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                        <View className='mt-auto'>
-                            <Text className='text-lg font-bold'>Quạt</Text>
-                        </View>
+        <View className='w-full h-full '>
+            <View className="flex-1">
+                <View className="flex flex-row">
+                    <View className="flex-grow w-2/3 mt-4">
+                        <Text className="text-xl text-center font-semibold">Thêm thiết bị vào</Text>
+                        <Text className="text-xl text-center font-semibold">{room ? room.name : ""}</Text>
                     </View>
-                    <View className="bg-gray-200 w-5/12 mx-auto h-24 p-2 rounded-lg">
-                        <View className='flex flex-row justify-between'>
-                            <View className="p-2 bg-white rounded-full">
-                                <Image source={images.lightbulb} style={{ width: 20, height: 20, tintColor: "black" }} />
-                            </View>
-                            <View className="">
-                                <TouchableOpacity onPress={() => setDeviceType(1)}>
-                                    {deviceType == 1 ?
-                                        <View className=" border-green-400 border-2 rounded-full w-8 h-8">
-                                            <View className="bg-green-400 rounded-full w-4 h-4 m-auto"></View>
-                                        </View>
-                                        :
-                                        <View className=" border-black border-2 rounded-full w-8 h-8"></View>
-                                    }
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                        <View className='mt-auto'>
-                            <Text className='text-lg font-bold'>Đèn</Text>
-                        </View>
+                    <View className="flex items-end mt-4 m-4">
+                        <TouchableOpacity onPress={() => setModal(false)} className='bg-black rounded-full'>
+                            <IconSymbol name="close" color="white" />
+                        </TouchableOpacity>
                     </View>
                 </View>
-                <View className="flex flex-row w-full justify-between mx-auto mt-2">
-                    <View className="bg-gray-200 w-5/12 h-24 p-2 rounded-lg mx-auto">
-                        <View className='flex flex-row justify-between'>
-                            <View className="p-2 bg-white rounded-full">
-                                <Image source={images.aircondition} style={{ width: 20, height: 20, tintColor: "black" }} />
+                <View className="mt-4">
+                    <View className="flex flex-row w-full justify-between mx-auto">
+                        <View className="bg-gray-200 w-5/12 h-24 p-2 rounded-lg mx-auto">
+                            <View className='flex flex-row justify-between'>
+                                <View className="p-2 bg-white rounded-full">
+                                    <Image source={images.fan} style={{ width: 20, height: 20, tintColor: "black" }} />
+                                </View>
+                                <View className="">
+                                    <TouchableOpacity onPress={() => setDeviceType(0)}>
+                                        {deviceType == 0 ?
+                                            <View className=" border-green-400 border-2 rounded-full w-8 h-8">
+                                                <View className="bg-green-400 rounded-full w-4 h-4 m-auto"></View>
+                                            </View>
+                                            :
+                                            <View className=" border-black border-2 rounded-full w-8 h-8"></View>
+                                        }
+                                    </TouchableOpacity>
+                                </View>
                             </View>
-                            <View className="">
-                                <TouchableOpacity onPress={() => setDeviceType(2)}>
-                                    {deviceType == 2 ?
-                                        <View className=" border-green-400 border-2 rounded-full w-8 h-8">
-                                            <View className="bg-green-400 rounded-full w-4 h-4 m-auto"></View>
-                                        </View>
-                                        :
-                                        <View className=" border-black border-2 rounded-full w-8 h-8"></View>
-                                    }
-                                </TouchableOpacity>
+                            <View className='mt-auto'>
+                                <Text className='text-lg font-bold'>Quạt</Text>
                             </View>
                         </View>
-                        <View className='mt-auto'>
-                            <Text className='text-lg font-bold'>Cảm biến</Text>
+                        <View className="bg-gray-200 w-5/12 mx-auto h-24 p-2 rounded-lg">
+                            <View className='flex flex-row justify-between'>
+                                <View className="p-2 bg-white rounded-full">
+                                    <Image source={images.lightbulb} style={{ width: 20, height: 20, tintColor: "black" }} />
+                                </View>
+                                <View className="">
+                                    <TouchableOpacity onPress={() => setDeviceType(1)}>
+                                        {deviceType == 1 ?
+                                            <View className=" border-green-400 border-2 rounded-full w-8 h-8">
+                                                <View className="bg-green-400 rounded-full w-4 h-4 m-auto"></View>
+                                            </View>
+                                            :
+                                            <View className=" border-black border-2 rounded-full w-8 h-8"></View>
+                                        }
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                            <View className='mt-auto'>
+                                <Text className='text-lg font-bold'>Đèn</Text>
+                            </View>
                         </View>
                     </View>
-                    <View className="bg-white w-5/12 mx-auto p-2 rounded-lg">
+                    <View className="flex flex-row w-full justify-between mx-auto mt-2">
+                        <View className="bg-gray-200 w-5/12 h-24 p-2 rounded-lg mx-auto">
+                            <View className='flex flex-row justify-between'>
+                                <View className="p-2 bg-white rounded-full">
+                                    <Image source={images.sensor} style={{ width: 20, height: 20, tintColor: "black" }} />
+                                </View>
+                                <View className="">
+                                    <TouchableOpacity onPress={() => setDeviceType(2)}>
+                                        {deviceType == 2 ?
+                                            <View className=" border-green-400 border-2 rounded-full w-8 h-8">
+                                                <View className="bg-green-400 rounded-full w-4 h-4 m-auto"></View>
+                                            </View>
+                                            :
+                                            <View className=" border-black border-2 rounded-full w-8 h-8"></View>
+                                        }
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                            <View className='mt-auto'>
+                                <Text className='text-lg font-bold'>Cảm biến</Text>
+                            </View>
+                        </View>
+                        
+                        {/* door option */}
+                        <View className="bg-gray-200 w-5/12 h-24 p-2 rounded-lg mx-auto">
+                            <View className='flex flex-row justify-between'>
+                                <View className="p-2 bg-white rounded-full">
+                                    <Image source={images.door} style={{ width: 20, height: 20, tintColor: "black" }} />
+                                </View>
+                                <View className="">
+                                    <TouchableOpacity onPress={() => setDeviceType(3)}>
+                                        {deviceType == 3 ?
+                                            <View className=" border-green-400 border-2 rounded-full w-8 h-8">
+                                                <View className="bg-green-400 rounded-full w-4 h-4 m-auto"></View>
+                                            </View>
+                                            :
+                                            <View className=" border-black border-2 rounded-full w-8 h-8"></View>
+                                        }
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                            <View className='mt-auto'>
+                                <Text className='text-lg font-bold'>Cửa</Text>
+                            </View>
+                        </View>
                     </View>
-                </View>
 
+                </View>
             </View>
+
+
 
             {/* Button */}
-            <View className='w-11/12 mx-auto mt-2'>
-                <TouchableOpacity onPress={() => hanldeContinueName()}>
+            <View className='w-11/12 mx-auto mt-2 p-2'>
+                <TouchableOpacity onPress={() => hanldeContinueName()} className='bottom-0'>
                     <View className="bg-green-300 p-2 rounded-lg">
                         <Text className="text-center font-bold">Tiếp tục</Text>
                     </View>
@@ -138,6 +163,8 @@ const SetNewName = ({ feedKey, setFeedKey, feedID, setFeedID, setFinishMode, set
             setTextType('Đèn');
         } else if (deviceType == 2) {
             setTextType('Cảm biến');
+        } else if (deviceType == 3) {
+            setTextType('Cửa')
         }
     }, [deviceType])
 
@@ -222,7 +249,10 @@ const FinishModal = ({ setFinishMode, feedKey, feedID, setModal, deviceName, dev
         } else if (deviceType == 2) {
             setTextType('Cảm biến');
             setType('sensor');
-        }
+        } else if(deviceType == 3) {
+            setTextType('Cửa');
+            setType('door');
+        }   
     }, [deviceType])
 
     // {

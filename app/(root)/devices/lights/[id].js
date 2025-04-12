@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Image, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Modal, KeyboardAvoidingView, Platform, Button } from 'react-native';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import images from '@/constants/images';
 import { useState, useEffect } from 'react';
 import { Table, Row } from "react-native-table-component";
@@ -9,47 +10,40 @@ import DeviceNav from '@/components/DeviceNav';
 import Navigation from '@/components/Navigation';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ScheduleTable from '@/components/ScheduleTable';
 
-const renderCell = (data, index) => {
-    if (index === 3) {
-        // Nếu là cột "Edit", thêm button
-        return (
-            <TouchableOpacity onPress={() => alert("Xóa hàng này")}>
-                <Text style={{ color: "red", textAlign: "center" }}>Xóa</Text>
-            </TouchableOpacity>
-        );
-    }
-    return <Text>{data}</Text>;
+const formatTime = (date) => {
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const hourString = hours.toString().padStart(2, '0');
+
+    return `${hourString}:${minutes} ${ampm}`;
 };
-
-// data: {
-//     "feedId": "3023667",
-//     "feedKey": "fan",
-//     "value": "0",
-//     "type": "fan",
-//     "title": "quat tran",
-//     "created_at": "2025-03-24T07:13:51Z"
-// }
 
 export default function Light() {
     const router = useRouter();
     const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
     const { id } = useLocalSearchParams();
-
     const [color, setColor] = useState("white");
     const [statusAuto, setSatusAuto] = useState(true);
     const [status, setStatus] = useState(false);
     const [token, setToken] = useState(null);
+    const [showPicker, setShowPicker] = useState(false);
+    const [timer, setTimer] = useState(0);
+    const [startTime, setStartTime] = useState(new Date());
+    const [endTime, setEndTime] = useState(new Date());
+    const [modal, setModal] = useState(false);
     const [lightData, setLightData] = useState(null);
-
     const tableHead = ["Start", "End", "Brightness", "Edit"];
     const tableData = [
         ["17:00", "16:00", "nhẹ", ".."],
         ["20:00", "21:00", "nhẹ", ".."]
     ];
-
     useEffect(() => {
-        const fetchToken = async () => {   
+        const fetchToken = async () => {
             let t = await AsyncStorage.getItem("authToken")
             setToken(t)
         }
@@ -57,10 +51,11 @@ export default function Light() {
     }, [])
 
     async function powerLight(value) {
+        if (!token) return
         try {
             const response = await axios.post(`${base_url}/devices/${id}`, { value: value }, {
                 headers: {
-                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDQwNDM5MjUsInVzZXJJRCI6IjEifQ.KBPm3b4JE7082jm7bm3gZBrFfrAyccvZSmTlAnDaJJ8"
+                    "Authorization": token
                 }
             })
             if (value === "#000000") {
@@ -80,7 +75,7 @@ export default function Light() {
         try {
             const response = await axios.post(`${base_url}/devices/${id}`, { value: value }, {
                 headers: {
-                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDQwNDM5MjUsInVzZXJJRCI6IjEifQ.KBPm3b4JE7082jm7bm3gZBrFfrAyccvZSmTlAnDaJJ8"
+                    "Authorization": token
                 }
             })
             console.log(response)
@@ -115,15 +110,24 @@ export default function Light() {
             }
         }
         fetchCurrentStatus();
-        const interval = setInterval(fetchCurrentStatus, 5000);
-        return () => clearInterval(interval);
-        
+        // const interval = setInterval(fetchCurrentStatus, 5000);
+        // return () => clearInterval(interval);
+
     }, [])
 
+    const onChange = (event, selectedTime) => {
+        setShowPicker(false);
+        if(timer == 0) {
+            setStartTime(selectedTime);
+        } else {
+            setEndTime(selectedTime);
+        }
+    };
 
-   return(
+    
+    return (
         <View className='flex-1'>
-            <ScrollView className='mt-1 mx-2'>
+            <ScrollView className={`mt-1 mx-2`}>
                 <View className='flex flex-row justify-between'>
                     <View className="mx -2">
                         <TouchableOpacity onPress={() => { router.back() }}>
@@ -150,7 +154,7 @@ export default function Light() {
                         <View className='w-40'>
                             <Text className="px-2 w-40 font-semibold"> {status ? "Bật" : "Tắt"}     </Text>
                         </View>
-                        <TouchableOpacity onPress={() => { if(status) {powerLight("#000000")} else{ powerLight("#F2F2F2")} }}>
+                        <TouchableOpacity onPress={() => { if (status) { powerLight("#000000") } else { powerLight("#F2F2F2") } }}>
                             <Image source={status ? images.auto_on : images.auto_off} />
                         </TouchableOpacity>
                         <View >
@@ -183,47 +187,69 @@ export default function Light() {
                     <View>
                         <View className='flex flex-row justify-between'>
                             <Text className='font-semibold mt-4'>Hẹn giờ</Text>
-                            <TouchableOpacity onPress={() => alert("Thêm hẹn giờ")}>
+                            <TouchableOpacity className="absolute top-4 right-4 w-8 h-8 rounded-full bg-black items-center justify-center z-50" onPress={() => {setModal(true); console.log("Modal", modal)}}>
                                 <View className='bg-black rounded-full'>
                                     <IconSymbol name="add" color="white" />
                                 </View>
                             </TouchableOpacity>
                         </View>
                         <View className='mt-2'>
-                            <View style={{ borderWidth: 1, borderColor: "black", borderRadius: 10, overflow: "hidden" }}>
-                                <Table borderStyle={{ borderWidth: 0 }}>
-                                    {/* Header */}
-                                    <Row
-                                        data={tableHead}
-                                        style={{
-                                            height: 40,
-                                            backgroundColor: "#FFD700",
-                                            borderBottomWidth: 1,
-                                            borderColor: "black",
-                                        }}
-                                        textStyle={{ textAlign: "center", fontWeight: "bold" }}
-                                    />
-                                    {/* Body */}
-                                    {tableData.map((rowData, rowIndex) => (
-                                        <Row
-                                            key={rowIndex}
-                                            data={rowData.map((cell, cellIndex) => renderCell(cell, cellIndex))}
-                                            style={{ height: 30 }}
-                                            textStyle={{ textAlign: "center" }}
-                                        />
-                                    ))}
-                                </Table>
-                            </View>
+                            <ScheduleTable tableData={tableData} />
                         </View>
                     </View>
-
-                    <View className='h-10'></View>
                 </View>
 
             </ScrollView>
             <View className="absolute bottom-2 w-full">
                 <Navigation current={2} />
             </View>
-        </View>
-   )
+            {modal &&  <Modal
+                animationType="slide"
+                transparent={true}
+                visible={true}
+                onRequestClose={() => {
+                    setModal(false);
+                }}
+                className='bg-green-50 z-20'
+            >
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                    style={{ flex: 1, justifyContent: 'flex-end' }}
+                >
+                   <View className="bg-gray-400 h-44 w-full bottom-0 z-20 rounded-3xl my-auto p-2">
+                        <View className='w-full flex flex-row justify-between items-center'>
+                            <Text className='text-2xl font-bold m-2 text-gray-100'>Hẹn giờ</Text>
+                            <TouchableOpacity onPress={() => setModal(false)}>
+                            <IconSymbol name="close" color="white" className="absolute right-0 top-2" />
+                            </TouchableOpacity>
+                        </View>
+                        <View className='flex flex-row items-center justify-center w-full mx-auto mt-6'>
+                            <View>
+                                <TouchableOpacity onPress={() =>{ setTimer(0); setShowPicker(true)}} className="bg-white p-3 rounded-lg shadow">
+                                    <Text className='font-bold text-3xl'>{formatTime(startTime)}</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <Text className='font-bold text-3xl'>  -  </Text>
+                            <View>
+                                <TouchableOpacity onPress={() =>{ setTimer(1); setShowPicker(true)}} className="bg-white p-3 rounded-lg shadow">
+                                    <Text className='font-bold text-3xl'>{formatTime(endTime)}</Text>
+                                </TouchableOpacity>
+                            </View>
+                            {showPicker && (
+                                <DateTimePicker
+                                    value={timer == 0 ? startTime : endTime}
+                                    mode="time"
+                                    is24Hour={false}
+                                    display="spinner"
+                                    onChange={onChange}
+                                />
+                            )}
+                        </View>
+                </View>
+            </KeyboardAvoidingView>
+                    </Modal>
+            }
+           
+        </View >
+    )
 }

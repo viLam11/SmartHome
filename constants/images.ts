@@ -27,6 +27,7 @@ import canh_quat from "@/assets/images/canh_quat.png";
 import than_quat from "@/assets/images/than_quat.png";
 import done from "@/assets/images/done.png";
 import sensor from "@/assets/images/sensor.png";
+import smart_door from "@/assets/images/smart_door.png";  
 export default {  
   sensor,
   onboarding,
@@ -50,5 +51,6 @@ export default {
   lamp, light, power,
   auto_on, auto_off,
   canh_quat, than_quat,
-  done
+  done, 
+  smart_door
 };

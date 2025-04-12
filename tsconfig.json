@@ -15,5 +15,5 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "nativewind-env.d.ts"
-, "app/(root)/rooms/[id].tsx", "app/(root)/hist/[id].js", "app/(root)/devices/lights/[id].js"  ]
+, "app/(root)/rooms/[id].js", "app/(root)/hist/[id].js", "app/(root)/devices/lights/[id].js", "app/(root)/devices/fans/[id].js", "app/(root)/rooms/home.js", "components/AddNewDevice.js", "components/Navigation.js"  ]
 }

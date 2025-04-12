@@ -2,15 +2,6 @@ import React, { Component } from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
 import { Table, TableWrapper, Row, Cell } from 'react-native-table-component';
 
-// export default class ExampleThree extends Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {
-//       tableHead: ['Hoạt động', 'Thời gian',],
-//       widthArr: [60, 40]
-//     }
-//   }
-
 
 const tableHead = ['Hoạt động', 'Thời gian']
 const  widthArr =  [60, 40]

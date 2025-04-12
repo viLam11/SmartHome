@@ -25,6 +25,8 @@ const MAPPING = {
   "user":"person",
   "support": "support-agent",
   "exit": "logout",
+  "eye": "visibility",
+  "eye.slash": "visibility-off",
 } as const;
   // } as Partial<
 //   Record<

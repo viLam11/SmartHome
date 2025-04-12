@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Image, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Image, Text, ScrollView, TouchableOpacity , KeyboardAvoidingView, Platform} from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import images from '@/constants/images';
@@ -9,9 +9,13 @@ import DeviceNav from '@/components/DeviceNav';
 import Navigation from '@/components/Navigation';
 import SpinningFan from '@/components/SpinningFan';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Modal } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+
 const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
 
-const renderCell = (data: string, index: number) => {
+const renderCell = (data, index) => {
     if (index === 3) {
         // Nếu là cột "Edit", thêm button
         return (
@@ -22,10 +26,16 @@ const renderCell = (data: string, index: number) => {
     }
     return <Text className='text-center'>{data}</Text>;
 };
+const formatTime = (date) => {
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const hourString = hours.toString().padStart(2, '0');
 
-
-
-
+    return `${hourString}:${minutes} ${ampm}`;
+};
 export default function Fan() {
     const router = useRouter();
     const { id } = useLocalSearchParams();
@@ -34,26 +44,37 @@ export default function Fan() {
     const [status, setStatus] = useState(false);
     const [statusAuto, setSatusAuto] = useState(false);
     const [fanData, setFanData] = useState(null);
-
+    const [token, setToken] = useState(null);
+    const [showPicker, setShowPicker] = useState(false);
+    const [timer, setTimer] = useState(0);
+    const [startTime, setStartTime] = useState(new Date());
+    const [endTime, setEndTime] = useState(new Date());
+    const [modal, setModal] = useState(false);
     const tableHead = ["Start", "End", "Brightness", "Edit"];
     const tableData = [
         ["17:00", "16:00", "nhẹ", ".."],
         ["20:00", "21:00", "nhẹ", ".."]
     ];
-
     useEffect(() => {
+        const fetchToken = async () => {
+            let t = await AsyncStorage.getItem("authToken")
+            setToken(t)
+        }
+        fetchToken()
+    }, [])
+    useEffect(() => {
+        console.log(token)
         const fetchCurrentStatus = async () => {
-            console.log("## Feed ID: ", id);
             const response = await axios.get(`${base_url}/devices/${id}`);
             setFanData(response.data)
             const fanTemp = response.data;
-            if (fanTemp.value == 1) {
+            if (fanTemp.value == 50) {
                 setSpeed(150);
                 setStatus(true);
-            } else if (fanTemp.value == 2) {
+            } else if (fanTemp.value == 75) {
                 setSpeed(100);
                 setStatus(true);
-            } else if (fanTemp.value == 3) {
+            } else if (fanTemp.value == 100) {
                 setSpeed(25);
                 setStatus(true);
             }
@@ -61,12 +82,12 @@ export default function Fan() {
         fetchCurrentStatus();
     }, [id]);
 
-    async function handleFanSpeed(id: string | string[], level: number) {
-        console.log("check :", level)
+    async function handleFanSpeed(id, level) {
+        if (!token) return
         try {
             const respone = await axios.post(`${base_url}/devices/${id}`, { value: level.toString() }, {
                 headers: {
-                    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3NDM0ODI5OTQsInVzZXJJRCI6IjEifQ.9Gt8rqLKmePlnbc2MpkCofnGSK_gmf0WqoXlNuv75EE"
+                    "Authorization": token
                 }
             });
 
@@ -88,8 +109,17 @@ export default function Fan() {
         }
     }
 
+    const onChange = (event, selectedTime) => {
+        setShowPicker(false);
+        if(timer == 0) {
+            setStartTime(selectedTime);
+        } else {
+            setEndTime(selectedTime);
+        }
+    };
 
     return (
+
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} className='min-h-screen flex-1 m-2'>
             <View className='flex flex-row justify-between'>
                 <View className="mx -2">
@@ -97,7 +127,7 @@ export default function Fan() {
                         <IconSymbol name="back" color="black" />
                     </TouchableOpacity>
                 </View>
-                <Text className='text-xl font-bold'>QUẠT {+id}</Text>
+                <Text className='text-xl font-bold'>Quạt {+id}</Text>
                 <View>
                 </View>
             </View>
@@ -110,7 +140,7 @@ export default function Fan() {
                         <View className=' flex flex-row'>
                             {/* {status ? <Text className="px-2 w-20 font-semibold">Bật</Text> : <Text className="px-2 w-20 font-semibold">Tắt</Text>} */}
                             <TouchableOpacity onPress={() => { if (status) { handleFanSpeed(id, 0) } else { setStatus(true), handleFanSpeed(id, 1) } }}>
-                                <Image source={status ? images.power : images.power} style={{width: 46, height: 40}} />
+                                <Image source={status ? images.power : images.power} style={{ width: 46, height: 40 }} />
                             </TouchableOpacity>
                         </View>
                         <TouchableOpacity onPress={() => handleFanSpeed(id, 1)} className={`w-6 h-6 mx-1 rounded-full ${speed == 150 ? "bg-yellow" : "bg-gray-500"}  flex items-center justify-center`}>
@@ -124,14 +154,6 @@ export default function Fan() {
                         </TouchableOpacity>
                     </View>
                 </View>
-                {/* <View className='w-1/2 flex flex-col items-end px-4 '>
-                    <View className=' flex flex-row'>
-                        {status ? <Text className="px-2 w-20 font-semibold">Bật</Text> : <Text className="px-2 w-20 font-semibold">Tắt</Text>}
-                        <TouchableOpacity onPress={() => { if (status) { handleFanSpeed(id, 0) } else { setStatus(true),handleFanSpeed(id, 1) } }}>
-                            <Image source={status ? images.auto_on : images.auto_off} />
-                        </TouchableOpacity>
-                    </View>
-                </View> */}
             </View>
 
 
@@ -149,7 +171,7 @@ export default function Fan() {
                 <View>
                     <View className='flex flex-row justify-between'>
                         <Text className='font-semibold mt-4'>Hẹn giờ</Text>
-                        <TouchableOpacity onPress={() => alert("Thêm hẹn giờ")}>
+                        <TouchableOpacity onPress={() => setModal(true)}>
                             <View className='bg-black rounded-full'>
                                 <IconSymbol name="add" color="white" />
                             </View>
@@ -192,6 +214,52 @@ export default function Fan() {
                     <Navigation current={2} />
                 </View>
             </View>
+            {modal && <Modal
+                animationType="slide"
+                transparent={true}
+                visible={true}
+                onRequestClose={() => {
+                    setModal(false);
+                }}
+                className='bg-green-50 z-20'
+            >
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                    style={{ flex: 1, justifyContent: 'flex-end' }}
+                >
+                    <View className="bg-gray-400 h-44 w-full bottom-0 z-20 rounded-3xl my-auto p-2">
+                        <View className='w-full flex flex-row justify-between items-center'>
+                            <Text className='text-2xl font-bold m-2 text-gray-100'>Hẹn giờ</Text>
+                            <TouchableOpacity onPress={() => setModal(false)}>
+                                <IconSymbol name="close" color="white" className="absolute right-0 top-2" />
+                            </TouchableOpacity>
+                        </View>
+                        <View className='flex flex-row items-center justify-center w-full mx-auto mt-6'>
+                            <View>
+                                <TouchableOpacity onPress={() => { setTimer(0); setShowPicker(true) }} className="bg-white p-3 rounded-lg shadow">
+                                    <Text className='font-bold text-3xl'>{formatTime(startTime)}</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <Text className='font-bold text-3xl'>  -  </Text>
+                            <View>
+                                <TouchableOpacity onPress={() => { setTimer(1); setShowPicker(true) }} className="bg-white p-3 rounded-lg shadow">
+                                    <Text className='font-bold text-3xl'>{formatTime(endTime)}</Text>
+                                </TouchableOpacity>
+                            </View>
+                            {showPicker && (
+                                <DateTimePicker
+                                    value={timer == 0 ? startTime : endTime}
+                                    mode="time"
+                                    is24Hour={false}
+                                    display="spinner"
+                                    onChange={onChange}
+                                />
+                            )}
+                        </View>
+                    </View>
+                </KeyboardAvoidingView>
+            </Modal>
+            }
         </ScrollView>
     )
 }
