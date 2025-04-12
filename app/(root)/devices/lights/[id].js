@@ -39,7 +39,7 @@ export default function Light() {
     const [color, setColor] = useState("white");
     const [statusAuto, setSatusAuto] = useState(true);
     const [status, setStatus] = useState(false);
-    const [token, setToken] = useState<string | null>(null);
+    const [token, setToken] = useState(null);
     const [lightData, setLightData] = useState(null);
 
     const tableHead = ["Start", "End", "Brightness", "Edit"];
@@ -56,7 +56,7 @@ export default function Light() {
         fetchToken()
     }, [])
 
-    async function powerLight(value: number | string) {
+    async function powerLight(value) {
         try {
             const response = await axios.post(`${base_url}/devices/${id}`, { value: value }, {
                 headers: {
