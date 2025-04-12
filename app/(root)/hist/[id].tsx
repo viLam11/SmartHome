@@ -1,10 +1,13 @@
-import React from 'react';
+
+import { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Table, Row } from "react-native-table-component";
 import Navigation from '@/components/Navigation';
-import DeviceNav from '@/components/DeviceNav';
+import DeviceHeader from '@/components/device/DeviceHeader';
+import { getDeviceData } from '@/services/deviceService';
+import { deviceStatusObject } from '@/types/device.type';
+import { useLoading } from '@/contexts/LoadingContext';
 
 const renderCell = (data, index) => {
     if (index === 3) {
@@ -18,32 +21,34 @@ const renderCell = (data, index) => {
 };
 
 export default function History({}) {
-    const { feedId } = useLocalSearchParams();
-    const router = useRouter();
+    const feedId = useLocalSearchParams().id;
+    const { setLoading } = useLoading();
     const tableHead = ["Hoạt động", "Thời gian", "Người thực hiện"];
     const tableData = [
         ["17:00", "16:00", "nhẹ"],
         ["20:00", "21:00", "nhẹ"],
         ["17:00", "16:00", "nhẹ"]
     ];
-
+    const [deviceData, setDeviceData] = useState<deviceStatusObject | null>(null);
+    useEffect(() => {
+        if (!feedId) return;
+        setLoading(true);
+        (async () => {
+            try {
+                // const response = await getDeviceData(feedId as string);
+                // setDeviceData(response);
+            } catch (error) {
+                console.error("Error fetching device data:", error);
+            } finally {
+                setLoading(false);
+            }
+        })();
+    }, [feedId]);
     return (
         <View className="flex-1">
             <ScrollView contentContainerStyle={{ flexGrow: 1 }} className='mt-1 flex-grow mx-2 min-h-screen'>
                 <View>
-                    <View className='flex flex-row justify-between'>
-                        <View className="mx -2">
-                            <TouchableOpacity onPress={() => { router.back() }}>
-                                <IconSymbol name="back" />
-                            </TouchableOpacity>
-                        </View>
-                        <Text className='text-xl font-bold'>Đèn {+feedId}</Text>
-                        <View>
-                        </View>
-                    </View>
-
-                    <DeviceNav current={2} feedId={+feedId} type="light" />
-                    
+                    <DeviceHeader feedId={+feedId} title={deviceData ? `${deviceData.type} ${deviceData.title}` : null} />                    
 
                     <View className='my-10'>
                         <View style={{ borderWidth: 1, borderColor: "black", borderRadius: 10, overflow: "hidden" }}>

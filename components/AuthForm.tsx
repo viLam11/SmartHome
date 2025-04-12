@@ -28,68 +28,21 @@ export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
     //         return;
     //     }
 
-    //     setLoading(true);
-    //     try {
-    //         if (isSignIn) {
-    //             const response = await signInService({ email, password });
-    //             setTimeout(() => {
-    //                 router.replace('/rooms/home');
-    //             }, 3000);
-    //         } else {
-    //             const response = await registerService({ firstname: firstName, lastname: lastName, email, password });
-    //             Alert.alert('Thành công', 'Đăng ký thành công');
-    //             setTimeout(() => {
-    //                 router.replace('/rooms/home');
-    //             }, 3000);
-    //         }
-    //     } catch (error) {
-    //         Alert.alert('Lỗi', 'Đăng nhập hoặc đăng ký thất bại');
-    //     }
-    //     setLoading(false);
-    // };
-
-    async function handleAuth() {
-        console.log("Is sign in: ", isSignIn);  
-        console.log("Base url: ", base_url);
-        console.log("Email: ", email);
-        console.log("Password: ", password);
-        if (isSignIn) {
-            axios.post(`${base_url}/login`, {
-                "email": email,
-                "password": password,
-            })
-                .then((response) => {
-                    console.log(response)
-                    AsyncStorage.setItem('authToken', response.data.token);
-                    router.replace('/rooms/home');
-                })
-                .catch((error) => {
-                    console.log(error.response)
-                    if (error.response.status == 400) {
-                        alert("Email hoặc mật khẩu không đúng");
-                    }
-                })
-        } else {
-            axios.post(`${base_url}/register`, {
-                "firstname": firstName,
-                "lastname": lastName,
-                "email": email,
-                "password": password,
-            })
-                .then((response) => {
-                    console.log(response)
-                    alert("Đăng ký thành công");
-                    router.replace('/auth/login');
-                })
-                .catch((error) => {
-                    console.log(error.response)
-                    if (error.response.status == 400) {
-                        alert("Email đã tồn tại");
-                    }
-                })
+        setLoading(true);
+        try {
+            if (isSignIn) {
+                const response = await signInService({ email, password });
+                router.replace('/rooms/home');
+            } else {
+                const response = await registerService({ FirstName: firstName, LastName: lastName, email, password });
+                Alert.alert('Thành công', 'Đăng ký thành công');
+                router.replace('/rooms/home');
+            }
+        } catch (error) {
+            Alert.alert('Lỗi', 'Đăng nhập hoặc đăng ký thất bại');
         }
-
-    }
+        setLoading(false);
+    };
 
     return (
         <SafeAreaView className="bg-white h-full">
