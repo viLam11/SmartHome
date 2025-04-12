@@ -5,14 +5,16 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import images from '@/constants/images';
 import Navigation from '@/components/Navigation';
-import AddNewDevice from '@/components/AddNewDevice';
-import { deviceListObject, DEVICE_FORMAT } from '@/types/device';
-import { RoomObject } from '@/types/room';
+import AddNewDevice from '@/components/device/AddNewDevice';
+import { deviceListObject, DEVICE_FORMAT } from '@/types/device.type';
+import { RoomObject } from '@/types/room.type';
 import { getRoomDevices } from '@/services/deviceService';
 import { getAllRoomService } from '@/services/roomService';
+import { useLoading } from '@/contexts/LoadingContext';
 
 export default function Property() {
     const router = useRouter();
+    const { setLoading } = useLoading();
     const [room, setRoom] = useState<RoomObject | null>(null);
     const [deviceList, setDeviceList] = useState<deviceListObject | null>(null);
     const [deviceCount, setDeviceCount] = useState(0);
@@ -24,15 +26,24 @@ export default function Property() {
     useEffect(() => {
         if (!roomId) return;    
         (async () => {
-            const response = await getRoomDevices(roomId as string);
-            setDeviceList(response);
-            const roomList = await getAllRoomService();
-            const room = roomList.find((room: RoomObject) => room.id === Number(roomId));
-            if (room) {
-                setRoom(room);
-                setDeviceCount((room.fanCount ?? 0) + (room.lightCount ?? 0) + (room.sensorCount ?? 0) + (room.doorCount ?? 0));
-            } else {
-                console.warn(`Room with ID ${roomId} not found`);
+            try {
+                setLoading(true);
+                const response = await getRoomDevices(roomId as string);
+                setDeviceList(response);
+                const roomList = await getAllRoomService();
+                const room = roomList.find((room: RoomObject) => room.id === Number(roomId));
+                if (room) {
+                    setRoom(room);
+                    setDeviceCount((room.fanCount ?? 0) + (room.lightCount ?? 0) + (room.sensorCount ?? 0) + (room.doorCount ?? 0));
+                } else {
+                    console.warn(`Room with ID ${roomId} not found`);
+                }
+            }
+            catch (error) {
+                console.error("Error fetching room data:", error);
+            }
+            finally {
+                setLoading(false);
             }
 
         })();
@@ -111,7 +122,7 @@ export default function Property() {
                                     <View className="mt-2">
                                         {devices.map((device, index) =>{ 
                                             return (
-                                            <TouchableOpacity key={index} onPress={() => router.push(`/${devicesRouter}/${roomId}`)}>
+                                            <TouchableOpacity key={index} onPress={() => router.push(`/${devicesRouter}/${device.feedId}`)}>
                                                 <View className="w-full mt-2 p-2 rounded-xl bg-disable">
                                                     <Text className="font-semibold">{device.title}</Text>
                                                 </View>

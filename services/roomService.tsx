@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { RoomObject } from '../types/room';
+import { RoomObject } from '../types/room.type';
 import { getAuthToken } from './authService';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;

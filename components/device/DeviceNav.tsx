@@ -1,9 +1,8 @@
-import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-import { IconSymbol } from './ui/IconSymbol';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { useRouter, usePathname } from 'expo-router';
 
-type DeviceType = "light" | "fan" | "sensor";
+type DeviceType = "light" | "fan" | "sensor" | "door";
 
 interface DeviceNavProps {
     status?: number;
@@ -11,8 +10,16 @@ interface DeviceNavProps {
     type: DeviceType;
 }
 
-export default function DeviceNav({ status = 1, feedId = 1, type }: DeviceNavProps) {
+export default function DeviceNav({ feedId = 1, type }: DeviceNavProps) {
     const router = useRouter();
+    const pathname = usePathname();
+    const [status, setStatus] = useState(1);
+
+    useEffect(() => {
+        if (pathname.includes('/hist/')) setStatus(2);
+        else if (pathname.includes('/stats/')) setStatus(3);
+        else setStatus(1);
+    }, [pathname]);
     function hanldeNav(index: number) {
         if (index == status) return;
         switch (index) {
@@ -20,6 +27,7 @@ export default function DeviceNav({ status = 1, feedId = 1, type }: DeviceNavPro
                 if (type == "light") router.replace(`/devices/lights/${feedId}`);
                 if (type == "fan") router.replace(`/devices/fans/${feedId}`);
                 if (type == "sensor") router.replace(`/devices/sensors/${feedId}`);
+                // if (type == "door") router.replace(`/devices/doors/${feedId}`);
                 break;
             case 2:
                 router.replace(`/hist/${feedId}`);
@@ -28,7 +36,7 @@ export default function DeviceNav({ status = 1, feedId = 1, type }: DeviceNavPro
                 router.replace(`/devices/stats/${feedId}`);
                 break;
         }
-    }
+    }   
     return (
         <View>
             <View className='flex flex-row  justify-between mt-2 mx-6'>

@@ -1,44 +1,33 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { Stack } from "expo-router";
-import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-
 import "../global.css";
-import SignIn from "./(root)/auth/sign-in";
-// import GlobalProvider from "@/lib/global-provider";
+import { LoadingProvider, useLoading } from "../contexts/LoadingContext";
+import Loading from "../components/common/Loading";
 
-export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
-    "Rubik-Bold": require("../assets/fonts/Rubik-Bold.ttf"),
-    "Rubik-ExtraBold": require("../assets/fonts/Rubik-ExtraBold.ttf"),
-    "Rubik-Light": require("../assets/fonts/Rubik-Light.ttf"),
-    "Rubik-Medium": require("../assets/fonts/Rubik-Medium.ttf"),
-    "Rubik-Regular": require("../assets/fonts/Rubik-Regular.ttf"),
-    "Rubik-SemiBold": require("../assets/fonts/Rubik-SemiBold.ttf"),
-  });
-
-  useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
-
-  if (!fontsLoaded) {
-    return null;
-  }
-
+function AppLayout() {
+  const { loading } = useLoading();
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }} >
+    <GestureHandlerRootView className="flex-1">
       <SafeAreaProvider>
-        <Stack initialRouteName="index" > 
+        <Stack initialRouteName="index">
           <Stack.Screen name="sign-in" />
-          <Stack.Screen name="(tabs)"  />
-          <Stack.Screen name="index" options={{ headerShown: false }}/>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="index" options={{ headerShown: false }} />
         </Stack>
+
+        {loading && <Loading />}
       </SafeAreaProvider>
     </GestureHandlerRootView>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <LoadingProvider>
+      <AppLayout />
+    </LoadingProvider>
   );
 }

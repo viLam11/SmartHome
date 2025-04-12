@@ -18,7 +18,7 @@ const renderCell = (data, index) => {
 };
 
 export default function History({}) {
-    const { feedId } = useLocalSearchParams();
+    const feedId = useLocalSearchParams().id;
     const router = useRouter();
     const tableHead = ["Hoạt động", "Thời gian", "Người thực hiện"];
     const tableData = [

@@ -3,9 +3,9 @@ import images from '@/constants/images';
 export type deviceStatusObject = {
     feedId: number,
     feedKey: string,
+    value: string,
+    type: string,
     title: string,
-    name: string,
-    status: boolean,
     createdAt: string
 };
 

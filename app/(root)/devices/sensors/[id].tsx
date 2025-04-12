@@ -5,8 +5,10 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import images from '@/constants/images';
 import { useState, useEffect } from 'react';
 import { Table, Row } from "react-native-table-component";
-import DeviceNav from '@/components/DeviceNav';
 import Navigation from '@/components/Navigation';
+import DeviceHeader from '@/components/device/DeviceHeader';
+import { getDeviceData, controlDevice } from '@/services/deviceService';
+import { deviceStatusObject } from '@/types/device.type';
 
 
 const renderCell = (data, index) => {
@@ -22,8 +24,7 @@ const renderCell = (data, index) => {
 };
 
 export default function Sensor() {
-    const router = useRouter();
-    const { feedId } = useLocalSearchParams();
+    const feedId = useLocalSearchParams().id;
     const [color, setColor] = useState("white");
     const [statusAuto, setSatusAuto] = useState(true);
     const tableHead = ["Start", "End", "Brightness", "Edit"];
@@ -31,22 +32,20 @@ export default function Sensor() {
         ["17:00", "16:00", "nhẹ", ".."],
         ["20:00", "21:00", "nhẹ", ".."]
     ];
+    const [deviceData, setDeviceData] = useState<deviceStatusObject | null>(null);
+    
+    useEffect(() => {
+            if (!feedId) return;    
+            (async () => {
+                const response = await getDeviceData(feedId as string);
+                setDeviceData(response);
+            })();
+        }, [feedId]);
 
     return (
         <View className='flex-1'>
             <ScrollView className='mt-1 mx-2'>
-                <View className='flex flex-row'>
-                    <View className='w-1/6'>
-                        <TouchableOpacity onPress={() => { router.back() }}>
-                            <IconSymbol name="back" />
-                        </TouchableOpacity>
-                    </View>
-                    <View className='w-4/6 items-center'>
-                        <Text className='text-xl font-bold'>Cảm biến nhiệt {+feedId + 1}</Text>
-                    </View>
-                </View>
-
-                <DeviceNav current={1} feedId={+feedId} type={"sensor"} />
+                <DeviceHeader feedId={+feedId} title="Sensor" />
 
 
                 <View className='flex flex-row mt-4'>

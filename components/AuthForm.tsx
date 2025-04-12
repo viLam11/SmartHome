@@ -28,15 +28,11 @@ export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
         try {
             if (isSignIn) {
                 const response = await signInService({ email, password });
-                setTimeout(() => {
-                    router.replace('/rooms/home');
-                }, 3000);
+                router.replace('/rooms/home');
             } else {
                 const response = await registerService({ FirstName: firstName, LastName: lastName, email, password });
                 Alert.alert('Thành công', 'Đăng ký thành công');
-                setTimeout(() => {
-                    router.replace('/rooms/home');
-                }, 3000);
+                router.replace('/rooms/home');
             }
         } catch (error) {
             Alert.alert('Lỗi', 'Đăng nhập hoặc đăng ký thất bại');

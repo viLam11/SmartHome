@@ -9,12 +9,14 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import NewRoomModal from "@/components/NewRoomModal";
 import RoomImage from "@/components/RoomImage";
 import { getAllRoomService } from "@/services/roomService";
-import { RoomObject } from "@/types/room";
+import { RoomObject } from "@/types/room.type";
 import images from "@/constants/images";
+import { useLoading } from "@/contexts/LoadingContext";
 
 
 export default function HomeIndex() {
     const router = useRouter();
+    const { setLoading } = useLoading();
     // const [roomNum, setRoomNum] = useState(1);
     // const [imgArray, setImgArray] = useState([images.home1, images.home3, images.home3, images.home4]);
     const [modal, setModal] = useState(false);
@@ -30,11 +32,20 @@ export default function HomeIndex() {
     }
 
     useEffect(() => {
+        
         const fetchRoomData = async () => {
-            const response = await getAllRoomService();
-            if (!response) throw new Error("Failed to fetch image");
-                setAllRoomData(response);
-        }
+            setLoading(true);
+        
+            try {
+              const response = await getAllRoomService();
+              if (!response) throw new Error("Failed to fetch image");
+              setAllRoomData(response);
+            } catch (error) {
+              console.error("Error fetching room data:", error);
+            } finally {
+              setLoading(false);
+            }
+          };
         fetchRoomData();
     }, [count]);
 

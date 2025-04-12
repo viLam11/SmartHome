@@ -1,8 +1,8 @@
 import { View, Text, TouchableOpacity, Image, KeyboardAvoidingView, Platform, TextInput } from 'react-native';
 import { useState, useEffect } from 'react';
-import { IconSymbol } from './ui/IconSymbol';
-import { DEVICE_FORMAT, deviceCreateObject } from '@/types/device';
-import { RoomObject } from '@/types/room';
+import { IconSymbol } from '../ui/IconSymbol';
+import { DEVICE_FORMAT, deviceCreateObject } from '@/types/device.type';
+import { RoomObject } from '@/types/room.type';
 import images from '@/constants/images';
 import { addNewDeviceService } from '@/services/deviceService';
  
@@ -201,7 +201,7 @@ const FinishModal = ({ setModal, newDevice }: { setModal: any, newDevice: device
                     <Image source={images.done} style={{ width: 100, height: 100 }} />
                 </View>
                 <Text className='text-center text-2xl font-bold mt-6'>
-                    {device?.name} {newDevice.title} đã được thêm vào
+                    {device?.type} {newDevice.title} đã được thêm vào
                 </Text>
             </View>
             <TouchableOpacity onPress={() => setModal(false)} className="w-11/12 mx-auto h-12 bg-green-300 p-2 rounded-lg">
