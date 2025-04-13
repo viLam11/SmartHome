@@ -209,8 +209,10 @@ export default function Room() {
 
                             <View className='mt-2'>
                                 {sensorList.length > 0 && sensorList.map((sensor, index) => (
-                                    <View key={index} className="w-2/3 mt-2 bg-enable p-2 rounded-xl">
-                                        <Text className='font-semibold'>Cảm biến {sensor.title}</Text>
+                                    <View key={index} className=" mt-2 bg-enable p-2 rounded-xl">
+                                        <TouchableOpacity onPress={() => { router.push(`/devices/sensors/${sensor.feedId}`) }}>
+                                            <Text className='font-semibold'>Cảm biến {sensor.title}</Text>
+                                        </TouchableOpacity>
                                     </View>
                                 ))}
                             </View>
