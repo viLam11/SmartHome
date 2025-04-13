@@ -11,7 +11,7 @@ export default function BarChartAnimated({ barData }: { barData: timeADayObject[
 
     return {
       value: bar.value,
-      label: bar.dayOfWeek,
+      label: bar.date,
       frontColor: color,
       spacing: 12,
       barBorderRadius: 12,
@@ -24,7 +24,7 @@ export default function BarChartAnimated({ barData }: { barData: timeADayObject[
   });
 
   return (
-    <View className="justify-center items-center m-6 bg-white rounded-2xl p-4 pl-1">
+    <View className="justify-center items-center bg-white rounded-2xl p-4 pl-1">
       <Text className="text-lg font-bold mb-2">Running Time</Text>
       <BarChart
         data={data}
