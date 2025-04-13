@@ -1,6 +1,7 @@
 // This file is a fallback for using MaterialIcons on Android and web.
 
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import Feather from '@expo/vector-icons/Feather'
 import { SymbolWeight } from 'expo-symbols';
 import React from 'react';
 import { OpaqueColorValue, StyleProp, ViewStyle, TextStyle } from 'react-native';
@@ -27,6 +28,9 @@ const MAPPING = {
   "exit": "logout",
   "eye": "visibility",
   "eye.slash": "visibility-off",
+  "humidity": "droplet",
+  "temperature": "ac-unit",
+  "wind": "air",
 } as const;
   // } as Partial<
 //   Record<
@@ -55,5 +59,9 @@ export function IconSymbol({
   style?: StyleProp<TextStyle>;
   weight?: SymbolWeight;
 }) {
+  if (name === 'humidity') {
+    return <Feather name="droplet" size={size} color={color} style={style} />;
+  }
+
   return <MaterialIcons color={color} size={size} name={MAPPING[name]} style={style} />;
 }

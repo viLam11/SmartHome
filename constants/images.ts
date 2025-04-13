@@ -28,7 +28,17 @@ import than_quat from "@/assets/images/than_quat.png";
 import done from "@/assets/images/done.png";
 import sensor from "@/assets/images/sensor.png";
 import smart_door from "@/assets/images/smart_door.png";  
+import night from "@/assets/images/night.png";
+import day from "@/assets/images/day.png";
+import cloud_snow from "@/assets/images/cloud_snow.png";
+import night_humid from "@/assets/images/night_humid.png";
+import night_snow from "@/assets/images/night_snow.png";
+import night_wind from "@/assets/images/night_wind.png";
+import snow_wind from "@/assets/images/snow_wind.png";
+import sun_cloud from "@/assets/images/sun_cloud.png";
+import sun_humid from "@/assets/images/sun_humid.png";
 export default {  
+  night, day, cloud_snow, night_humid, night_snow, night_wind, snow_wind, sun_cloud, sun_humid,
   sensor,
   onboarding,
   avatar,
