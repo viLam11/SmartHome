@@ -5,7 +5,7 @@ import { StyleSheet, View, Text, Image } from 'react-native';
 
 
 export default function Profile() {
-  const [token, setToken] = 
+  const [token, setToken] = useState(null);
 
   return (
     <View className="flex-1">
