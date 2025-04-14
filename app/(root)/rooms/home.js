@@ -1,57 +1,70 @@
 import { ScrollView, Text, View, Image, TouchableOpacity, Alert, Modal, KeyboardAvoidingView, Platform } from "react-native";
 import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
-// import icons from "@/constants/icons";
 import Room from "@/components/Room";
 import Navigation from "@/components/Navigation";
-// import images from "@/constants/images";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import NewRoomModal from "@/components/NewRoomModal";
 import RoomImage from "@/components/RoomImage";
-import { getAllRoomService } from "@/services/roomService";
-import { RoomObject } from "@/types/room.type";
+import { rooms } from "@/constants/data";
+import axios from "axios";
 import images from "@/constants/images";
-import { useLoading } from "@/contexts/LoadingContext";
-
+import AsyncStorage, { useAsyncStorage } from "@react-native-async-storage/async-storage";
+import React from "react";
 
 export default function HomeIndex() {
+    const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
+    // const base_url = API_URL;
     const router = useRouter();
     const { setLoading } = useLoading();
     // const [roomNum, setRoomNum] = useState(1);
-    // const [imgArray, setImgArray] = useState([images.home1, images.home3, images.home3, images.home4]);
+    const [imgArray, setImgArray] = useState([images.home1, images.home3, images.home3, images.home4]);
     const [modal, setModal] = useState(false);
     const [imageMode, setImageMode] = useState(false);
     // Room data
-    const [allRoomData, setAllRoomData] = useState<RoomObject[]>();
+    const [roomData, setRoomData] = useState([]);
     const [deleteMode, setDeleteMode] = useState(false);
     const [newRoomName, setNewRoomName] = useState('');
+    const [reponse, setReponse] = useState('');
     const [count, setCount] = useState(0);
+    const [token, setToken] = useState(null);
+
     function handleDeleteMode() {
         setCount(count + 1);
         setDeleteMode(!deleteMode);
     }
 
-    useEffect(() => {
-        
+    useEffect(() => {  
+        console.log("fetching data");
         const fetchRoomData = async () => {
-            setLoading(true);
-        
-            try {
-              const response = await getAllRoomService();
-              if (!response) throw new Error("Failed to fetch image");
-              setAllRoomData(response);
-            } catch (error) {
-              console.error("Error fetching room data:", error);
-            } finally {
-              setLoading(false);
-            }
-          };
+            const authToken = await AsyncStorage.getItem("authToken");
+            setToken(authToken);
+            const response = await axios.get(`https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1/rooms`, {
+                headers: {
+                    "Authorization": authToken
+                }
+            })
+            // if (!response) throw new Error("Failed to fetch image");
+            console.log("### RESPONSE : ", response.data);   
+            let x = response.data;
+            let rooms = []
+            rooms = x.map((room) => ({
+                ...room,  // Giữ nguyên dữ liệu cũ của room
+                img: imgArray[Math.floor(Math.random() * imgArray.length)],   
+                device: room.fanCount + room.lightCount + room.sensorCount + room.doorCount
+            }));
+            console.log("### DATA :" , rooms);
+            let token = await AsyncStorage.getItem("authToken");
+            console.log("Token: ", token);
+            setRoomData(rooms);
+        }
         fetchRoomData();
-    }, [count]);
+        
 
-    const caculateDeviceNumber = (room: RoomObject) => {
-        return (room.fanCount ?? 0) + (room.lightCount ?? 0) + (room.sensorCount ?? 0) + (room.doorCount ?? 0);
-    }
+        // let interval = setInterval(() => {fetchRoomData()}, 10000); 
+    }, [count]);
+    
+
 
     return (
 
@@ -89,15 +102,15 @@ export default function HomeIndex() {
                                     }
                                 </View>
                             </View>
-                            {allRoomData && allRoomData.map((room, index) => (
+                            {roomData && roomData.map((room, index) => (
                                 <View>
                                     <TouchableOpacity key={index} onPress={() => { router.push(`/rooms/${room.id}`) }}>
-                                        <Room key={index} setRoomData={setAllRoomData} deleteMode={deleteMode} id={room.id} img={images.home1} name={room.title} allDeviceCount={caculateDeviceNumber(room)} light={room.lightCount} lightStatus={room.lightStatus} fan={room.fanCount} fanStatus={room.fanStatus} sensor={room.sensorCount} sensorStatus={room.sensorStatus} />
+                                        <Room key={index} setRoomData={setRoomData} deleteMode={deleteMode} id={room.id} img={room.img} name={room.title} device={room.device} light={room.lightCount} light_on={room.light_on} fan={room.fanCount} fan_on={room.fan_on} sensor={room.sensorCount} sensor_on={room.sensor_on} />
                                     </TouchableOpacity>
                                 </View>
                             ))}
                         </View>
-                        <View className="h-32">
+                        <View className="h-20">
                             <View className=" w-full">
                                 <Navigation current={2} />
                             </View>
@@ -119,7 +132,7 @@ export default function HomeIndex() {
                     >
                         {imageMode ?
                             <View className="bg-white h-1/2 w-full bottom-0 z-20 rounded-s-3xl">
-                                <RoomImage count={count} setCount={setCount} roomData={allRoomData} setRoomData={setAllRoomData}  setImageMode={setImageMode} newRoomName={newRoomName}  setModal={setModal} />
+                                <RoomImage count={count} setCount={setCount} roomData={roomData} setRoomData={setRoomData}  setImageMode={setImageMode} newRoomName={newRoomName}  setModal={setModal} />
                             </View>
                             :
                             <View className="bg-white h-1/3 w-full bottom-0 z-20 rounded-s-3xl">

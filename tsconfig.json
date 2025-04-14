@@ -1,6 +1,7 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
+    "jsx": "react",
     "strict": true,
     "paths": {
       "@/*": [
@@ -14,5 +15,5 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "nativewind-env.d.ts"
-  ]
+, "app/(root)/rooms/[id].js", "app/(root)/hist/[id].js", "app/(root)/devices/lights/[id].js", "app/(root)/devices/fans/[id].js", "app/(root)/rooms/home.js", "components/AddNewDevice.js", "components/Navigation.js", "app/(root)/devices/sensors/[id].js"  ]
 }

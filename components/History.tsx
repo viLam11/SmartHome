@@ -44,10 +44,9 @@ export default function History({}) {
 
                     <DeviceNav current={2} feedId={+feedId} type="light" />
                     
-
                     <View className='my-10'>
                         <View style={{ borderWidth: 1, borderColor: "black", borderRadius: 10, overflow: "hidden" }}>
-                            <Table borderStyle={{ borderWidth: 0 }}>
+                            <Table>
                                 {/* Header */}
                                 <Row
                                     data={tableHead}
@@ -71,9 +70,6 @@ export default function History({}) {
                             </Table>
                         </View>
                     </View>
-
-
-                    
                 </View>
             </ScrollView>
             <View className="absolute bottom-2 w-full">

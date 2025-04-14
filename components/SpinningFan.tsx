@@ -32,9 +32,9 @@ const SpinningFan = ({speed}) => {
     <View className='flex flex-col items-center'>
       <Animated.Image
         source={images.canh_quat}
-        style={{ width: 120, height: 120, transform: [{ rotate: spin }] }}
+        style={{ width: 160, height: 160, transform: [{ rotate: spin }] }}
       />
-      <Image source={images.than_quat}  style={{ width: 160, height: 60}} resizeMode='contain' ></Image>
+      <Image source={images.than_quat}  style={{ width: 220, height: 90}} resizeMode='contain' ></Image>
     </View>
   
 

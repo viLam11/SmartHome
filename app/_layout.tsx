@@ -1,33 +1,37 @@
-import React, { useEffect } from "react";
-import { Stack } from "expo-router";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Slot, useRouter, useSegments } from "expo-router";
+import React from "react";
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
 import "../global.css";
-import { LoadingProvider, useLoading } from "../contexts/LoadingContext";
-import Loading from "../components/common/Loading";
-
-function AppLayout() {
-  const { loading } = useLoading();
-
-  return (
-    <GestureHandlerRootView className="flex-1">
-      <SafeAreaProvider>
-        <Stack initialRouteName="index">
-          <Stack.Screen name="sign-in" />
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-        </Stack>
-
-        {loading && <Loading />}
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
-  );
-}
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function RootLayout() {
-  return (
-    <LoadingProvider>
-      <AppLayout />
-    </LoadingProvider>
-  );
+  const [isAuth, setIsAuth] = useState<boolean | null>(null);
+  const segments = useSegments();
+  const router = useRouter();
+
+  const [fontsLoaded] = useFonts({
+    "Rubik-Bold": require("../assets/fonts/Rubik-Bold.ttf"),
+    "Rubik-ExtraBold": require("../assets/fonts/Rubik-ExtraBold.ttf"),
+    "Rubik-Light": require("../assets/fonts/Rubik-Light.ttf"),
+    "Rubik-Medium": require("../assets/fonts/Rubik-Medium.ttf"),
+    "Rubik-Regular": require("../assets/fonts/Rubik-Regular.ttf"),
+    "Rubik-SemiBold": require("../assets/fonts/Rubik-SemiBold.ttf"),
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
+  return <GestureHandlerRootView>
+          <Slot/>
+      </GestureHandlerRootView>
 }

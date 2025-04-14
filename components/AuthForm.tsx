@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert, ActivityIndicator } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { useRouter, Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import images from '@/constants/images';
 // import { signInService, registerService } from '@/services/authService';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
 const base_url = "https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1"
 export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
     const isSignIn = type == 'sign-in';
     const router = useRouter();
+    // const navigation = useNavigation();
 
     // State cho form
     const [firstName, setFirstName] = useState('');
@@ -53,14 +53,19 @@ export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
         console.log("Base url: ", base_url);
         console.log("Email: ", email);
         console.log("Password: ", password);
+        setLoading(true); // Bắt đầu load
+
         if (isSignIn) {
             axios.post(`${base_url}/login`, {
                 "email": email,
                 "password": password,
-            })
+            },{ timeout: 5000 })
                 .then((response) => {
                     console.log(response)
+                    alert("Đăng nhập thành công");
                     AsyncStorage.setItem('authToken', response.data.token);
+                    console.log("Token: ", response.data.token);
+                    // navigation.navigate('home');
                     router.replace('/rooms/home');
                 })
                 .catch((error) => {
@@ -69,6 +74,9 @@ export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
                         alert("Email hoặc mật khẩu không đúng");
                     }
                 })
+                .finally(() => {
+                    setLoading(false); // Kết thúc load
+                });
         } else {
             axios.post(`${base_url}/register`, {
                 "firstname": firstName,
@@ -79,7 +87,7 @@ export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
                 .then((response) => {
                     console.log(response)
                     alert("Đăng ký thành công");
-                    router.replace('/auth/login');
+                    router.replace('/auth/sign-in');
                 })
                 .catch((error) => {
                     console.log(error.response)
