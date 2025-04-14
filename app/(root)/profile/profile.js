@@ -5,6 +5,8 @@ import { StyleSheet, View, Text, Image } from 'react-native';
 
 
 export default function Profile() {
+  const [token, setToken] = 
+
   return (
     <View className="flex-1">
       <View className="flex-grow mx-2">

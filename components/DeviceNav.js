@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'expo-router';
 export default function DeviceNav({current,  id = 1, type }) {
     const router = useRouter();
     const pathname = usePathname();
-    const [status, setStatus] = useState(status);
+    const [status, setStatus] = useState(current);
 
     useEffect(() => {
         if (pathname.includes('/hist/')) setStatus(2);
