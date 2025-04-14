@@ -6,8 +6,8 @@ import { getStatisticService } from '@/services/statisticService';
 import { runningTimeObjects } from '@/types/statistic.type';
 import { useLoading } from '@/contexts/LoadingContext';
 import Navigation from '@/components/Navigation';
-import BarChartAnimated from '@/components/chart/BarChartAnimated';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+import { BarChartAnimated } from '@/components/chart/BarChartAnimated';
+import ChooseCalendar from '@/components/chart/ChooseCalendar';
 import { DatePickerModal } from 'react-native-paper-dates';
 import dayjs from 'dayjs';
 
@@ -30,7 +30,6 @@ export default function Statistic() {
   const [deviceData, setDeviceData] = useState<runningTimeObjects | null>(null);
 
   const [endDate, setEndDate] = useState<Date | null>(null);
-  const [startDate, setStartDate] = useState<Date | null>(null);
   const [open, setOpen] = useState(false);
   
 
@@ -52,10 +51,10 @@ export default function Statistic() {
   }, [feedId]);
 
   useEffect(() => {
-    if (feedId && startDate && endDate) {
+    if (feedId && endDate) {
       fetchStatistic(feedId as string, endDate);
     }
-  }, [startDate, endDate]);
+  }, [endDate]);
 
   const onDismiss = () => {
     setOpen(false);
@@ -63,10 +62,8 @@ export default function Statistic() {
   
   const onConfirm = ({ date }: { date: Date | undefined }) => {
     const newEnd = dayjs(date).endOf('day').toDate();
-    const newStart = dayjs(newEnd).subtract(6, 'day').startOf('day').toDate();
   
     setEndDate(newEnd);
-    setStartDate(newStart);
     setOpen(false);
   };
 
@@ -77,31 +74,13 @@ export default function Statistic() {
           feedId={+feedId}
           title={deviceData ? `${deviceData.type} ${deviceData.title}` : null}
         />
-
-        <TouchableOpacity
-          className="w-9/12 mt-4 mx-auto border border-black rounded-md p-1"
-          onPress={() => setOpen(true)}
-        >
-          <View className="flex flex-row">
-            <View className="flex w-10/12 h-full items-center">
-              <Text className="text-lg color-black-200">
-                {startDate && endDate
-                  ? `${dayjs(startDate).format('DD/MM/YYYY')} - ${dayjs(endDate).format('DD/MM/YYYY')}`
-                  : `${deviceData?.startDate} - ${deviceData?.endDate}`}
-              </Text>
-            </View>
-            <View className="w-2/12 flex items-center justify-center">
-              <IconSymbol name="calendar" color="black" />
-            </View>
-          </View>
-        </TouchableOpacity>
+        <ChooseCalendar startDate={deviceData?.startDate} endDate={deviceData?.endDate} setOpen={setOpen} />
+        
         <View className="flex flex-col w-9/12 mt-4 mx-auto p-1 bg-white justify-center items-center">
          <Text className="text-2xl color-black">{currentTime.hour}hrs, {currentTime.minute} mins</Text>
          <Text className="text-lg color-black-200">{currentTime.dayOfWeek}, {currentTime.day} {currentTime.month}</Text>
         </View>
-        <View className='border border-black rounded-md mt-4 w-11/12 mx-auto'>
-          <BarChartAnimated barData={deviceData ? deviceData.data : []} />
-        </View>
+        <BarChartAnimated setType={() => {}} barData={deviceData ? deviceData.data : []} />
       </ScrollView>
 
       <DatePickerModal
