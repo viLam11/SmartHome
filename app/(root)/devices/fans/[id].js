@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Image, Text, ScrollView, TouchableOpacity , KeyboardAvoidingView, Platform} from 'react-native';
+import { StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import images from '@/constants/images';
@@ -12,7 +12,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Modal } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-
+import ScheduleTable from '@/components/ScheduleTable';
 const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
 
 const renderCell = (data, index) => {
@@ -50,11 +50,12 @@ export default function Fan() {
     const [startTime, setStartTime] = useState(new Date());
     const [endTime, setEndTime] = useState(new Date());
     const [modal, setModal] = useState(false);
-    const tableHead = ["Start", "End", "Brightness", "Edit"];
-    const tableData = [
-        ["17:00", "16:00", "nhẹ", ".."],
-        ["20:00", "21:00", "nhẹ", ".."]
-    ];
+    const [scheduleTime, setScheduleTime] = useState(new Date());   
+    const [scheduleLevel, setScheduleLevel] = useState(0);
+    const [scheduleDays, setScheduleDays] = useState([2]);
+    const [tableData, setTableData] = useState([])
+    const tableHead = ["Thời gian", "Mức độ", "Ngày lặp", "Edit"];
+    
     useEffect(() => {
         const fetchToken = async () => {
             let t = await AsyncStorage.getItem("authToken")
@@ -81,6 +82,38 @@ export default function Fan() {
         }
         fetchCurrentStatus();
     }, [id]);
+    
+    // fetch Schedule
+    useEffect(() => {
+        if(!token) return   
+        const fetchSchedule = async () => {
+            const response = await axios.get(`${base_url}/schedules/${id}`, {
+                headers: {
+                    "Authorization": token
+                }
+            });
+            const schedules = response.data;
+            const newSchedules = schedules.map((item) => {
+                let formatedDays = item.repeatDays.split(',').map((day) => {
+                    if (day == "Mon") return "T2"
+                    if (day == "Tue") return "T3"
+                    if (day == "Wed") return "T4"
+                    if (day == "Thu") return "T5"
+                    if (day == "Fri") return "T6"
+                    if (day == "Sat") return "T7"
+                    if (day == "Sun") return "CN"
+                })
+                return [
+                   item.scheduledTime, 
+                    item.action, 
+                    formatedDays.join(", "),
+                ];
+            });
+            setTableData(newSchedules); 
+            console.log("New Schedules: ", newSchedules);
+        }
+        fetchSchedule();
+    }, [token, showPicker, modal]);
 
     async function handleFanSpeed(id, level) {
         if (!token) return
@@ -111,12 +144,59 @@ export default function Fan() {
 
     const onChange = (event, selectedTime) => {
         setShowPicker(false);
-        if(timer == 0) {
+        if (timer == 0) {
             setStartTime(selectedTime);
         } else {
             setEndTime(selectedTime);
         }
     };
+
+    function handleScheduleDays(day){
+        let temp = [2,3,4,5,6,7,8]
+        if (!temp.includes(day)) return 
+        if(scheduleDays.includes(day)){
+            setScheduleDays(scheduleDays.filter(item => item !== day));
+        } else {
+            setScheduleDays([...scheduleDays, day]);
+        }
+    }
+
+    async function handleSetSchedule() {
+        if (!token) return
+       
+        let time = formatTime(scheduleTime);
+        time = time.split(" ")[0] + ":00";
+        let days = [];
+        days = scheduleDays.map((item) => {
+            if (item == 2) return "Mon"
+            if (item == 3) return "Tue"
+            if (item == 4) return "Wed"
+            if (item == 5) return "Thu" 
+            if (item == 6) return "Fri"
+            if (item == 7) return "Sat"
+            if (item == 8) return "Sun"
+        })
+        let Sdays = ""
+        for(let x of days){ Sdays += x +','}
+        Sdays = Sdays.substring(0, Sdays.length - 1)
+        
+        const payload = {
+            deviceId: +id,
+            action: scheduleLevel.toString(),
+            scheduledTime: time,
+            repeatDays: Sdays   
+        }
+        console.log("check repeat days: ", payload)    
+        const response = await axios.post(`${base_url}/schedules`, payload, {
+            headers: {
+                "Authorization": token
+            }
+        })
+        if (response.status == 200) {
+            alert("Thêm lịch thành công")
+            setModal(false);
+        }
+    }
 
     return (
 
@@ -178,9 +258,10 @@ export default function Fan() {
                         </TouchableOpacity>
                     </View>
                     <View className='mt-2'>
-                        <View style={{ borderWidth: 1, borderColor: "black", borderRadius: 10, overflow: "hidden" }}>
-                            <Table borderStyle={{ borderWidth: 0 }}>
-                                {/* Header */}
+                        <ScheduleTable tableData={tableData} />
+                        {/*  <View style={{ borderWidth: 1, borderColor: "black", borderRadius: 10, overflow: "hidden" }}>
+                           <Table borderStyle={{ borderWidth: 0 }}>
+                         
                                 <Row
                                     data={tableHead}
                                     style={{
@@ -191,7 +272,7 @@ export default function Fan() {
                                     }}
                                     textStyle={{ textAlign: "center", fontWeight: "bold" }}
                                 />
-                                {/* Body */}
+                         
                                 {tableData.map((rowData, rowIndex) => (
                                     <Row
                                         key={rowIndex}
@@ -200,8 +281,8 @@ export default function Fan() {
                                         textStyle={{ textAlign: "center" }}
                                     />
                                 ))}
-                            </Table>
-                        </View>
+                            </Table> 
+                        </View> */}
                     </View>
                 </View>
 
@@ -227,12 +308,18 @@ export default function Fan() {
                     behavior={Platform.OS === "ios" ? "padding" : "height"}
                     style={{ flex: 1, justifyContent: 'flex-end' }}
                 >
-                    <View className="bg-gray-400 h-44 w-full bottom-0 z-20 rounded-3xl my-auto p-2">
+                    <View className="bg-gray-400 h-54 w-full bottom-0 z-20 rounded-3xl my-auto p-2">
                         <View className='w-full flex flex-row justify-between items-center'>
-                            <Text className='text-2xl font-bold m-2 text-gray-100'>Hẹn giờ</Text>
-                            <TouchableOpacity onPress={() => setModal(false)}>
-                                <IconSymbol name="close" color="white" className="absolute right-0 top-2" />
-                            </TouchableOpacity>
+                            <Text className='text-2xl font-bold m-2 text-gray-50'>Hẹn giờ</Text>
+                            <View className='flex flex-row'>
+                                <TouchableOpacity onPress={() => handleSetSchedule()}>
+                                    <Text className='text-black font-bold bg-white p-2 mx-4'>Lưu</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => setModal(false)}>
+                                    <IconSymbol name="close" color="white" className="absolute right-0 top-2" />
+                                </TouchableOpacity>
+                            </View> 
+                            
                         </View>
                         <View className='flex flex-row items-center justify-center w-full mx-auto mt-6'>
                             <View>
@@ -240,12 +327,12 @@ export default function Fan() {
                                     <Text className='font-bold text-3xl'>{formatTime(startTime)}</Text>
                                 </TouchableOpacity>
                             </View>
-                            <Text className='font-bold text-3xl'>  -  </Text>
+                            {/* <Text className='font-bold text-3xl'>  -  </Text>
                             <View>
                                 <TouchableOpacity onPress={() => { setTimer(1); setShowPicker(true) }} className="bg-white p-3 rounded-lg shadow">
                                     <Text className='font-bold text-3xl'>{formatTime(endTime)}</Text>
                                 </TouchableOpacity>
-                            </View>
+                            </View> */}
                             {showPicker && (
                                 <DateTimePicker
                                     value={timer == 0 ? startTime : endTime}
@@ -256,10 +343,47 @@ export default function Fan() {
                                 />
                             )}
                         </View>
+                        <View className='w-full flex flex-row mt-2'>
+                            <Text className='text-lg font-bold text-white text-left ' >Mức độ:</Text>
+                            <TouchableOpacity onPress={() => setScheduleLevel(1)}>
+                                <Text className={` rounded-full mx-2 h-8 w-8 items-center text-center font-bold ${(scheduleLevel == 1) ? 'bg-yellow' : 'bg-white' } `}>1</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity  onPress={() => setScheduleLevel(2)}>
+                                <Text  className={` rounded-full mx-2 h-8 w-8 items-center text-center font-bold ${(scheduleLevel == 2) ? 'bg-yellow' : 'bg-white' } `}>2</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity  onPress={() => setScheduleLevel(3)}>
+                                <Text  className={` rounded-full mx-2 h-8 w-8 items-center text-center font-bold ${(scheduleLevel == 3) ? 'bg-yellow' : 'bg-white' } `}>3</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View className='w-full flex flex-row mt-2'>
+                            <Text className='text-lg font-bold text-white text-left ' >Ngày lặp lại:</Text>
+                            <TouchableOpacity onPress={() => handleScheduleDays(2)}>
+                                <Text className={` rounded-full mx-2 h-8 w-8 items-center text-center font-bold ${(scheduleDays.includes(2)) ? 'bg-yellow' : 'bg-white' } `}>T2</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity  onPress={() => handleScheduleDays(3)}>
+                                <Text  className={` rounded-full mx-2 h-8 w-8 items-center text-center font-bold ${(scheduleDays.includes(3)) ? 'bg-yellow' : 'bg-white' } `}>T3</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity  onPress={() => handleScheduleDays(4)}>
+                                <Text  className={` rounded-full mx-2 h-8 w-8 items-center text-center font-bold ${(scheduleDays.includes(4)) ? 'bg-yellow' : 'bg-white' } `}>T4</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity  onPress={() => handleScheduleDays(5)}>
+                                <Text  className={` rounded-full mx-2 h-8 w-8 items-center text-center font-bold ${(scheduleDays.includes(5)) ? 'bg-yellow' : 'bg-white' } `}>T5</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity  onPress={() => handleScheduleDays(6)}>
+                                <Text  className={` rounded-full mx-2 h-8 w-8 items-center text-center font-bold ${(scheduleDays.includes(6)) ? 'bg-yellow' : 'bg-white' } `}>T6</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity  onPress={() => handleScheduleDays(7)}>
+                                <Text  className={` rounded-full mx-2 h-8 w-8 items-center text-center font-bold ${(scheduleDays.includes(7)) ? 'bg-yellow' : 'bg-white' } `}>T7</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity  onPress={() => handleScheduleDays(8)}>
+                                <Text  className={` rounded-full mx-2 h-8 w-8 items-center text-center font-bold ${(scheduleDays.includes(8)) ? 'bg-yellow' : 'bg-white' } `}>CN</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </KeyboardAvoidingView>
             </Modal>
             }
-        </ScrollView>
+        </ScrollView >
     )
 }

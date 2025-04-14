@@ -1,12 +1,39 @@
 import Navigation from '@/components/Navigation';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import React from 'react';
-import { StyleSheet, View, Text, Image } from 'react-native';
-
+import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
+const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
 
 export default function Profile() {
   const [token, setToken] = useState(null);
+  const [userData, setUserData] = useState(null);
 
+  const router = useRouter();
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const authToken = await AsyncStorage.getItem("authToken");
+      setToken(authToken);
+    }
+    fetchUserData();
+  }, [])
+
+  useEffect(() => {
+    if (!token) return;
+    const fetchUserData = async () => {
+      const response = await axios.get(`${base_url}/profile`, {
+        headers: {
+          "Authorization": token
+        }
+      })
+      console.log("### RESPONSE : ", response.data);
+      setUserData(response.data);
+    }
+    fetchUserData();
+  })
   return (
     <View className="flex-1">
       <View className="flex-grow mx-2">
@@ -14,24 +41,30 @@ export default function Profile() {
         <View className="flex justify-between items-center">
           <Image className='w-40 h-40 bg-red-100' source={{ uri: 'https://ui-avatars.com/api/?name=John' }} />
         </View>
-        <Text className="text-center font-bold text-2xl p-2">Name</Text>
-        <Text className="text-center color-gray-500 text-medium ">ngoc@gmail.com</Text>
+        <Text className="text-center font-bold text-2xl p-2">{userData ? userData.lastName + " " + userData.firstName : ""}</Text>
+        <Text className="text-center color-gray-500 text-medium ">{userData ? userData.email : ""}</Text>
 
 
         <View className="w-full my-auto">
           <View className="div-1 flex flex-col my-4">
-            <View className="bg-white mx-2 p-4 rounded-xl shadow-transparent my-2 flex flex-row align-middle items-center ">
-              <IconSymbol name="notification" />
-              <Text className='text-black text-2xl font-semibold ml-4'>
-                Thông báo
-              </Text>
+            <View className="bg-white mx-2 p-4 shadow-transparent my-2 flex flex-row align-middle items-center border rounded-3xl">
+              <TouchableOpacity className="flex flex-row" onPress={() => { router.push('/profile/notification') }}>
+                <IconSymbol name="notification" />
+                <Text className='text-black text-2xl font-semibold ml-4'>
+                  Thông báo
+                </Text>
+              </TouchableOpacity>
+
             </View>
             <View className="my-2">
-              <View className="bg-white mx-2 p-4 rounded-xl shadow-transparent my-2 flex flex-row align-middle items-center ">
-                <IconSymbol name="user" />
-                <Text className='text-black text-2xl font-semibold ml-4'>
-                  Tài khoản
-                </Text>
+              <View className="bg-white mx-2 p-4 shadow-transparent my-2 flex flex-row align-middle items-center border rounded-3xl">
+                <TouchableOpacity className="flex flex-row" onPress={() => { router.push('/profile/detail') }}>
+                  <IconSymbol name="user" />
+                  <Text className='text-black text-2xl font-semibold ml-4'>
+                    Tài khoản
+                  </Text>
+                </TouchableOpacity>
+
               </View>
             </View>
           </View>
@@ -39,14 +72,14 @@ export default function Profile() {
           <View className="border mx-2 border-gray-300"></View>
 
           <View className="div-1 flex flex-col my-4">
-            <View className="bg-white mx-2 p-4 rounded-xl shadow-transparent my-2 flex flex-row align-middle items-center ">
+            <View className="bg-white mx-2 p-4  shadow-transparent my-2 flex flex-row align-middle items-center border rounded-3xl">
               <IconSymbol name="support" />
               <Text className='text-black text-2xl font-semibold ml-4'>
                 Hỗ trợ
               </Text>
             </View>
             <View className="my-2">
-              <View className="bg-white mx-2 p-4 rounded-xl shadow-transparent my-2 flex flex-row align-middle items-center ">
+              <View className="bg-white mx-2 p-4 shadow-transparent my-2 flex flex-row align-middle items-center border rounded-3xl">
                 <IconSymbol name="exit" />
                 <Text className='text-black text-2xl font-semibold ml-4'>
                   Đăng xuất
@@ -55,12 +88,7 @@ export default function Profile() {
             </View>
           </View>
         </View>
-
-
-
       </View>
-
-
 
       <View className="bottom-0 h-20">
         <Navigation current={3} />

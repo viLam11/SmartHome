@@ -4,11 +4,11 @@ import { StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native';
 import { Table, TableWrapper, Row, Cell } from 'react-native-table-component';
 
 
-const tableHead = ['Từ', 'Đến', 'Màu', 'Sửa']
-const widthArr = [25, 25, 25, 25]
+const tableHead = ['Thời gian', 'Mức độ', 'Ngày lặp', 'Sửa']
+const widthArr = [25, 20, 30, 25]
 
 export default function ScheduleTable({ tableData }) {
-  tableData = [["12:00", "17:00", "#F0F0F0", "Xóa"]]
+  // tableData = [["12:00", "17:00", "#F0F0F0", "Xóa"]]
   function handleDeleteSchedule(index) {
 
   }

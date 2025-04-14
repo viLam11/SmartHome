@@ -11,26 +11,6 @@ import AddNewDevice from '@/components/AddNewDevice';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// type Fan = {
-//     title: string;
-//     feedId: number;
-//     id: number;
-//     name: string;
-//     value: number;
-// };
-
-// type Light = {
-//     id: number;
-//     name: string;
-//     value: number;
-// };
-
-// type Sensor = {
-//     id: number;
-//     name: string;
-//     value: number;
-// };
-
 export default function Room() {
     const router = useRouter();
     const roomName = useState(["Phòng Khách", "Phòng Ngủ", "Phòng Bếp"]);
@@ -86,10 +66,14 @@ export default function Room() {
             setRoom(room);
         }
         fetchRoomData();
+        // setInterval(() => {
+        //     fetchRoomData();
+        // }, 1000);
+        // return clearInterval();
     }, [modal, editMode, token]);
 
 
-    if (!token) return
+   
     return (
         <View className="min-h-screen">
             <ScrollView contentContainerStyle={{ flexGrow: 1 }} className='mt-1 mx-2 min-h-screen'>
@@ -268,7 +252,7 @@ export default function Room() {
                         <View className="bg-white h-2/4 w-full bottom-0 z-20 rounded-s-3xl">
                             <View>
                                 <TouchableOpacity onPress={() => { setEditMode(false) }} className="absolute top-2 right-2">
-                                    <Text>Close hhhhh</Text>
+                                    <Text>Close</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>

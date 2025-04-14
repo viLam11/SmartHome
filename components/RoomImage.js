@@ -5,25 +5,14 @@ import images from '@/constants/images';
 import { addNewRoomService } from '@/services/roomService';
 import axios from 'axios';
 
-interface RoomImageProps {
-    count: number;
-    setCount: (count: number) => void;
-    setImageMode: (mode: boolean) => void;
-    setModal: (modal: boolean) => void;
-    newRoomName: string;
-}
 const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
 
-export default function RoomImage(props: { count: number, setCount: number, roomData: object, setRoomData: void, newRoomName: string, setImageMode: boolean, setModal: void }) {
+export default function RoomImage({ count, setCount, roomData, setRoomData, newRoomName , setImageMode, setModal }) {
     const [img, setImage] = useState(images.home1);
     const [imgNo, setImgNo] = useState(-1);
-    const [newRoomName, setNewRoomName] = useState(props.newRoomName);  
-    const [imageMode, setImageMode] = useState(props.setImageMode);
-    const [modal, setModal] = useState(false);
     const [num, setNum] = useState(0);
-    const [count, setCount] = useState(props.count);
 
-    function handleSelectImage(num: number) {
+    function handleSelectImage(num) {
         setImgNo((prev) => (prev == num ? 0 : num));
     }
 

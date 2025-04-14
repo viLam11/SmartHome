@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function WelcomeScreen() {
     const router = useRouter();
-    const [token, setToken] = useState(null);
+    const [token, setToken] = useState<null | string>(null);
     
     useEffect(() => {
         const loadToken = async () => {

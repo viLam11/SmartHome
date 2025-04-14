@@ -52,7 +52,7 @@ export default function Sensor() {
                                 <View className="bg-white rounded-full p-2 m-2">
                                     <IconSymbol name="wind" color="#158cdb" size={40} />
                                 </View>
-                                <Text className="font-semibold text-gray-500 italic text-center">Tốc độ gió</Text>
+                                <Text className="font-semibold text-gray-500 italic text-center">Ánh sáng</Text>
                                 <Text className="font-bold text-xl text-center">9 km/h</Text>
                             </View>
                             <View className="">
@@ -61,38 +61,6 @@ export default function Sensor() {
                                 </View>
                                 <Text className="font-semibold text-center text-gray-500 italic">Độ ẩm</Text>
                                 <Text className="font-bold text-xl text-center">90 %</Text>
-                            </View>
-                            <View className="">
-                                <View className="bg-white rounded-full p-2 m-2">
-                                    <IconSymbol name="wind" color="#158cdb" size={40} />
-                                </View>
-                                <Text className="font-semibold text-gray-500 italic text-center">Bụi mịn</Text>
-                                <Text className="font-bold text-xl text-center">9km/h</Text>
-                            </View>
-                        </View>
-                    </View>
-                    <View>
-                    <View className="flex flex-row justify-between  mt-4">
-                            <View className="">
-                                <View className="bg-white rounded-full p-2 m-2">
-                                    <IconSymbol name="wind" color="#158cdb" size={40} />
-                                </View>
-                                <Text className="font-semibold text-gray-500 italic text-center">Tốc độ gió</Text>
-                                <Text className="font-bold text-xl text-center">9 km/h</Text>
-                            </View>
-                            <View className="">
-                                <View className="bg-white rounded-full p-2 m-2">
-                                    <IconSymbol name="humidity" color="#158cdb" size={40} />
-                                </View>
-                                <Text className="font-semibold text-center text-gray-500 italic">Độ ẩm</Text>
-                                <Text className="font-bold text-xl text-center">90 %</Text>
-                            </View>
-                            <View className="">
-                                <View className="bg-white rounded-full p-2 m-2">
-                                    <IconSymbol name="wind" color="#158cdb" size={40} />
-                                </View>
-                                <Text className="font-semibold text-gray-500 italic text-center">Bụi mịn</Text>
-                                <Text className="font-bold text-xl text-center">9km/h</Text>
                             </View>
                         </View>
                     </View>

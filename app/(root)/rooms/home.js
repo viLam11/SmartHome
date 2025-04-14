@@ -28,12 +28,12 @@ export default function HomeIndex() {
     const [count, setCount] = useState(0);
     const [token, setToken] = useState(null);
 
-    function handleDeleteMode() {
+    function handleDeleteMode(roomID) {
         setCount(count + 1);
         setDeleteMode(!deleteMode);
     }
 
-    useEffect(() => {
+    useEffect(() => {  
         console.log("fetching data");
         const fetchRoomData = async () => {
             const authToken = await AsyncStorage.getItem("authToken");
@@ -43,26 +43,25 @@ export default function HomeIndex() {
                     "Authorization": authToken
                 }
             })
-            // if (!response) throw new Error("Failed to fetch image");
-            console.log("### RESPONSE : ", response.data);
+            console.log("### RESPONSE : ", response.data);   
             let x = response.data;
             let rooms = []
             rooms = x.map((room) => ({
                 ...room,  // Giữ nguyên dữ liệu cũ của room
-                img: imgArray[Math.floor(Math.random() * imgArray.length)],
+                img: imgArray[Math.floor(Math.random() * imgArray.length)],   
                 device: room.fanCount + room.lightCount + room.sensorCount + room.doorCount
             }));
-            console.log("### DATA :", rooms);
+            console.log("### DATA :" , rooms);
             let token = await AsyncStorage.getItem("authToken");
             console.log("Token: ", token);
             setRoomData(rooms);
         }
         fetchRoomData();
-
-
-        // let interval = setInterval(() => {fetchRoomData()}, 10000); 
-    }, [count]);
-
+    }, [count, deleteMode]);
+    
+    useEffect(() =>{
+        console.log(imageMode, modal)
+    }, [imageMode, modal])
 
 
     return (
@@ -82,7 +81,7 @@ export default function HomeIndex() {
                                 <View className="flex flex-row space-x-2">
                                     {deleteMode ?
                                         <View>
-                                            <TouchableOpacity className="bg-black rounded-full p-1" onPress={() => handleDeleteMode()}>
+                                            <TouchableOpacity className="bg-black rounded-full p-1" onPress={() => setDeleteMode(false)}>
                                                 <IconSymbol name="save" size={18} color="white" />
                                             </TouchableOpacity>
                                         </View>
@@ -93,7 +92,7 @@ export default function HomeIndex() {
                                             </TouchableOpacity>
                                         </View>
                                             <View>
-                                                <TouchableOpacity className="bg-black rounded-full p-1" onPress={() => handleDeleteMode()}>
+                                                <TouchableOpacity className="bg-black rounded-full p-1" onPress={() => setDeleteMode(!deleteMode)}>
                                                     <IconSymbol name="edit" size={18} color="white" />
                                                 </TouchableOpacity>
                                             </View>
@@ -104,7 +103,7 @@ export default function HomeIndex() {
                             {roomData && roomData.map((room, index) => (
                                 <View>
                                     <TouchableOpacity key={index} onPress={() => { router.push(`/rooms/${room.id}`) }}>
-                                        <Room key={index} setRoomData={setRoomData} deleteMode={deleteMode} id={room.id} img={room.img} name={room.title} device={room.device} light={room.lightCount} light_on={room.light_on} fan={room.fanCount} fan_on={room.fan_on} sensor={room.sensorCount} sensor_on={room.sensor_on} />
+                                        <Room key={index} setRoomData={setRoomData} deleteMode={deleteMode} setDeleteMode={setDeleteMode} id={room.id} img={room.img} name={room.title} device={room.device} light={room.lightCount} light_on={room.light_on} fan={room.fanCount} fan_on={room.fan_on} sensor={room.sensorCount} sensor_on={room.sensor_on} />
                                     </TouchableOpacity>
                                 </View>
                             ))}
@@ -116,6 +115,30 @@ export default function HomeIndex() {
                         </View>
                     </View>
                 </ScrollView>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modal || imageMode}
+                    onRequestClose={() => {
+                        setModal(false);
+                        setImageMode(false);
+                    }}
+                >
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === "ios" ? "padding" : "height"}
+                        style={{ flex: 1, justifyContent: 'flex-end' }}
+                    >
+                        {imageMode === true ?
+                            <View className="bg-white h-1/2 w-full bottom-0 z-20 rounded-s-3xl">
+                                <RoomImage count={count} setCount={setCount} roomData={roomData} setRoomData={setRoomData}  setImageMode={setImageMode} newRoomName={newRoomName}  setModal={setModal} />
+                            </View>
+                            :
+                            <View className="bg-white h-1/3 w-full bottom-0 z-20 rounded-s-3xl">
+                                <NewRoomModal setModal={setModal} newRoomName={newRoomName} setNewRoomName={setNewRoomName} setImageMode={setImageMode} />
+                            </View>
+                        }
+                    </KeyboardAvoidingView>
+                </Modal>
             </View>
         </KeyboardAvoidingView>
     )

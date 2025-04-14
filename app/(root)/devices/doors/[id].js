@@ -17,17 +17,10 @@ const tableData = [[1, 2, 3], [4, 5, 6], [7, 8, 9], ['OK', 0, 'Del']];
 export default function Door() {
     const router = useRouter();
     const { id } = useLocalSearchParams();
-    const [color, setColor] = useState("white");
-    const [speed, setSpeed] = useState(0);
+    const [doorData, setDoorData] = useState(null);
     const [status, setStatus] = useState(false);
-    const [statusAuto, setSatusAuto] = useState(false);
-    const [fanData, setFanData] = useState(null);
     const [token, setToken] = useState(null);
-    const [showPicker, setShowPicker] = useState(false);
-    const [timer, setTimer] = useState(0);
-    const [startTime, setStartTime] = useState(new Date());
-    const [endTime, setEndTime] = useState(new Date());
-    const [modal, setModal] = useState(false);
+
     const [visible, setVisible] = useState(false);
     const [password, setPassword] = useState('');
 
@@ -38,29 +31,79 @@ export default function Door() {
         }
         fetchToken()
     }, [])
-    useEffect(() => {
-        console.log(token)
-        const fetchCurrentStatus = async () => {
-            const response = await axios.get(`${base_url}/devices/${id}`);
-            setFanData(response.data)
-            const fanTemp = response.data;
-            if (fanTemp.value == 50) {
-                setSpeed(150);
-                setStatus(true);
-            } else if (fanTemp.value == 75) {
-                setSpeed(100);
-                setStatus(true);
-            } else if (fanTemp.value == 100) {
-                setSpeed(25);
-                setStatus(true);
+
+    useEffect(() =>{
+        if (!token) return  
+        const fetchDoorData = async () => {
+            try {
+                const response = await axios.get(`${base_url}/devices/${id}`, {
+                    headers: {
+                        Authorization: token
+                    }
+                })
+                console.log("### RESPONSE : ", response.data);
+                setDoorData(response.data);
+                setStatus(response.data.value == 0 ? false : true) 
+            } catch (error) {
+                console.log(error)
             }
         }
-        fetchCurrentStatus();
-    }, [id]);
+        fetchDoorData()
+    }, [token])
+ 
+    async function hanldeOpenDoor() {
+        if (!token) return
+        console.log("check pass: ", password)
+        if (password.length == 0) {
+            alert("Vui lòng nhập mật khẩu")
+            return
+        }
+        try {
+            const response = await axios.post(`${base_url}/devices/${id}/checkpwd`, {
+                pwd: password
+            }, {
+                headers: {
+                    Authorization: token
+                }
+            })
+            if (response.status == 401) {
+                alert("Mật khẩu không đúng")
+            } else {
+                setPassword('')
+                alert("Mở cửa thành công")
+                setStatus(true)
+                await axios.post(`${base_url}/devices/${id}`, {
+                    value: 1
+                }, {
+                    headers: {
+                        Authorization: token
+                    }
+                })
+            }
+        } catch (error) {
+            console.log(error)
+        }
 
-    function hanldeOpenDoor() {
-        alert("Bạn có chắc chắn muốn mở cửa không?")
     }
+
+    async function handleCloseDoor() {
+        if (!token) return
+        try {
+            const response = await axios.post(`${base_url}/devices/${id}`, {
+                value: "0"
+            }, {
+                headers: {
+                    Authorization: token
+                }
+            })
+            setPassword('')
+            alert("Khóa cửa thành công")
+            setStatus(false)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} className='min-h-screen flex-1 m-2'>
             <View className="flex-1">
@@ -74,7 +117,7 @@ export default function Door() {
                     <View>
                     </View>
                 </View>
-                <DeviceNav status={1} id={+id} type={"fan"} />
+                <DeviceNav current={1} id={+id} type={"fan"} />
                 <View className="mt-6">
                     <View className="flex flex-row mt-6">
                         <View className='w-2/5 h-60 '>
@@ -85,7 +128,7 @@ export default function Door() {
                                 <View className='w-20'>
                                     <Text className="px-2 w-40 font-semibold"> {status ? "Mở" : "Khóa"}     </Text>
                                 </View>
-                                <TouchableOpacity onPress={() => { setStatus(!status) }}>
+                                <TouchableOpacity onPress={() => { if(status == true) { handleCloseDoor() } else {hanldeOpenDoor()} }}>
                                     <Image source={status ? images.auto_on : images.auto_off} />
                                 </TouchableOpacity>
                             </View>
@@ -96,9 +139,9 @@ export default function Door() {
                                 ))
                                 }
                                 <View className="ml-2">
-                                    <TouchableOpacity onPress={() => { setVisible(!visible) }}>
+                                    { password.length > 0 && <TouchableOpacity onPress={() => { setVisible(!visible) }}>
                                         <IconSymbol name={visible ? "eye" : "eye.slash"} />
-                                    </TouchableOpacity>
+                                    </TouchableOpacity> }
                                 </View>
                             </View>
                         </View>

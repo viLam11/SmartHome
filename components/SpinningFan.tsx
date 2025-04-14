@@ -5,8 +5,6 @@ import { View, Image, Animated } from 'react-native';
 
 const SpinningFan = ({speed}) => {
   const spinValue = useRef(new Animated.Value(0)).current;
-
-
   useEffect(() => {
     console.log("##@", speed);
     spinValue.setValue(0); // Reset animation value

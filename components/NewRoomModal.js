@@ -3,14 +3,13 @@ import { KeyboardAvoidingView, Platform, StyleSheet, View, TouchableOpacity, Tex
 import { IconSymbol } from './ui/IconSymbol';
 import { TextInput } from 'react-native-gesture-handler';
 
-export default function NewRoomModal({ newRoomName, setNewRoomName, setModal, setImageMode }) {
-
+export default function NewRoomModal({newRoomName, setNewRoomName, setModal, setImageMode}) {
     function hanldeContinue() {
         if (newRoomName == '') {
             alert('Nhập tên phòng');
             return;
         }
-        setImageMode(true);
+        setImageMode((prev) => !prev);
     }
 
     return (
