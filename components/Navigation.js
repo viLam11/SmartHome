@@ -8,7 +8,7 @@ const styles = StyleSheet.create({});
 const tabs = [
   { index: 1, label: 'Dashboard', icon: images.dashboard, route: '/dashboard' },
   { index: 2, label: 'Rooms', icon: images.door, route: '/rooms/home' },
-  { index: 3, label: 'Profile', icon: images.user, route: null },
+  { index: 3, label: 'Profile', icon: images.user, route: '/profile/profile' },
 ];
 
 export default function Navigation({ current }) {

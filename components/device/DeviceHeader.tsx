@@ -1,7 +1,7 @@
 import { StyleSheet, View, Image, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import DeviceNav from './DeviceNav';
+import DeviceNav from '../DeviceNav';
 export default function DeviceHeader ({feedId, title}: {feedId: number, title: string | null}) {
     const router = useRouter();
     return (<>

@@ -16,7 +16,6 @@ export default function HomeIndex() {
     const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
     // const base_url = API_URL;
     const router = useRouter();
-    const { setLoading } = useLoading();
     // const [roomNum, setRoomNum] = useState(1);
     const [imgArray, setImgArray] = useState([images.home1, images.home3, images.home3, images.home4]);
     const [modal, setModal] = useState(false);
@@ -34,7 +33,7 @@ export default function HomeIndex() {
         setDeleteMode(!deleteMode);
     }
 
-    useEffect(() => {  
+    useEffect(() => {
         console.log("fetching data");
         const fetchRoomData = async () => {
             const authToken = await AsyncStorage.getItem("authToken");
@@ -45,25 +44,25 @@ export default function HomeIndex() {
                 }
             })
             // if (!response) throw new Error("Failed to fetch image");
-            console.log("### RESPONSE : ", response.data);   
+            console.log("### RESPONSE : ", response.data);
             let x = response.data;
             let rooms = []
             rooms = x.map((room) => ({
                 ...room,  // Giữ nguyên dữ liệu cũ của room
-                img: imgArray[Math.floor(Math.random() * imgArray.length)],   
+                img: imgArray[Math.floor(Math.random() * imgArray.length)],
                 device: room.fanCount + room.lightCount + room.sensorCount + room.doorCount
             }));
-            console.log("### DATA :" , rooms);
+            console.log("### DATA :", rooms);
             let token = await AsyncStorage.getItem("authToken");
             console.log("Token: ", token);
             setRoomData(rooms);
         }
         fetchRoomData();
-        
+
 
         // let interval = setInterval(() => {fetchRoomData()}, 10000); 
     }, [count]);
-    
+
 
 
     return (
@@ -117,33 +116,6 @@ export default function HomeIndex() {
                         </View>
                     </View>
                 </ScrollView>
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={modal || imageMode}
-                    onRequestClose={() => {
-                        setModal(false);
-                        setImageMode(false);
-                    }}
-                >
-                    <KeyboardAvoidingView
-                        behavior={Platform.OS === "ios" ? "padding" : "height"}
-                        style={{ flex: 1, justifyContent: 'flex-end' }}
-                    >
-                        {imageMode ?
-                            <View className="bg-white h-1/2 w-full bottom-0 z-20 rounded-s-3xl">
-                                <RoomImage count={count} setCount={setCount} roomData={roomData} setRoomData={setRoomData}  setImageMode={setImageMode} newRoomName={newRoomName}  setModal={setModal} />
-                            </View>
-                            :
-                            <View className="bg-white h-1/3 w-full bottom-0 z-20 rounded-s-3xl">
-                                <NewRoomModal setModal={setModal} newRoomName={newRoomName} setNewRoomName={setNewRoomName} setImageMode={setImageMode} />
-                            </View>
-                        }
-                    </KeyboardAvoidingView>
-                </Modal>
-            </View>
-            <View className="absolute bottom-2 w-full">
-                <Navigation current={2} />
             </View>
         </KeyboardAvoidingView>
     )

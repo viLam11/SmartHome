@@ -139,7 +139,7 @@ export default function Light() {
                     </View>
                 </View>
 
-                <DeviceNav status={1} id={+id} type={"light"} />
+                <DeviceNav current={1} id={+id} type={"light"} />
 
 
                 <View className='flex flex-row mt-4'>
@@ -179,8 +179,8 @@ export default function Light() {
                         <View className='w-40'>
                             <Text className="px-2 w-40 font-semibold">Tự động:     </Text>
                         </View>
-                        <TouchableOpacity onPress={() => setSatusAuto(!statusAuto)}>
-                            <Image source={statusAuto ? images.auto_on : images.auto_off} />
+                        <TouchableOpacity onPress={() => setSatusAuto(!status)}>
+                            <Image source={status ? images.auto_on : images.auto_off} />
                         </TouchableOpacity>
                     </View>
 
