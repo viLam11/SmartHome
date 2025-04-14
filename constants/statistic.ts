@@ -9,10 +9,11 @@ export const runningTime = {
   data: Array.from({ length: 7 }, (_, i) => {
     const currentDate = addDays(startDate, i);
     return {
-      dayOfWeek: format(currentDate, 'EEE'),
+      date: format(currentDate, 'dd/MM'),
       value: Math.floor(Math.random() * 24),
     };
   }),
   startDate: format(startDate, 'dd/MM/yyyy'),
   endDate: format(endDate, 'dd/MM/yyyy'),
 };
+

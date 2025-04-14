@@ -7,7 +7,7 @@ export type runningTimeObjects = {
 };
 
 export type timeADayObject = {
-    dayOfWeek: 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun',
+    date: string,
     value: number
 };
 

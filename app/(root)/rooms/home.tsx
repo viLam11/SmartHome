@@ -129,6 +129,9 @@ export default function HomeIndex() {
                     </KeyboardAvoidingView>
                 </Modal>
             </View>
+            <View className="absolute bottom-2 w-full">
+                <Navigation current={2} />
+            </View>
         </KeyboardAvoidingView>
     )
 }
