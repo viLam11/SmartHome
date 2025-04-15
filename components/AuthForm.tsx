@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert, ActivityIndicator } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { useRouter, Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import images from '@/constants/images';
 import { signInService, registerService } from '@/services/authService';
 
 export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
-    const isSignIn = type === 'sign-in';
+    const isSignIn = type == 'sign-in';
     const router = useRouter();
+    // const navigation = useNavigation();
 
     // State cho form
     const [firstName, setFirstName] = useState('');
@@ -17,27 +18,23 @@ export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // Xử lý đăng nhập & đăng ký
-    const handleAuth = async () => {
-        if (!email || !password || (!isSignIn && !firstName && !lastName)) {
-            Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin');
-            return;
-        }
-
+    async function handleAuth() {
         setLoading(true);
+
         try {
             if (isSignIn) {
-                const response = await signInService({ email, password });
+                await signInService({ email, password });
                 router.replace('/rooms/home');
             } else {
-                const response = await registerService({ FirstName: firstName, LastName: lastName, email, password });
-                Alert.alert('Thành công', 'Đăng ký thành công');
+                const response = await registerService({ firstname: firstName, lastname: lastName, email, password });
+                alert('Đăng ký thành công');
                 router.replace('/rooms/home');
             }
         } catch (error) {
-            Alert.alert('Lỗi', 'Đăng nhập hoặc đăng ký thất bại');
+            alert('Đăng nhập hoặc đăng ký thất bại');
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     return (
@@ -52,33 +49,33 @@ export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
 
                 <View className="mt-4 w-5/6">
                     {!isSignIn && (<>
-                            <TextInput
-                                placeholder="FirstName"
-                                className="border border-gray-300 p-3 rounded-lg"
-                                value={firstName}
-                                onChangeText={setFirstName}
-                            />
-                            <TextInput
-                                placeholder="LastName"
-                                className="border border-gray-300 p-3 rounded-lg"
-                                value={lastName}
-                                onChangeText={setLastName}
-                            />                    
-                        </>
+                        <TextInput
+                            placeholder="FirstName"
+                            className="border border-gray-300 p-3 rounded-lg"
+                            value={firstName}
+                            onChangeText={setFirstName}
+                        />
+                        <TextInput
+                            placeholder="LastName"
+                            className="border border-gray-300 p-3 rounded-lg"
+                            value={lastName}
+                            onChangeText={setLastName}
+                        />
+                    </>
                     )}
                     <TextInput
                         placeholder="Email"
                         className="border border-gray-300 p-3 rounded-lg"
                         keyboardType="email-address"
                         value={email}
-                        onChangeText={setEmail}
+                        onChangeText={(text) => setEmail(text)}
                     />
                     <TextInput
                         placeholder="Mật khẩu"
                         className="border border-gray-300 p-3 rounded-lg"
                         secureTextEntry
                         value={password}
-                        onChangeText={setPassword}
+                        onChangeText={(pass) => setPassword(pass)}
                     />
                 </View>
 

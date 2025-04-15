@@ -1,10 +1,23 @@
-import { Text, View, Image } from "react-native";
-import { Link, Redirect, router } from "expo-router";
-import images from "@/constants/images";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import images from '@/constants/images';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function Index() {
-
+export default function WelcomeScreen() {
+    const router = useRouter();
+    const [token, setToken] = useState(null);
+    
+    useEffect(() => {
+        const loadToken = async () => {
+            let t = await AsyncStorage.getItem('authToken');
+            if (t) {
+                setToken(t);
+            }
+        }
+        loadToken();
+    }, [])
 
   return (
     <View className="h-full">

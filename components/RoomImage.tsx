@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity, Text, Image, Alert } from 'react-native';
 import { IconSymbol } from './ui/IconSymbol';
+import { RoomObject } from '@/types/room.type';
 import images from '@/constants/images';
 import { addNewRoomService } from '@/services/roomService';
 
 interface RoomImageProps {
     count: number;
     setCount: (count: number) => void;
+    roomData: RoomObject[];
+    setRoomData: (data: RoomObject[]) => void;
     setImageMode: (mode: boolean) => void;
     setModal: (modal: boolean) => void;
     newRoomName: string;
@@ -21,8 +24,8 @@ export default function RoomImage({ count, setCount, setImageMode, setModal, new
 
     async function addNewRoom() {
         try {
-            if (!newRoomName.trim()) {
-                Alert.alert("Lỗi", "Vui lòng nhập tên phòng!");
+            if (!newRoomName) {
+                alert("Please enter room name");
                 return;
             }
 
@@ -32,9 +35,10 @@ export default function RoomImage({ count, setCount, setImageMode, setModal, new
             setImageMode(false);
             setCount(count + 1);
         } catch (error) {
-            Alert.alert("Lỗi", "Không thể thêm phòng, vui lòng thử lại.");
+            alert("Không thể thêm phòng, vui lòng thử lại.");
         }
     }
+
 
     return (
         <View className="w-full h-full">
@@ -47,7 +51,7 @@ export default function RoomImage({ count, setCount, setImageMode, setModal, new
 
             {/* Chọn ảnh */}
             <View className="w-11/12 mx-auto bottom-2 flex-grow">
-                <View className="flex flex-row justify-between flex-wrap">
+                <View className="flex flex-row justify-between">
                     {[images.home1, images.home2, images.home3, images.home4].map((image, index) => (
                         <TouchableOpacity key={index} onPress={() => handleSelectImage(index + 1)} className="mb-2">
                             <Image

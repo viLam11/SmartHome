@@ -1,10 +1,9 @@
+import React from "react";
 import { ScrollView, Text, View, Image, TouchableOpacity, Alert, Modal, KeyboardAvoidingView, Platform } from "react-native";
 import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
-// import icons from "@/constants/icons";
 import Room from "@/components/Room";
 import Navigation from "@/components/Navigation";
-// import images from "@/constants/images";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import NewRoomModal from "@/components/NewRoomModal";
 import RoomImage from "@/components/RoomImage";
@@ -22,14 +21,14 @@ export default function HomeIndex() {
     const [modal, setModal] = useState(false);
     const [imageMode, setImageMode] = useState(false);
     // Room data
-    const [allRoomData, setAllRoomData] = useState<RoomObject[]>();
+    const [allRoomData, setAllRoomData] = useState<RoomObject[]>([]);
     const [deleteMode, setDeleteMode] = useState(false);
     const [newRoomName, setNewRoomName] = useState('');
     const [count, setCount] = useState(0);
-    function handleDeleteMode() {
-        setCount(count + 1);
-        setDeleteMode(!deleteMode);
-    }
+    // function handleDeleteMode() {
+    //     setCount(count + 1);
+    //     setDeleteMode(!deleteMode);
+    // }
 
     useEffect(() => {
         
@@ -49,7 +48,7 @@ export default function HomeIndex() {
         fetchRoomData();
     }, [count]);
 
-    const caculateDeviceNumber = (room: RoomObject) => {
+    const calculateDeviceNumber = (room: RoomObject) => {
         return (room.fanCount ?? 0) + (room.lightCount ?? 0) + (room.sensorCount ?? 0) + (room.doorCount ?? 0);
     }
 
@@ -70,7 +69,7 @@ export default function HomeIndex() {
                                 <View className="flex flex-row space-x-2">
                                     {deleteMode ?
                                         <View>
-                                            <TouchableOpacity className="bg-black rounded-full p-1" onPress={() => handleDeleteMode()}>
+                                            <TouchableOpacity className="bg-black rounded-full p-1" onPress={() => setDeleteMode(false)}>
                                                 <IconSymbol name="save" size={18} color="white" />
                                             </TouchableOpacity>
                                         </View>
@@ -81,7 +80,7 @@ export default function HomeIndex() {
                                             </TouchableOpacity>
                                         </View>
                                             <View>
-                                                <TouchableOpacity className="bg-black rounded-full p-1" onPress={() => handleDeleteMode()}>
+                                                <TouchableOpacity className="bg-black rounded-full p-1" onPress={() => setDeleteMode(!deleteMode)}>
                                                     <IconSymbol name="edit" size={18} color="white" />
                                                 </TouchableOpacity>
                                             </View>
@@ -92,12 +91,12 @@ export default function HomeIndex() {
                             {allRoomData && allRoomData.map((room, index) => (
                                 <View>
                                     <TouchableOpacity key={index} onPress={() => { router.push(`/rooms/${room.id}`) }}>
-                                        <Room key={index} setRoomData={setAllRoomData} deleteMode={deleteMode} id={room.id} img={images.home1} name={room.title} allDeviceCount={caculateDeviceNumber(room)} light={room.lightCount} lightStatus={room.lightStatus} fan={room.fanCount} fanStatus={room.fanStatus} sensor={room.sensorCount} sensorStatus={room.sensorStatus} />
+                                        <Room key={index} deleteMode={deleteMode} setDeleteMode={setDeleteMode} id={room.id} img={images.home1} title={room.title} allDeviceCount={calculateDeviceNumber(room)} lightCount={room.lightCount} lightStatus={room.lightStatus} fanCount={room.fanCount} fanStatus={room.fanStatus} sensorCount={room.sensorCount} sensorStatus={room.sensorStatus} />
                                     </TouchableOpacity>
                                 </View>
                             ))}
                         </View>
-                        <View className="h-32">
+                        <View className="h-20">
                             <View className=" w-full">
                                 <Navigation current={2} />
                             </View>

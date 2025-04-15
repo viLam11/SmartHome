@@ -3,15 +3,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
-export const registerService = async (userData: { FirstName: string, LastName: string, email: string, password: string }) => {
+export const registerService = async (userData: { firstname: string, lastname: string, email: string, password: string }) => {
     try {
         const response = await axios.post(`${API_URL}/register`, userData);
         const { token } = response.data;
         await AsyncStorage.setItem('authToken', token);
-        return response.data;
-    } catch (error) {
-        console.error('Lỗi khi đăng ký:', error);
-        throw error;
+        return response;
+    } catch (error ) {        
+        if (error.response.status == 400) {
+            alert("Email đã tồn tại");
+        }
     }
 };
 
@@ -23,10 +24,11 @@ export const signInService = async (credentials: { email: string, password: stri
         // Lưu token vào AsyncStorage
         await AsyncStorage.setItem('authToken', token);
 
-        return response.data;
+        return response;
     } catch (error) {
-        console.error('Lỗi khi đăng nhập:', error);
-        throw error;
+        if (error.response.status == 400) {
+            alert("Email hoặc mật khẩu không đúng");
+        }
     }
 };
 

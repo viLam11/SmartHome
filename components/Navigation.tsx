@@ -11,18 +11,18 @@ const tabs = [
   { index: 3, label: 'Profile', icon: images.user, route: null },
 ];
 
-export default function Navigation({ current }) {
+export default function Navigation({ current }: { current: number }) {
   const [currentTab, setCurrentTab] = useState(current);
   const router = useRouter();
 
-  const handleClick = (index, route) => {
+  const handleClick = (index: number, route: string | null) => {
     setCurrentTab(index);
     if (route) {
       router.navigate(route);
     }
   };
 
-  const renderTab = (tab) => (
+  const renderTab = (tab: any) => (
     <View
       key={tab.index}
       className={tab.index === currentTab ? 'w-1/2 items-center justify-center' : 'w-1/4 bg-black'}

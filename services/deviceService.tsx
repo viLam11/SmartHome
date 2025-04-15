@@ -39,10 +39,10 @@ export const getDeviceData = async (feedId: string): Promise<deviceStatusObject>
     }
 };
 
-export const controlDevice = async (feedId: string, feedKey: string, status: boolean) => {
+export const controlDevice = async (feedId: string, value: string) => {
     try {
         const headers = await getAuthHeaders();
-        const response = await axios.put(`${API_URL}/devices/${feedId}`, { feedKey, status }, headers);
+        const response = await axios.post(`${API_URL}/devices/${feedId}`, { value }, headers);
         return response.data;
     } catch (error) {
         console.error('Error controlling device:', error);
@@ -61,11 +61,12 @@ export const addNewDeviceService = async (device: deviceCreateObject) => {
     }
 };
 
-export const fanSpeedService = async (feedId: string, level: number) => {
+
+export const checkDoorPwdService = async (feedId: string, pwd: string) => {
     try {
         const headers = await getAuthHeaders();
-        const respone = await axios.post(`${API_URL}/devices/${feedId}`, { value: level.toString() }, headers);
-        return respone.data;
+        const respone = await axios.post(`${API_URL}/devices/${feedId}/checkpwd`, { pwd: pwd }, headers);
+        return respone;
     } catch(e) {
         console.log("Error: ", e);
         throw e;

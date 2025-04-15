@@ -1,3 +1,4 @@
+import React from 'react';
 import { View, Text, TouchableOpacity, Image, KeyboardAvoidingView, Platform, TextInput } from 'react-native';
 import { useState, useEffect } from 'react';
 import { IconSymbol } from '../ui/IconSymbol';
@@ -36,7 +37,15 @@ export default function AddNewDevice({ setModal, room }: { setModal: any, room: 
         title: deviceName,
         roomID: roomID
     };
-    console.log(feedID, newDevice);
+
+    function hanldeContinueName() {
+        if (deviceType == '') {
+            alert('Chọn thiết bị');
+            return;
+        }
+        setNameMode(true);
+    }
+    
     const addDevice = async (newDevice: deviceCreateObject) => {
         try {
             await addNewDeviceService(newDevice as deviceCreateObject);
@@ -56,13 +65,6 @@ export default function AddNewDevice({ setModal, room }: { setModal: any, room: 
         return <FinishModal setModal={setModal} newDevice={newDevice}/>
     }
 
-    function hanldeContinueName() {
-        if (deviceType == '') {
-            alert('Chọn thiết bị');
-            return;
-        }
-        setNameMode(true);
-    }
 
 
 
@@ -71,7 +73,7 @@ export default function AddNewDevice({ setModal, room }: { setModal: any, room: 
             <View className="flex flex-row">
                 <View className="flex-grow w-2/3 mt-4">
                     <Text className="text-xl text-center font-semibold">Thêm thiết bị vào</Text>
-                    <Text className="text-xl text-center font-semibold">{room ? room.name : ""}</Text>
+                    <Text className="text-xl text-center font-semibold">{room ? room.title : ""}</Text>
                 </View>
                 <View className="flex items-end mt-4 m-4">
                     <TouchableOpacity onPress={() => setModal(false)} className='bg-black rounded-full'>
@@ -82,10 +84,10 @@ export default function AddNewDevice({ setModal, room }: { setModal: any, room: 
 
             <DeviceSelection deviceType={deviceType} setDeviceType={setDeviceType} />
 
-            <View className='w-11/12 mx-auto mt-2 h-full'>
-                <View className='h-20'></View>
-                <TouchableOpacity onPress={() => hanldeContinueName()}>
-                    <View className="bg-green-300 p-2 rounded-lg ">
+            {/* Button */}
+            <View className='w-11/12 mx-auto mt-2 p-2'>
+                <TouchableOpacity onPress={() => hanldeContinueName()} className='bottom-0'>
+                    <View className="bg-green-300 p-2 rounded-lg">
                         <Text className="text-center font-bold">Tiếp tục</Text>
                     </View>
                 </TouchableOpacity>

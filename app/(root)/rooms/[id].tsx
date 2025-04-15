@@ -12,7 +12,7 @@ import { getRoomDevices } from '@/services/deviceService';
 import { getAllRoomService } from '@/services/roomService';
 import { useLoading } from '@/contexts/LoadingContext';
 
-export default function Property() {
+export default function Room() {
     const router = useRouter();
     const { setLoading } = useLoading();
     const [room, setRoom] = useState<RoomObject | null>(null);
@@ -49,12 +49,6 @@ export default function Property() {
         })();
     }, [roomId]); 
     
-    // useEffect(() => {
-    //     if (!deviceList) return;
-    //     (async () => {
-            
-    //     })();
-    // }, [deviceList]);
 
     return (
         <View className="min-h-screen">
@@ -64,7 +58,7 @@ export default function Property() {
                 <View className='flex flex-row justify-between'>
                     <View className="mx -2">
                         <TouchableOpacity onPress={() => { router.push(`/rooms/home`) }}>
-                            <IconSymbol name="back" />
+                            <IconSymbol name="back" color="black"/>
                         </TouchableOpacity>
                     </View>
                     <View>
@@ -94,7 +88,11 @@ export default function Property() {
                 </View>
 
                 <View className="my-4 overflow-hidden rounded-lg">
-                    <ImageBackground source={images.home1} style={{ width: "100%", height: 120 }} resizeMode="cover">
+                    <ImageBackground
+                        source={images.home1}
+                        style={{ width: "100%", height: 120, borderRadius: 12 }}
+                        resizeMode="cover"
+                    >
                         <View className="p-3">
                             <Text className="text-2xl font-bold text-white">{room ? room.title : ""}</Text>
                             <Text className="text-white">{room ? deviceCount : '0'} thiết bị</Text>
@@ -104,29 +102,33 @@ export default function Property() {
 
                 <View className="flex flex-row flex-wrap">
                     {deviceList && Object.entries(deviceList).map(([key, devices]) => {
+                        
+                        console.log(deviceList);
                         const image = DEVICE_FORMAT[key]['img'];
                         const amount = devices.length;
                         const devicesRouter = DEVICE_FORMAT[key]['router'];
                         const displayTittle = DEVICE_FORMAT[key]['displayTittle'];
 
                         return (
-                            <View key={key} className="w-1/2">
+                            <View key={key} className="w-1/2 flex flex-col">
                                 <View className="bg-white m-2 p-2 rounded-lg">
                                     <View className="flex flex-row items-center">
-                                        <Image source={image} style={{ width: 40, height: 40, tintColor: "#FFD700" }} />
+                                        <View className='w-1/3'>
+                                            <Image source={image as any} style={{ width: 40, height: 40, tintColor: room && room[`${DEVICE_FORMAT[key].type}Status` as keyof RoomObject] ? "#F5BA0B" : "black" }} />
+                                        </View>
                                         <View className="w-2/3">
                                             <Text className="ml-4 text-xl font-bold">{displayTittle}</Text>
-                                            <Text className="ml-4 text-gray-500">{amount} thiết bị</Text>
+                                            <Text className="ml-4 color-gray-500">{amount} thiết bị</Text>
                                         </View>
                                     </View>
                                     <View className="mt-2">
                                         {devices.map((device, index) =>{ 
                                             return (
-                                            <TouchableOpacity key={index} onPress={() => router.push(`/${devicesRouter}/${device.feedId}`)}>
-                                                <View className="w-full mt-2 p-2 rounded-xl bg-disable">
-                                                    <Text className="font-semibold">{device.title}</Text>
+                                                <View key={index} className={`mt-2 ${device.value == '0' || device.value == '#000000' ? "bg-disable" : "bg-enable"} p-2 rounded-xl `}>
+                                                    <TouchableOpacity key={index} onPress={() => router.push(`/${devicesRouter}/${device.feedId}` as any)}>
+                                                        <Text className="font-semibold">{device.title}</Text>
+                                                    </TouchableOpacity>
                                                 </View>
-                                            </TouchableOpacity>
                                         )})}
                                     </View>
                                 </View>
@@ -156,7 +158,7 @@ export default function Property() {
                     {editMode ? (
                         <View className="bg-white h-2/4 w-full bottom-0 z-20 rounded-s-3xl">
                             <View>
-                                <TouchableOpacity onPress={() => setModal(false)}>
+                                <TouchableOpacity onPress={() => { setEditMode(false) }} className="absolute top-2 right-2">
                                     <Text>Close</Text>
                                 </TouchableOpacity>
                             </View>
