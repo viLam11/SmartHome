@@ -4,81 +4,60 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import images from '@/constants/images';
 import { useState, useEffect } from 'react';
-import DeviceNav from '@/components/DeviceNav';
 import Navigation from '@/components/Navigation';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import DeviceHeader from '@/components/device/DeviceHeader';
 import { Table, TableWrapper, Row, Cell } from 'react-native-table-component';
+import { checkDoorPwdService, controlDevice, getDeviceData } from '@/services/deviceService';
+import { deviceStatusObject } from '@/types/device.type';
+import { useLoading } from '@/contexts/LoadingContext';
 
-const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
 
 const tableData = [[1, 2, 3], [4, 5, 6], [7, 8, 9], ['OK', 0, 'Del']];
 
 export default function Door() {
+    const feedId = useLocalSearchParams().id;
     const router = useRouter();
     const { id } = useLocalSearchParams();
-    const [doorData, setDoorData] = useState(null);
-    const [status, setStatus] = useState(false);
+    const [doorData, setDoorData] = useState<deviceStatusObject | null>(null);
+    const [status, setStatus] = useState<boolean>(false);
     const [token, setToken] = useState(null);
 
     const [visible, setVisible] = useState(false);
     const [password, setPassword] = useState('');
-
+    const { setLoading } = useLoading();
+    
     useEffect(() => {
-        const fetchToken = async () => {
-            let t = await AsyncStorage.getItem("authToken")
-            setToken(t)
+        const fetchCurrentStatus = async () => {
+        setLoading(true);
+        try {
+            const response = await getDeviceData(feedId as string);
+            setDoorData(response);
+            setStatus(response.value == '0' ? false : true) 
+        } catch (error) {
+            console.error("Error fetching device data:", error);
+        } finally {
+            setLoading(false);
         }
-        fetchToken()
-    }, [])
-
-    useEffect(() =>{
-        if (!token) return  
-        const fetchDoorData = async () => {
-            try {
-                const response = await axios.get(`${base_url}/devices/${id}`, {
-                    headers: {
-                        Authorization: token
-                    }
-                })
-                console.log("### RESPONSE : ", response.data);
-                setDoorData(response.data);
-                setStatus(response.data.value == 0 ? false : true) 
-            } catch (error) {
-                console.log(error)
-            }
-        }
-        fetchDoorData()
-    }, [token])
+        };
+        fetchCurrentStatus();
+    }, [feedId]);
  
     async function hanldeOpenDoor() {
         if (!token) return
-        console.log("check pass: ", password)
         if (password.length == 0) {
             alert("Vui lòng nhập mật khẩu")
             return
         }
         try {
-            const response = await axios.post(`${base_url}/devices/${id}/checkpwd`, {
-                pwd: password
-            }, {
-                headers: {
-                    Authorization: token
-                }
-            })
+            const response = await checkDoorPwdService(feedId as string, password);
+            
             if (response.status == 401) {
                 alert("Mật khẩu không đúng")
             } else {
                 setPassword('')
                 alert("Mở cửa thành công")
                 setStatus(true)
-                await axios.post(`${base_url}/devices/${id}`, {
-                    value: 1
-                }, {
-                    headers: {
-                        Authorization: token
-                    }
-                })
+                await controlDevice(feedId as string, "1")
             }
         } catch (error) {
             console.log(error)
@@ -89,13 +68,7 @@ export default function Door() {
     async function handleCloseDoor() {
         if (!token) return
         try {
-            const response = await axios.post(`${base_url}/devices/${id}`, {
-                value: "0"
-            }, {
-                headers: {
-                    Authorization: token
-                }
-            })
+            await controlDevice(feedId as string, "0")
             setPassword('')
             alert("Khóa cửa thành công")
             setStatus(false)
@@ -106,18 +79,9 @@ export default function Door() {
     
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} className='min-h-screen flex-1 m-2'>
-            <View className="flex-1">
-                <View className='flex flex-row justify-between'>
-                    <View className="mx -2">
-                        <TouchableOpacity onPress={() => { router.back() }}>
-                            <IconSymbol name="back" color="black" />
-                        </TouchableOpacity>
-                    </View>
-                    <Text className='text-xl font-bold'>Cửa {+id}</Text>
-                    <View>
-                    </View>
-                </View>
-                <DeviceNav current={1} id={+id} type={"fan"} />
+            <View className="flex-1">            
+                <DeviceHeader feedId={+feedId} title="Door" />
+
                 <View className="mt-6">
                     <View className="flex flex-row mt-6">
                         <View className='w-2/5 h-60 '>
@@ -140,7 +104,7 @@ export default function Door() {
                                 }
                                 <View className="ml-2">
                                     { password.length > 0 && <TouchableOpacity onPress={() => { setVisible(!visible) }}>
-                                        <IconSymbol name={visible ? "eye" : "eye.slash"} />
+                                        <IconSymbol name={visible ? "eye" : "eye.slash"} color="black" />
                                     </TouchableOpacity> }
                                 </View>
                             </View>

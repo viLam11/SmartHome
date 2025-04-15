@@ -3,13 +3,15 @@ import { TouchableOpacity, Image } from 'react-native';
 import images from '@/constants/images';
 
 type Props = {
-  onPress: () => void;
+  status: boolean;
+  powerLight: (value: string) => void;
 };
 
-export default function PowerButton({ onPress }: Props) {
+export default function PowerButton({ status, powerLight }: Props) {
   return (
-    <TouchableOpacity onPress={onPress}>
-      <Image source={images.power} />
+    <TouchableOpacity onPress={() => { if (status) { powerLight("#000000") } else { powerLight("#F2F2F2") } }}>
+        <Image source={status ? images.auto_on : images.auto_off} />
     </TouchableOpacity>
   );
 }
+

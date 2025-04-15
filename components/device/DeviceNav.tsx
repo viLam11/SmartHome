@@ -1,31 +1,34 @@
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 
-export default function DeviceNav({current,  id = 1, type }) {
+type DeviceType = "light" | "fan" | "sensor" | "door";
+
+interface DeviceNavProps {
+    status?: number;
+    feedId?: number;
+    type: DeviceType;
+}
+
+export default function DeviceNav({ feedId = 1, type }: DeviceNavProps) {
     const router = useRouter();
-    const pathname = usePathname();
-    const [status, setStatus] = useState(current);
-
-    useEffect(() => {
-        if (pathname.includes('/hist/')) setStatus(2);
-        else if (pathname.includes('/stats/')) setStatus(3);
-        else setStatus(1);
-    }, [pathname]);
-    function hanldeNav(index) {
+    const [status, setStatus] = useState(1);
+    function hanldeNav(index: number) {
         if (index == status) return;
         switch (index) {
             case 1:
-                if (type == "light") router.replace(`/devices/lights/${id}`);
-                if (type == "fan") router.replace(`/devices/fans/${id}`);
-                if (type == "sensor") router.replace(`/devices/sensors/${id}`);
-                if (type == "door") router.replace(`/devices/doors/${id}`);
+                if (type == "light") router.replace(`/devices/lights/${feedId}`);
+                if (type == "fan") router.replace(`/devices/fans/${feedId}`);
+                if (type == "sensor") router.replace(`/devices/sensors/${feedId}`);
+                if (type == "door") router.replace(`/devices/doors/${feedId}`);
                 break;
             case 2:
-                router.replace(`/hist/${id}`);
+                router.replace(`/hist/${feedId}`);
                 break;
             case 3:
-                router.replace(`/devices/stats/${id}`);
+                router.replace(`/devices/stats/${feedId}`);
                 break;
         }
     }   
