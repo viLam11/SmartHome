@@ -3,19 +3,20 @@ import { View, Text, TouchableOpacity, Image } from 'react-native';
 import images from '@/constants/images';
 
 type Props = {
-  enabled: boolean;
-  onToggle: () => void;
+  status: boolean;
+  setStatusAuto: (status: boolean) => void;
 };
 
-export default function AutoToggle({ enabled, onToggle }: Props) {
+export default function AutoToggle({ status, setStatusAuto }: Props) {
   return (
     <View className="flex flex-row">
       <View className='w-40'>
-        <Text className="px-2 w-40 font-semibold">Tự động:</Text>
+        <Text className="px-2 w-40 font-semibold">Tự động:     </Text>
       </View>
-      <TouchableOpacity onPress={onToggle}>
-        <Image source={enabled ? images.auto_on : images.auto_off} />
+      <TouchableOpacity onPress={() => setStatusAuto(!status)}>
+        <Image source={status ? images.auto_on : images.auto_off} />
       </TouchableOpacity>
     </View>
   );
 }
+

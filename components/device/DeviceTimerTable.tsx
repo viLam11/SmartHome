@@ -1,6 +1,8 @@
 import React from 'react';
 import { TouchableOpacity, Text, View } from 'react-native';
 import { Table, Row } from 'react-native-table-component';
+import { IconSymbol } from '@/components/ui/IconSymbol';
+import ScheduleTable from '@/components/ScheduleTable';
 
 const tableHead = ["Start", "End", "Brightness", "Edit"];
 const tableData = [
@@ -19,34 +21,20 @@ const renderCell = (data, index ) => {
   return <Text>{data}</Text>;
 };
 
-export default function DeviceTimerTable() {
+export default function DeviceTimerTable( {setModal}: {setModal: (status: boolean) => void} ) {
   return (
     <View>
-      <View className="flex flex-row justify-between">
-        <Text className="font-semibold mt-4">Hẹn giờ</Text>
-        <TouchableOpacity onPress={() => alert('Thêm hẹn giờ')}>
-          <View className="bg-black rounded-full">
-            <Text className="text-white text-lg px-2">+</Text>
+      <View className='flex flex-row justify-between'>
+        <Text className='font-semibold mt-4'>Hẹn giờ</Text>
+        <TouchableOpacity className="absolute top-4 right-4 w-8 h-8 rounded-full bg-black items-center justify-center z-50" onPress={() => {setModal(true)}}>
+          <View className='bg-black rounded-full'>
+            <IconSymbol name="add" color="white" />
           </View>
         </TouchableOpacity>
       </View>
-      <View style={{ borderWidth: 1, borderColor: "black", borderRadius: 10, overflow: "hidden" }}>
-        <Table borderStyle={{ borderWidth: 0 }}>
-          <Row
-            data={tableHead}
-            style={{ height: 40, backgroundColor: "#FFD700", borderBottomWidth: 1, borderColor: "black" }}
-            textStyle={{ textAlign: "center", fontWeight: "bold" }}
-          />
-          {tableData.map((rowData, rowIndex) => (
-            <Row
-              key={rowIndex}
-              data={rowData.map((cell, cellIndex) => renderCell(cell, cellIndex))}
-              style={{ height: 30 }}
-              textStyle={{ textAlign: "center" }}
-            />
-          ))}
-        </Table>
+      <View className='mt-2'>
+        <ScheduleTable tableData={tableData} />
       </View>
-    </View>
+  </View>
   );
 }

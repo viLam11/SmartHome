@@ -4,11 +4,8 @@ import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert, Acti
 import { FontAwesome } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
 import images from '@/constants/images';
-// import { signInService, registerService } from '@/services/authService';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { signInService, registerService } from '@/services/authService';
 
-const base_url = "https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1"
 export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
     const isSignIn = type == 'sign-in';
     const router = useRouter();
@@ -21,83 +18,24 @@ export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // Xử lý đăng nhập & đăng ký
-    // const handleAuth = async () => {
-    //     if (!email || !password || (!isSignIn && !firstName && !lastName)) {
-    //         Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin');
-    //         return;
-    //     }
-
-    //     setLoading(true);
-    //     try {
-    //         if (isSignIn) {
-    //             const response = await signInService({ email, password });
-    //             setTimeout(() => {
-    //                 router.replace('/rooms/home');
-    //             }, 3000);
-    //         } else {
-    //             const response = await registerService({ firstname: firstName, lastname: lastName, email, password });
-    //             Alert.alert('Thành công', 'Đăng ký thành công');
-    //             setTimeout(() => {
-    //                 router.replace('/rooms/home');
-    //             }, 3000);
-    //         }
-    //     } catch (error) {
-    //         Alert.alert('Lỗi', 'Đăng nhập hoặc đăng ký thất bại');
-    //     }
-    //     setLoading(false);
-    // };
-
     async function handleAuth() {
-        console.log("Is sign in: ", isSignIn);  
-        console.log("Base url: ", base_url);
-        console.log("Email: ", email);
-        console.log("Password: ", password);
-        setLoading(true); // Bắt đầu load
+        setLoading(true);
 
-        if (isSignIn) {
-            axios.post(`${base_url}/login`, {
-                "email": email,
-                "password": password,
-            },{ timeout: 5000 })
-                .then((response) => {
-                    console.log(response)
-                    alert("Đăng nhập thành công");
-                    AsyncStorage.setItem('authToken', response.data.token);
-                    console.log("Token: ", response.data.token);
-                    // navigation.navigate('home');
-                    router.replace('/rooms/home');
-                })
-                .catch((error) => {
-                    console.log(error.response)
-                    if (error.response.status == 400) {
-                        alert("Email hoặc mật khẩu không đúng");
-                    }
-                })
-                .finally(() => {
-                    setLoading(false); // Kết thúc load
-                });
-        } else {
-            axios.post(`${base_url}/register`, {
-                "firstname": firstName,
-                "lastname": lastName,
-                "email": email,
-                "password": password,
-            })
-                .then((response) => {
-                    console.log(response)
-                    alert("Đăng ký thành công");
-                    router.replace('/auth/sign-in');
-                })
-                .catch((error) => {
-                    console.log(error.response)
-                    if (error.response.status == 400) {
-                        alert("Email đã tồn tại");
-                    }
-                })
+        try {
+            if (isSignIn) {
+                await signInService({ email, password });
+                router.replace('/rooms/home');
+            } else {
+                const response = await registerService({ firstname: firstName, lastname: lastName, email, password });
+                alert('Đăng ký thành công');
+                router.replace('/rooms/home');
+            }
+        } catch (error) {
+            alert('Đăng nhập hoặc đăng ký thất bại');
+        } finally {
+            setLoading(false);
         }
-
-    }
+    };
 
     return (
         <SafeAreaView className="bg-white h-full">
