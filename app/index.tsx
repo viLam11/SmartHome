@@ -1,11 +1,23 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import images from '@/constants/images';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function WelcomeScreen() {
     const router = useRouter();
+    const [token, setToken] = useState<null | string>(null);
+    
+    useEffect(() => {
+        const loadToken = async () => {
+            let t = await AsyncStorage.getItem('authToken');
+            if (t) {
+                setToken(t);
+            }
+        }
+        loadToken();
+    }, [])
 
     return (
         <SafeAreaView className="flex-1 bg-white items-center justify-center">
@@ -18,13 +30,20 @@ export default function WelcomeScreen() {
 
             <Text className="text-2xl font-bold text-black">SmartHome</Text>
             <Text className="text-gray-500 mt-2">A new way to control your home</Text>
-
-            <TouchableOpacity 
+            { token ? 
+                 <TouchableOpacity 
+                 className="absolute bottom-10 w-[40%] mx-auto bg-orange-500 px-6 py-3 rounded-lg self-center"
+                 onPress={() => router.push('/rooms/home')}
+                    ><Text className="text-white font-bold text-center">GET STARTED</Text>
+                    </TouchableOpacity> : 
+                <TouchableOpacity 
                 className="absolute bottom-10 w-[40%] mx-auto bg-orange-500 px-6 py-3 rounded-lg self-center"
                 onPress={() => router.push('/auth/sign-in')}
-            >
-                <Text className="text-white font-bold text-center">GET STARTED</Text>
+            ><Text className="text-white font-bold text-center">GET STARTED</Text>
             </TouchableOpacity>
+            }
+            
+                
         </SafeAreaView>
     );
 }

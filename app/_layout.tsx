@@ -1,15 +1,17 @@
-import { useEffect } from "react";
-import { Stack } from "expo-router";
+import { Slot, useRouter, useSegments } from "expo-router";
+import React from "react";
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-
 import "../global.css";
-import SignIn from "./(root)/auth/sign-in";
-// import GlobalProvider from "@/lib/global-provider";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function RootLayout() {
+  const [isAuth, setIsAuth] = useState<boolean | null>(null);
+  const segments = useSegments();
+  const router = useRouter();
+
   const [fontsLoaded] = useFonts({
     "Rubik-Bold": require("../assets/fonts/Rubik-Bold.ttf"),
     "Rubik-ExtraBold": require("../assets/fonts/Rubik-ExtraBold.ttf"),
@@ -29,16 +31,7 @@ export default function RootLayout() {
     return null;
   }
 
-
-  return (
-    <GestureHandlerRootView style={{ flex: 1 }} >
-      <SafeAreaProvider>
-        <Stack initialRouteName="index" > 
-          <Stack.Screen name="sign-in" />
-          <Stack.Screen name="(tabs)"  />
-          <Stack.Screen name="index" options={{ headerShown: false }}/>
-        </Stack>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
-  );
+  return <GestureHandlerRootView>
+          <Slot/>
+      </GestureHandlerRootView>
 }

@@ -1,6 +1,6 @@
 import icons from "./icons";
 import images from "./images";
-import { deviceStatusObject } from "../types/device";
+import { deviceStatusObject } from "../types/device.type";
 
 export const rooms = [
   {
