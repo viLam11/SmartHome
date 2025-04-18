@@ -37,9 +37,10 @@ import night_wind from "@/assets/images/night_wind.png";
 import snow_wind from "@/assets/images/snow_wind.png";
 import sun_cloud from "@/assets/images/sun_cloud.png";
 import sun_humid from "@/assets/images/sun_humid.png";
+import fail from "@/assets/images/fail.png";
 export default {  
   night, day, cloud_snow, night_humid, night_snow, night_wind, snow_wind, sun_cloud, sun_humid,
-  sensor,
+  sensor, fail,
   onboarding,
   avatar,
   newYork,

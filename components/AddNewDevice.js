@@ -4,6 +4,7 @@ import { IconSymbol } from './ui/IconSymbol';
 import images from '@/constants/images';
 import axios from 'axios';
 import React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // deviceType: 0 - Fan, 1 - Light, 2 - Sensor
 const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
@@ -18,13 +19,14 @@ export default function AddNewDevice({ setModal, room }) {
     const [feedKey, setFeedKey] = useState('');
     const [roomID, setRoomID] = useState(room.id);
     const [password, setPassword] = useState(null);
+    const [success, setSuccess] = useState(false)
 
     if (nameMode) {
-        return <SetNewName feedID={feedID} setFeedID={setFeedID} feedKey={feedKey} setFeedKey={setFeedKey} setNameMode={setNameMode} setFinishMode={setFinishMode} deviceType={deviceType} setModal={setModal} setDeviceName={setDeviceName} deviceName={deviceName} />
+        return <SetNewName success={success} setSuccess={setSuccess}  roomID={roomID} feedID={feedID} setFeedID={setFeedID} feedKey={feedKey} setFeedKey={setFeedKey} setNameMode={setNameMode} setFinishMode={setFinishMode} setDoorPassMode={setDoorPassMode} deviceType={deviceType} setModal={setModal} setDeviceName={setDeviceName} deviceName={deviceName} />
     } else if (finishMode) {
-        return <FinishModal  setFinishMode={setFinishMode} setModal={setModal} deviceName={deviceName} deviceType={deviceType} feedID={feedID} feedKey={feedKey} roomID={roomID} password={password} />
+        return <FinishModal success={success} setSuccess={setSuccess} setFinishMode={setFinishMode} setModal={setModal} deviceName={deviceName} deviceType={deviceType} feedID={feedID} feedKey={feedKey} roomID={roomID} password={password} />
     } else if (doorPassMode) {
-        return <DoorPassModal password={password} setPassword={setPassword} setFinishMode={setFinishMode} setNameMode={setNameMode} setDoorPassMode={setDoorPassMode} />
+        return <DoorPassModal setSuccess={setSuccess} deviceName={deviceName} feedID={feedID} feedKey={feedKey} roomID={roomID} password={password} setPassword={setPassword} setFinishMode={setFinishMode} setNameMode={setNameMode} setDoorPassMode={setDoorPassMode} />
     }
 
     function hanldeContinueName() {
@@ -144,8 +146,6 @@ export default function AddNewDevice({ setModal, room }) {
                 </View>
             </View>
 
-
-
             {/* Button */}
             <View className='w-11/12 mx-auto mt-2 p-2'>
                 <TouchableOpacity onPress={() => hanldeContinueName()} className='bottom-0'>
@@ -159,9 +159,18 @@ export default function AddNewDevice({ setModal, room }) {
     )
 }
 
-const SetNewName = ({ feedKey, setFeedKey, feedID, setFeedID, setFinishMode, setNameMode, setModal, setDeviceName, deviceName, deviceType }) => {
+const SetNewName = ({ roomID, feedKey, setFeedKey, feedID, setFeedID, setFinishMode, setDoorPassMode, setNameMode, setModal, setDeviceName, setSuccess, deviceName, deviceType }) => {
     const [textType, setTextType] = useState('');
+    const [token, setToken] = useState(null)
     useEffect(() => {
+        const fetchToken = async () => {
+            const temp = await AsyncStorage.getItem("authToken")
+            setToken(temp)
+        }
+        fetchToken()
+    }, [])
+    useEffect(() => {
+        if (!token) return
         if (deviceType == 0) {
             setTextType('Quạt');
         }
@@ -173,6 +182,64 @@ const SetNewName = ({ feedKey, setFeedKey, feedID, setFeedID, setFinishMode, set
             setTextType('Cửa')
         }
     }, [deviceType])
+
+    async function hanldeContinueName() {
+        if (!deviceName) { alert("Vui lòng nhập tên thiết bị"); return; }
+        if (!feedID) { alert("Vui lòng nhập FeedID"); return; }
+        if (!feedKey) { alert("Vui lòng nhập FeedKey"); return; }
+        console.log("deviceType", deviceType);
+        if (deviceType == 3) {
+            setNameMode(false); setDoorPassMode(true);
+        }
+        else {
+            if (!token) return
+            console.log("deviceType", deviceType);
+            if (deviceType == 3) {
+                setNameMode(false)
+                setDoorPassMode(true)
+                return
+            }
+            let type = ""
+            if (deviceType == 0) {
+                type = "fan"
+            } else if (deviceType == 1) {
+                type = "light"
+            } else if (deviceType == 2) {
+                type = "sensor"
+            } else if (deviceType == 3) {
+                type = "door"
+            }
+            try {
+                const payload = {
+                    feedId: +feedID,
+                    feedKey: feedKey,
+                    type: type,
+                    title: deviceName,
+                    roomID: +roomID
+                }
+                console.log(payload)
+                const response = await axios.post(`${base_url}/devices`, payload, {
+                    headers: {
+                        "Authorization": token
+                    }
+                }).catch(err => {
+                    console.error("Error khi tạo thiết bị: ", err)
+                    setSuccess(false)
+                    setFinishMode(true)
+                    setNameMode(false)
+                    throw new Error("Tạo thiết bị thất bại")
+                })
+                console.log("Thêm thiết bị thành công: ", response.data);
+                setSuccess(true)
+                setFinishMode(true)
+                setNameMode(false)
+                setFinishMode(true);
+            } catch (error) {
+                console.log("here")
+                console.log(error);
+            }
+        }
+    }
 
     return (
         <KeyboardAvoidingView
@@ -224,7 +291,7 @@ const SetNewName = ({ feedKey, setFeedKey, feedID, setFeedID, setFinishMode, set
 
                     <View className="h-32">
                         <View className="bg-green-300 bottom-4 rounded-md mt-4 p-2 w-full mx-auto">
-                            <TouchableOpacity onPress={(() => { setNameMode(false); setFinishMode(true); })}>
+                            <TouchableOpacity onPress={(() => { hanldeContinueName() })}>
                                 <Text className="text-black text-center font-bold">Tiếp tục</Text>
                             </TouchableOpacity>
                         </View>
@@ -241,16 +308,18 @@ const SetNewName = ({ feedKey, setFeedKey, feedID, setFeedID, setFinishMode, set
     )
 }
 
-const FinishModal = ({ setFinishMode, feedKey, feedID, setModal, deviceName, deviceType, roomID, password }) => {
+const FinishModal = ({ success, setFinishMode, feedKey, feedID, setModal, deviceName, deviceType, roomID, password }) => {
     const [textType, setTextType] = useState('');
     const [type, setType] = useState('');
     const [token, setToken] = useState(null)
+    const [done, setDone] = useState(false);
     useEffect(() => {
         const getToken = async () => {
             const token = await AsyncStorage.getItem('token');
             setToken(token);
-        }   
-    })
+        }
+        getToken()
+    }, [])
     useEffect(() => {
         if (deviceType == 0) {
             setTextType('Quạt');
@@ -285,25 +354,6 @@ const FinishModal = ({ setFinishMode, feedKey, feedID, setModal, deviceName, dev
                     "Authorization": token
                 }
             });
-            if(response.status != 200) {
-                alert(response.data);
-            }
-        
-            if (type == "door") {
-                console.log("doorPassMode", password);
-                const doorPassResponse = await axios.post(`${base_url}/devices/${feedID}/setpwd`, {
-                    pwd: password
-                } ,{
-                    headers: {
-                        "Authorization": token
-                    }
-                }
-                )
-                // console.log("doorPassResponse", doorPassResponse);
-                setModal(false);
-                setFinishMode(false);
-                return
-            }
             setModal(false);
             setFinishMode(false);
         } catch (error) {
@@ -313,8 +363,39 @@ const FinishModal = ({ setFinishMode, feedKey, feedID, setModal, deviceName, dev
         setFinishMode(false);
         setModal(false);
     }
-    return (
-        <View className='min-h-screen h-full w-full'>
+
+
+    if (success) {
+        return (
+            <View className='min-h-screen h-full w-full'>
+                <View className='h-1/3  mb-10'>
+                    <View className="flex items-end m-4 ">
+                        <TouchableOpacity onPress={() => setModal(false)} className='bg-black rounded-full'>
+                            <IconSymbol name="close" color="white" />
+                        </TouchableOpacity>
+                    </View>
+                    <View className="flex items-center justify-center">
+                        <Image source={images.done} style={{ width: 100, height: 100 }} />
+                    </View>
+                    <View>
+                        <Text className='text-center text-2xl font-bold mt-6'>
+                            {textType} {deviceName} đã được thêm vào
+                        </Text>
+                    </View>
+    
+                </View>
+    
+                <View className="w-11/12 mx-auto h-30 bottom-0 h-12 bg-green-300 p-2 rounded-lg">
+                    <TouchableOpacity onPress={() => setModal(false)}>
+                        <Text className='text-center text-xl font-bold m-auto'>Xong</Text>
+                    </TouchableOpacity>
+    
+                </View>
+            </View>
+        )
+    } else {
+        return (
+            <View className='min-h-screen h-full w-full'>
             <View className='h-1/3  mb-10'>
                 <View className="flex items-end m-4 ">
                     <TouchableOpacity onPress={() => setModal(false)} className='bg-black rounded-full'>
@@ -322,28 +403,98 @@ const FinishModal = ({ setFinishMode, feedKey, feedID, setModal, deviceName, dev
                     </TouchableOpacity>
                 </View>
                 <View className="flex items-center justify-center">
-                    <Image source={images.done} style={{ width: 100, height: 100 }} />
+                    <Image source={images.fail} style={{ width: 100, height: 100 }} />
                 </View>
                 <View>
                     <Text className='text-center text-2xl font-bold mt-6'>
-                        {textType} {deviceName} đã được thêm vào
+                       Không thể thêm {textType} {deviceName}
                     </Text>
                 </View>
 
             </View>
 
             <View className="w-11/12 mx-auto h-30 bottom-0 h-12 bg-green-300 p-2 rounded-lg">
-                <TouchableOpacity onPress={() => hanldeAddNewDevice()}>
-                    <Text className='text-center text-xl font-bold m-auto'>Xong</Text>
+                <TouchableOpacity onPress={() => setModal(false)}>
+                    <Text className='text-center text-xl font-bold m-auto'>Thoát</Text>
                 </TouchableOpacity>
-
+            </View>
+            <View className="w-11/12 m x-auto h-30 bottom-0 h-12 bg-gray-300 p-2 rounded-lg">
+                <TouchableOpacity onPress={() => setModal(false)}>
+                    <Text className='text-center text-xl font-bold m-auto'>Quay lại</Text>
+                </TouchableOpacity>
             </View>
         </View>
-    )
+        )
+    }
+    
+
+
 }
 
-const DoorPassModal = (({ password, setPassword, setNameMode, setFinishMode, setDoorPassMode}) => {
+const DoorPassModal = (({ password, deviceName, feedID, feedKey, roomID, setPassword, setNameMode, setFinishMode, setDoorPassMode, setSuccess }) => {
     const [passwordVisible, setPasswordVisible] = useState(false);
+    const [token, setToken] = useState(null)
+    useEffect(() => {
+        const fetchToken = async () => {
+            const temp = await AsyncStorage.getItem("authToken")
+            setToken(temp)
+        }
+        fetchToken()
+    }, [])
+
+    async function hanldeContinue() {
+        if (!(password && feedID && feedKey && roomID && token)) {
+            console.log("Thiếu data")
+        }
+        if (!token) return
+        if (!password) {
+            alert("Vui lòng nhập mật khẩu");
+            return;
+        }
+        if (password.length < 4) {
+            alert("Mật khẩu tối thiểu 4 chữ số")
+        }
+        try {
+            const payload = {
+                feedId: +feedID,
+                feedKey: feedKey,
+                type: "door",
+                title: deviceName,
+                roomId: +roomID
+            }
+            console.log("Check payload: ", payload)
+            const response = await axios.post(`${base_url}/devices`, payload, {
+                headers: {
+                    'Authorization': token
+                }
+            }).catch(err => {
+                if (err.response) {
+                    console.error("Status code:", err.response.status)
+                    if (err.response.status == 500) {
+                        throw new Error("Trùng feedID")
+                    }
+                    console.error("Response data:", err.response.data)
+                } else {
+                    console.error("Không có response (có thể lỗi network)", err)
+                }
+            })
+            console.log(response.data)
+            const setPass = await axios.post(`${base_url}/devices/${feedID}/setpwd`, {
+                pwd: password
+            }).catch(err => {
+                console.error("Error khi set password: ", err)
+                throw new Error("Set password thất bại")
+                setSuccess(false)
+            })
+            console.log(setPass.data)
+            setDoorPassMode(false); setFinishMode(true);
+            setSuccess(true)
+        } catch (error) {
+            setSuccess(false)
+            console.log(error.message)
+            alert(error.message)
+        }
+    }
     return (
         <View className='h-full m-4 flex flex-col justify-between'>
             <View className='h-2/3'>
@@ -358,14 +509,14 @@ const DoorPassModal = (({ password, setPassword, setNameMode, setFinishMode, set
                         secureTextEntry={!passwordVisible}
                     />
                     <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-                            {passwordVisible ? <IconSymbol name="eye.slash" color="black" size={24} /> : <IconSymbol name="eye" color="black" size={24} />}
+                        {passwordVisible ? <IconSymbol name="eye.slash" color="black" size={24} /> : <IconSymbol name="eye" color="black" size={24} />}
                     </TouchableOpacity>
-                    </View>
+                </View>
             </View>
 
             <View className='h-1/3'>
                 <View className="bg-green-300 bottom-4 rounded-md mt-4 p-2 w-full mx-auto">
-                    <TouchableOpacity onPress={(() => { setDoorPassMode(false); setFinishMode(true); })}>
+                    <TouchableOpacity onPress={hanldeContinue}>
                         <Text className="text-black text-center font-bold">Tiếp tục</Text>
                     </TouchableOpacity>
                 </View>

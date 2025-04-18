@@ -6,6 +6,9 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import "../global.css";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs(['Text strings must be rendered within a <Text>']);   
 
 export default function RootLayout() {
   const [isAuth, setIsAuth] = useState<boolean | null>(null);

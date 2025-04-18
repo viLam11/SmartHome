@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { LogBox } from 'react-native';
+LogBox.ignoreLogs(['Text strings must be rendered within a <Text>']);   
 import { StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Modal, KeyboardAvoidingView, Platform, Button } from 'react-native';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/ui/IconSymbol';

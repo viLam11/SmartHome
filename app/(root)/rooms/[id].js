@@ -24,7 +24,7 @@ export default function Room() {
     const [editMode, setEditMode] = useState(false);
     const [modal, setModal] = useState(false);
     const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
-    const [token, setToken] = useState(null);    
+    const [token, setToken] = useState(null);
     const [isTokenLoaded, setIsTokenLoaded] = useState(false);
 
     useEffect(() => {
@@ -39,19 +39,12 @@ export default function Room() {
 
     useEffect(() => {
         if (!isTokenLoaded) return;
-        console.log("### ROOM ID: ", id);
         const fetchDeviceInRoom = async () => {
             const response = await axios.get(`${base_url}/devices/room/${id}`)
-            console.log("fetch device in room: ", response);   
-            if (response.status != 200) {
-                console.log("### ERROR: ", response.data);
-            }
-            console.log("### DATA: ", response.data);
             setFanList(response.data.fanList);
             setLightList(response.data.lightList);
             setSensorList(response.data.sensorList);
             setDoorList(response.data.doorList);
-            console.log("## Fan list: ", fanList);
         }
         fetchDeviceInRoom();
         const fetchRoomData = async () => {
@@ -60,7 +53,6 @@ export default function Room() {
                     "Authorization": token
                 }
             })
-            console.log("fetch room data: ", response); 
             let room = response.data.find((room) => room.id == id);
             room = { ...room, device: room.fanCount + room.lightCount + room.sensorCount + room.doorCount };
             setRoom(room);
@@ -72,15 +64,29 @@ export default function Room() {
         // return clearInterval();
     }, [modal, editMode, token]);
 
+    async function handleDeleteDevice(feedID) {
+        if (!feedID || !token) return;
+        console.log("Delete device with ID: ", feedID);
+        const response = await axios.delete(`${base_url}/devices/${feedID}`, {
+            headers: {
+                "Authorization": token
+            }
+        })
+        console.log(response)
+        if (response.status == 200) {
+            setWaring(false);
+            setModal(false);
+            setEditMode(false);
+        }
+    }
 
-   
     return (
         <View className="min-h-screen">
             <ScrollView contentContainerStyle={{ flexGrow: 1 }} className='mt-1 mx-2 min-h-screen'>
-                {modal || editMode ? <View className="absolute top-0 left-0 z-10 w-full h-full bg-black/50" /> : <></>}
+                {modal ? <View className="absolute top-0 left-0 z-10 w-full h-full bg-black/50" /> : <></>}
 
                 <View className='flex flex-row justify-between'>
-                    <View className="mx -2">
+                    <View className="mx-2">
                         <TouchableOpacity onPress={() => { router.push(`/rooms/home`) }}>
                             <IconSymbol name="back" />
                         </TouchableOpacity>
@@ -90,8 +96,8 @@ export default function Room() {
                     </View>
                     <View className="flex flex-row space-x-2">
                         {editMode ?
-                            <View>
-                                <TouchableOpacity className="bg-black rounded-full p-1" onPress={() => { }}>
+                            <View className=''>
+                                <TouchableOpacity className="bg-black rounded-full p-1" onPress={() => { setEditMode(false) }}>
                                     <IconSymbol name="save" size={18} color="white" />
                                 </TouchableOpacity>
                             </View>
@@ -138,11 +144,22 @@ export default function Room() {
 
                             <View className='mt-2'>
                                 {fanList.length > 0 && fanList.map((fan, index) => (
-                                    <View key={index} className={`mt-2 ${fan.value == 0 ? "bg-disable" : "bg-enable"} p-2 rounded-xl `}>
-                                        <TouchableOpacity onPress={() => { router.push(`/devices/fans/${fan.feedId}`) }}>
-                                            <Text className='font-semibold'>Quạt {fan.title}</Text>
-                                        </TouchableOpacity>
-
+                                    <View>
+                                        {editMode ?
+                                            <View key={fan.feedId} className={`mt-2 ${fan.value == 0 ? "bg-disable" : "bg-enable"}  rounded-xl `}>
+                                                <TouchableOpacity onPress={() => { console.log("Đang xóa thiết bị"); handleDeleteDevice(fan.feedId)}} >
+                                                    <View className="absolute top-0 right-0 bg-red-100 rounded-full p-2">
+                                                        <IconSymbol name="delete" size={18} color="black" />
+                                                    </View>
+                                                    <Text className='font-semibold p-2'>Quạt {fan.title}</Text>
+                                                </TouchableOpacity>
+                                            </View> :
+                                            <View key={index} className={`mt-2 ${fan.value == 0 ? "bg-disable" : "bg-enable"} p-2 rounded-xl `}>
+                                                <TouchableOpacity onPress={() => { router.push(`/devices/fans/${fan.feedId}`) }}>
+                                                    <Text className='font-semibold'>Quạt {fan.title}</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                        }
                                     </View>
                                 ))}
                             </View>
@@ -183,11 +200,11 @@ export default function Room() {
                         <View className="bg-white m-2 p-2 rounded-lg">
                             <View className="flex flex-row items-center">
                                 <View className='w-1/3'>
-                                    <Image source={images.sensor} style={{ width: 40, height: 40 , opacity: 0.8, tintColor: (room && room.sensor_on) ? "#F5BA0B" : "black" }} />
+                                    <Image source={images.sensor} style={{ width: 40, height: 40, opacity: 0.8, tintColor: (room && room.sensor_on) ? "#F5BA0B" : "black" }} />
                                 </View>
                                 <View className='w-2/3'>
                                     <Text className='ml-4 text-xl font-bold'>Cảm biến</Text>
-                                    <Text className='ml-4 color-gray-500'>{ sensorList.length} thiết bị</Text>
+                                    <Text className='ml-4 color-gray-500'>{sensorList.length} thiết bị</Text>
                                 </View>
                             </View>
 
@@ -207,18 +224,18 @@ export default function Room() {
                         <View className="bg-white m-2 p-2 rounded-lg">
                             <View className="flex flex-row items-center">
                                 <View className='w-1/3'>
-                                    <Image source={images.door} style={{ width: 40, height: 40 , opacity: 0.8, tintColor: (room && room.door_on > 0) ? "#F5BA0B" : "black" }} />
+                                    <Image source={images.door} style={{ width: 40, height: 40, opacity: 0.8, tintColor: (room && room.door_on > 0) ? "#F5BA0B" : "black" }} />
                                 </View>
                                 <View className='w-2/3'>
                                     <Text className='ml-4 text-xl font-bold'>Cửa</Text>
-                                    <Text className='ml-4 color-gray-500'>{ doorList.length} thiết bị</Text>
+                                    <Text className='ml-4 color-gray-500'>{doorList.length} thiết bị</Text>
                                 </View>
                             </View>
 
                             <View className='mt-2'>
                                 {doorList.length > 0 && doorList.map((door, index) => (
                                     <View key={index} className="mt-2 bg-enable p-2 rounded-xl">
-                                        <TouchableOpacity onPress={() => { router.push(`/devices/doors/${door.feedId}`) }}> 
+                                        <TouchableOpacity onPress={() => { router.push(`/devices/doors/${door.feedId}`) }}>
                                             <Text className='font-semibold'>{door.title}</Text>
                                         </TouchableOpacity>
                                     </View>
@@ -238,7 +255,7 @@ export default function Room() {
             <Modal
                 animationType="slide"
                 transparent={true}
-                visible={modal || editMode}
+                visible={modal}
                 onRequestClose={() => {
                     setModal(false);
                     setEditMode(false);
@@ -248,19 +265,11 @@ export default function Room() {
                     behavior={Platform.OS === "ios" ? "padding" : "height"}
                     style={{ flex: 1, justifyContent: 'flex-end' }}
                 >
-                    {editMode ?
-                        <View className="bg-white h-2/4 w-full bottom-0 z-20 rounded-s-3xl">
-                            <View>
-                                <TouchableOpacity onPress={() => { setEditMode(false) }} className="absolute top-2 right-2">
-                                    <Text>Close</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                        :
-                        <View className="bg-white h-1/2 w-full bottom-0 z-20 rounded-s-3xl">
-                            <AddNewDevice setModal={setModal} room={room} />
-                        </View>
-                    }
+
+                    <View className="bg-white h-1/2 w-full bottom-0 z-20 rounded-s-3xl">
+                        <AddNewDevice setModal={setModal} room={room} />
+                    </View>
+
                 </KeyboardAvoidingView>
             </Modal>
         </View>

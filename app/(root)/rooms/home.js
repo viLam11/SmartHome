@@ -12,11 +12,9 @@ import images from "@/constants/images";
 import AsyncStorage, { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import React from "react";
 
+const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
 export default function HomeIndex() {
-    const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
-    // const base_url = API_URL;
     const router = useRouter();
-    // const [roomNum, setRoomNum] = useState(1);
     const [imgArray, setImgArray] = useState([images.home1, images.home3, images.home3, images.home4]);
     const [modal, setModal] = useState(false);
     const [imageMode, setImageMode] = useState(false);
@@ -43,7 +41,7 @@ export default function HomeIndex() {
                     "Authorization": authToken
                 }
             })
-            console.log("### RESPONSE : ", response.data);   
+            // console.log("### RESPONSE : ", response.data);   
             let x = response.data;
             let rooms = []
             rooms = x.map((room) => ({
@@ -51,21 +49,18 @@ export default function HomeIndex() {
                 img: imgArray[Math.floor(Math.random() * imgArray.length)],   
                 device: room.fanCount + room.lightCount + room.sensorCount + room.doorCount
             }));
-            console.log("### DATA :" , rooms);
+            // console.log("### DATA :" , rooms);
             let token = await AsyncStorage.getItem("authToken");
-            console.log("Token: ", token);
+            // console.log("Token: ", token);
             setRoomData(rooms);
         }
         fetchRoomData();
     }, [count, deleteMode]);
-    
     useEffect(() =>{
         console.log(imageMode, modal)
     }, [imageMode, modal])
-
-
+ 
     return (
-
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={{ flex: 1 }}
