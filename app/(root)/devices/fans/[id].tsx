@@ -13,6 +13,7 @@ import { getDeviceData, controlDevice } from '@/services/deviceService';
 import { getSchedule, setSchedule } from '@/services/scheduleService';
 import { deviceStatusObject } from '@/types/device.type';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 
 import { useLoading } from '@/contexts/LoadingContext';
 
@@ -100,14 +101,18 @@ export default function Fan() {
       console.log('Error: ', e);
     }
   }
-  const onChange = (event: any, selectedTime: Date) => {
-      setShowPicker(false);
+  const onChange = (event: DateTimePickerEvent, selectedTime?: Date) => {
+    setShowPicker(false);
+  
+    if (selectedTime) {
       if (timer == 0) {
-          setStartTime(selectedTime);
+        setStartTime(selectedTime);
       } else {
-          setEndTime(selectedTime);
+        setEndTime(selectedTime);
       }
+    }
   };
+  
   function handleScheduleDays(day: number){
       let temp = [2,3,4,5,6,7,8]
       if (!temp.includes(day)) return 

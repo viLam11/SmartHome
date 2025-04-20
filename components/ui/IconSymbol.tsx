@@ -51,17 +51,19 @@ export function IconSymbol({
   size = 24,
   color,
   style,
+  className,
 }: {
   name: IconSymbolName;
   size?: number;
   color: string | OpaqueColorValue;
   // style?: StyleProp<ViewStyle>;
   style?: StyleProp<TextStyle>;
+  className?: string,
   weight?: SymbolWeight;
 }) {
   if (name === 'humidity') {
-    return <Feather name="droplet" size={size} color={color} style={style} />;
+    return <Feather name="droplet" size={size} color={color} style={style} className={className}/>;
   }
 
-  return <MaterialIcons color={color} size={size} name={MAPPING[name]} style={style} />;
+  return <MaterialIcons color={color} size={size} name={MAPPING[name]} style={style} className={className}/>;
 }

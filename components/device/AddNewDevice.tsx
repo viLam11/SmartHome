@@ -69,7 +69,7 @@ export default function AddNewDevice({ setModal, room }: { setModal: any, room: 
 
 
     return (
-        <View>
+        <View className='flex-1'>
             <View className="flex flex-row">
                 <View className="flex-grow w-2/3 mt-4">
                     <Text className="text-xl text-center font-semibold">Thêm thiết bị vào</Text>
@@ -81,8 +81,11 @@ export default function AddNewDevice({ setModal, room }: { setModal: any, room: 
                     </TouchableOpacity>
                 </View>
             </View>
+            <View className='flex flex-grow'>
+                <DeviceSelection deviceType={deviceType} setDeviceType={setDeviceType} />
+            </View>
 
-            <DeviceSelection deviceType={deviceType} setDeviceType={setDeviceType} />
+            
 
             {/* Button */}
             <View className='w-11/12 mx-auto mt-2 p-2'>
@@ -98,9 +101,10 @@ export default function AddNewDevice({ setModal, room }: { setModal: any, room: 
 }
 
 const DeviceSelection = ({ deviceType, setDeviceType }: { deviceType: string | null, setDeviceType: any }) => (
-    <View className="mt-4 flex flex-row flex-wrap justify-start">
+    <View className="mt-4 flex flex-row flex-wrap justify-between items-center">
         {Object.entries(DEVICE_FORMAT).map(([key, device], index) => (
-            <View className='w-2/5 bg-gray-200 h-24 p-2 rounded-lg mx-auto mb-2'>
+         <View className='w-1/2'>
+            <View className='w-11/12 bg-gray-200 h-24 p-2 rounded-lg mx-auto mb-4'>
                 <TouchableOpacity onPress={() => setDeviceType(device.type)} >
                     <View className='flex flex-row justify-between'>
                         <View className="p-2 bg-white rounded-full">
@@ -114,8 +118,8 @@ const DeviceSelection = ({ deviceType, setDeviceType }: { deviceType: string | n
                     </View>
                     <Text className='text-lg font-bold mt-auto'>{device.displayTittle}</Text>
                 </TouchableOpacity>
-
             </View>
+        </View>
         ))}
     </View>
 );
@@ -152,7 +156,7 @@ const SetNewName = ({ feedID, feedKey, deviceType, deviceName, setModal, setFeed
                                 className="border border-gray-300 w-full p-2 h-1/2 rounded-md mx-auto"
                                 placeholder=""
                                 keyboardType="visible-password"
-                                value={String(feedID)}
+                                value={(feedID !== -1 && feedID !== 0) ? String(feedID) : ""}
                                 onChangeText={(text) => setFeedID(Number(text))}
                             />
                         </View>

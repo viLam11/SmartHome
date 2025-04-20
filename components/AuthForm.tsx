@@ -32,6 +32,7 @@ export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
             }
         } catch (error) {
             alert('Đăng nhập hoặc đăng ký thất bại');
+            return
         } finally {
             setLoading(false);
         }

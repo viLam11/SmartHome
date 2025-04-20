@@ -91,13 +91,13 @@ export default function HomeIndex() {
                             {allRoomData && allRoomData.map((room, index) => (
                                 <View>
                                     <TouchableOpacity key={index} onPress={() => { router.push(`/rooms/${room.id}`) }}>
-                                        <Room key={index} deleteMode={deleteMode} setDeleteMode={setDeleteMode} id={room.id} img={images.home1} title={room.title} allDeviceCount={calculateDeviceNumber(room)} lightCount={room.lightCount} lightStatus={room.lightStatus} fanCount={room.fanCount} fanStatus={room.fanStatus} sensorCount={room.sensorCount} sensorStatus={room.sensorStatus} />
+                                        <Room key={index} deleteMode={deleteMode} setDeleteMode={setDeleteMode} id={room.id} img={images.home1} title={room.title} allDeviceCount={calculateDeviceNumber(room)} lightCount={room.lightCount} lightStatus={room.lightStatus} fanCount={room.fanCount} fanStatus={room.fanStatus} sensorCount={room.sensorCount} sensorStatus={room.sensorStatus} doorCount={room.doorCount} doorStatus={room.doorStatus} />
                                     </TouchableOpacity>
                                 </View>
                             ))}
                         </View>
-                        <View className="h-20">
-                            <View className=" w-full">
+                        <View className="h-28">
+                            <View className="w-full bottom-2">
                                 <Navigation current={2} />
                             </View>
                         </View>
@@ -127,9 +127,6 @@ export default function HomeIndex() {
                         }
                     </KeyboardAvoidingView>
                 </Modal>
-            </View>
-            <View className="absolute bottom-2 w-full">
-                <Navigation current={2} />
             </View>
         </KeyboardAvoidingView>
     )
