@@ -3,6 +3,7 @@ import { View, Image, Text, ScrollView, TouchableOpacity, Modal, KeyboardAvoidin
 import { useLocalSearchParams } from 'expo-router';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import images from '@/constants/images';
 import { useState, useEffect } from 'react';
 import DeviceHeader from '@/components/device/DeviceHeader';
@@ -39,8 +40,8 @@ export default function Light() {
     const [modal, setModal] = useState(false);
     const [deviceData, setDeviceData] = useState<deviceStatusObject | null>(null);
     const { setLoading } = useLoading();
-    
-    const controlLight = async (value : string) => {
+
+    const controlLight = async (value: string) => {
         try {
             await controlDevice(feedId as string, value);
             setColor(value)
@@ -50,7 +51,7 @@ export default function Light() {
     };
 
     async function powerLight(value: string) {
-        try {            
+        try {
             await controlDevice(feedId as string, value);
             setColor(value === "#000000" ? "#F2F2F2" : "white");
             setStatus(!status)
@@ -82,14 +83,18 @@ export default function Light() {
         fetchCurrentStatus();
     }, [feedId]);
 
-    const onChange = (event: any, selectedTime: Date) => {
+    const onChange = (event: DateTimePickerEvent, selectedTime?: Date) => {
         setShowPicker(false);
-        if(timer == 0) {
-            setStartTime(selectedTime);
-        } else {
-            setEndTime(selectedTime);
+
+        if (selectedTime) {
+            if (timer == 0) {
+                setStartTime(selectedTime);
+            } else {
+                setEndTime(selectedTime);
+            }
         }
     };
+
 
     return (
         <View className='flex-1'>
@@ -103,7 +108,7 @@ export default function Light() {
                             <Image source={images.light} style={{ width: "50%", height: 100, tintColor: `${color}` }}></Image>
                         </View>
                     </View>
-                    
+
                     <View className='w-1/2 flex flex-col items-end justify-center'>
                         <View className='w-40'>
                             <Text className="px-2 w-40 font-semibold"> {status ? "Bật" : "Tắt"}     </Text>
@@ -112,7 +117,7 @@ export default function Light() {
                         <View className='mt-4'>
                             <ColorSelector color={color} controlLight={controlLight} />
                         </View>
-                    </View> 
+                    </View>
                 </View>
 
                 <View className='mx-2 mt-4'>
@@ -124,7 +129,7 @@ export default function Light() {
             <View className="absolute bottom-2 w-full">
                 <Navigation current={2} />
             </View>
-            {modal &&  <Modal
+            {modal && <Modal
                 animationType="slide"
                 transparent={true}
                 visible={true}
@@ -141,18 +146,18 @@ export default function Light() {
                         <View className='w-full flex flex-row justify-between items-center'>
                             <Text className='text-2xl font-bold m-2 text-gray-100'>Hẹn giờ</Text>
                             <TouchableOpacity onPress={() => setModal(false)}>
-                            <IconSymbol name="close" color="white" className="absolute right-0 top-2" />
+                                <IconSymbol name="close" color="white" className="absolute right-0 top-2" />
                             </TouchableOpacity>
                         </View>
                         <View className='flex flex-row items-center justify-center w-full mx-auto mt-6'>
                             <View>
-                                <TouchableOpacity onPress={() =>{ setTimer(0); setShowPicker(true)}} className="bg-white p-3 rounded-lg shadow">
+                                <TouchableOpacity onPress={() => { setTimer(0); setShowPicker(true) }} className="bg-white p-3 rounded-lg shadow">
                                     <Text className='font-bold text-3xl'>{formatTime(startTime)}</Text>
                                 </TouchableOpacity>
                             </View>
                             <Text className='font-bold text-3xl'>  -  </Text>
                             <View>
-                                <TouchableOpacity onPress={() =>{ setTimer(1); setShowPicker(true)}} className="bg-white p-3 rounded-lg shadow">
+                                <TouchableOpacity onPress={() => { setTimer(1); setShowPicker(true) }} className="bg-white p-3 rounded-lg shadow">
                                     <Text className='font-bold text-3xl'>{formatTime(endTime)}</Text>
                                 </TouchableOpacity>
                             </View>
@@ -166,9 +171,9 @@ export default function Light() {
                                 />
                             )}
                         </View>
-                </View>
-            </KeyboardAvoidingView>
-                    </Modal>
+                    </View>
+                </KeyboardAvoidingView>
+            </Modal>
             }
         </View>
     )

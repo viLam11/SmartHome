@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
-const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1';
+const base_url = process.env.EXPO_PUBLIC_API_URL;
 
 export default function Profile() {
   const [token, setToken] = useState(null);
@@ -33,7 +33,13 @@ export default function Profile() {
       setUserData(response.data);
     }
     fetchUserData();
-  })
+  }, [])
+
+  async function hanldeLogout() {
+    await AsyncStorage.removeItem("authToken");
+    router.push('/')
+  }
+
   return (
     <View className="flex-1">
       <View className="flex-grow mx-2">
@@ -80,10 +86,13 @@ export default function Profile() {
             </View>
             <View className="my-2">
               <View className="bg-white mx-2 p-4 shadow-transparent my-2 flex flex-row align-middle items-center border rounded-3xl">
-                <IconSymbol name="exit" />
-                <Text className='text-black text-2xl font-semibold ml-4'>
-                  Đăng xuất
-                </Text>
+                <TouchableOpacity className='flex flex-row' onPress={hanldeLogout}>
+                  <IconSymbol name="exit" />
+                  <Text className='text-black text-2xl font-semibold ml-4'>
+                    Đăng xuất
+                  </Text>
+                </TouchableOpacity>
+                
               </View>
             </View>
           </View>

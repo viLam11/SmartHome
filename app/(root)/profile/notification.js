@@ -7,7 +7,7 @@ import NotiCard from "../../../components/NotiCard";
 import { useRouter, useSearchParams } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const base_url = 'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1'
+const base_url = process.env.EXPO_PUBLIC_API_URL;
 
 export default function Notification() {
     const router = useRouter()

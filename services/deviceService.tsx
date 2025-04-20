@@ -53,7 +53,10 @@ export const controlDevice = async (feedId: string, value: string) => {
 export const addNewDeviceService = async (device: deviceCreateObject) => {
     try {
         const headers = await getAuthHeaders();
-        const response = await axios.post(`${API_URL}/devices`, device, headers);
+        console.log(headers)
+        console.log(device)
+        const response = await axios.post(`${API_URL}/devices`, device, headers );
+        console.log(response.request)
         return response.data;
     } catch (error) {
         console.error('Error adding new device:', error);
