@@ -34,7 +34,6 @@ export default function HomeIndex() {
         
         const fetchRoomData = async () => {
             setLoading(true);
-        
             try {
               const response = await getAllRoomService();
               if (!response) throw new Error("Failed to fetch image");

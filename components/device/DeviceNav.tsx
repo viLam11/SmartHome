@@ -10,11 +10,12 @@ interface DeviceNavProps {
     status?: number;
     feedId?: number;
     type: DeviceType;
+    roomId?: number;    
 }
 
-export default function DeviceNav({ feedId = 1, type }: DeviceNavProps) {
+export default function DeviceNav({status, feedId = 1, type, roomId }: DeviceNavProps) {
     const router = useRouter();
-    const [status, setStatus] = useState(1);
+    // const [status, setStatus] = useState(1);
     function hanldeNav(index: number) {
         if (index == status) return;
         switch (index) {
@@ -25,6 +26,7 @@ export default function DeviceNav({ feedId = 1, type }: DeviceNavProps) {
                 if (type == "door") router.replace(`/devices/doors/${feedId}`);
                 break;
             case 2:
+                if (type == "sensor") router.replace({pathname: `/devices/stats/sensorStat`, params: {roomID: roomId}});
                 router.replace(`/hist/${feedId}`);
                 break;
             case 3:
@@ -32,6 +34,7 @@ export default function DeviceNav({ feedId = 1, type }: DeviceNavProps) {
                 break;
         }
     }   
+
     return (
         <View>
             <View className='flex flex-row  justify-between mt-2 mx-6'>

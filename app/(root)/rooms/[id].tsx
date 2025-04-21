@@ -108,13 +108,22 @@ export default function Room() {
                         const amount = devices.length;
                         const devicesRouter = DEVICE_FORMAT[key]['router'];
                         const displayTittle = DEVICE_FORMAT[key]['displayTittle'];
+                        console.log(devices);
+                        let on = false;
+                        if (amount > 0 ) {
+                            devices.forEach((device) => {
+                                if (device.value !== '0' && device.value !== '#000000' ){
+                                    on = true
+                                }
+                            })
+                        }
 
                         return (
                             <View key={key} className="w-1/2 flex flex-col">
                                 <View className="bg-white m-2 p-2 rounded-lg">
                                     <View className="flex flex-row items-center">
                                         <View className='w-1/3'>
-                                            <Image source={image as any} style={{ width: 40, height: 40, tintColor: room && room[`${DEVICE_FORMAT[key].type}Status` as keyof RoomObject] ? "#F5BA0B" : "black" }} />
+                                            <Image source={image as any} style={{ width: 40, height: 40, tintColor: "black"}} />
                                         </View>
                                         <View className="w-2/3">
                                             <Text className="ml-4 text-xl font-bold">{displayTittle}</Text>

@@ -15,7 +15,7 @@ import ColorSelector from '@/components/device/ColorSelector';
 import AutoToggle from '@/components/device/AutoToggle';
 import DeviceTimerTable from '@/components/device/DeviceTimerTable';
 import { useLoading } from '@/contexts/LoadingContext';
-
+import SchedulePicker from '@/components/SchedulePicker'
 const formatTime = (date: Date) => {
     let hours = date.getHours();
     const minutes = date.getMinutes().toString().padStart(2, '0');
@@ -83,23 +83,10 @@ export default function Light() {
         fetchCurrentStatus();
     }, [feedId]);
 
-    const onChange = (event: DateTimePickerEvent, selectedTime?: Date) => {
-        setShowPicker(false);
-
-        if (selectedTime) {
-            if (timer == 0) {
-                setStartTime(selectedTime);
-            } else {
-                setEndTime(selectedTime);
-            }
-        }
-    };
-
-
     return (
         <View className='flex-1'>
             <ScrollView className='mt-1 mx-2'>
-                <DeviceHeader feedId={+feedId} title={deviceData ? `${deviceData.type} ${deviceData.title}` : null} />
+                <DeviceHeader status={1} feedId={+feedId} title={deviceData ? `${deviceData.type} ${deviceData.title}` : null} />
 
                 <View className='flex flex-row mt-4'>
                     <View className='w-1/2 '>
@@ -122,14 +109,14 @@ export default function Light() {
 
                 <View className='mx-2 mt-4'>
                     <AutoToggle status={status} setStatusAuto={setStatusAuto} />
-                    <DeviceTimerTable setModal={setModal} />
+                    <DeviceTimerTable feedId={+feedId} setModal={setModal} />
                 </View>
 
             </ScrollView>
             <View className="absolute bottom-2 w-full">
                 <Navigation current={2} />
             </View>
-            {modal && <Modal
+            {/* {modal &&  <Modal
                 animationType="slide"
                 transparent={true}
                 visible={true}
@@ -142,22 +129,22 @@ export default function Light() {
                     behavior={Platform.OS === "ios" ? "padding" : "height"}
                     style={{ flex: 1, justifyContent: 'flex-end' }}
                 >
-                    <View className="bg-gray-400 h-44 w-full bottom-0 z-20 rounded-3xl my-auto p-2">
+                   <View className="bg-gray-400 h-44 w-full bottom-0 z-20 rounded-3xl my-auto p-2">
                         <View className='w-full flex flex-row justify-between items-center'>
                             <Text className='text-2xl font-bold m-2 text-gray-100'>Hẹn giờ</Text>
                             <TouchableOpacity onPress={() => setModal(false)}>
-                                <IconSymbol name="close" color="white" className="absolute right-0 top-2" />
+                            <IconSymbol name="close" color="white" className="absolute right-0 top-2" />
                             </TouchableOpacity>
                         </View>
                         <View className='flex flex-row items-center justify-center w-full mx-auto mt-6'>
                             <View>
-                                <TouchableOpacity onPress={() => { setTimer(0); setShowPicker(true) }} className="bg-white p-3 rounded-lg shadow">
+                                <TouchableOpacity onPress={() =>{ setTimer(0); setShowPicker(true)}} className="bg-white p-3 rounded-lg shadow">
                                     <Text className='font-bold text-3xl'>{formatTime(startTime)}</Text>
                                 </TouchableOpacity>
                             </View>
                             <Text className='font-bold text-3xl'>  -  </Text>
                             <View>
-                                <TouchableOpacity onPress={() => { setTimer(1); setShowPicker(true) }} className="bg-white p-3 rounded-lg shadow">
+                                <TouchableOpacity onPress={() =>{ setTimer(1); setShowPicker(true)}} className="bg-white p-3 rounded-lg shadow">
                                     <Text className='font-bold text-3xl'>{formatTime(endTime)}</Text>
                                 </TouchableOpacity>
                             </View>
@@ -171,10 +158,10 @@ export default function Light() {
                                 />
                             )}
                         </View>
-                    </View>
-                </KeyboardAvoidingView>
-            </Modal>
-            }
+                </View>
+            </KeyboardAvoidingView>
+                    </Modal>} */}
+            {modal && <SchedulePicker setModal={setModal} />}
         </View>
     )
 }
