@@ -45,7 +45,7 @@ export const DEVICE_FORMAT: Record<string, Record<string, string>> = {
         "router": "devices/lights/"
     },
     "sensorList": {
-        "img": images.aircondition,
+        "img": images.sensor,
         "type": "sensor",
         "displayTittle": 'Sensor',
         "router": "devices/sensors/"

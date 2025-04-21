@@ -6,7 +6,7 @@ import { useRouter } from 'expo-router';
 const styles = StyleSheet.create({});
 
 const tabs = [
-  { index: 1, label: 'Dashboard', icon: images.dashboard, route: '/dashboard' },
+  { index: 1, label: 'Dashboard', icon: images.dashboard, route: '/dashboard/statistic' },
   { index: 2, label: 'Rooms', icon: images.door, route: '/rooms/home' },
   { index: 3, label: 'Profile', icon: images.user, route: '/profile/profile' },
 ];

@@ -10,18 +10,19 @@ const tableData = [
   ["20:00", "21:00", "nhẹ", ".."]
 ];
 
-const renderCell = (data, index ) => {
-  if (index === 3) {
-    return (
-      <TouchableOpacity onPress={() => alert("Xóa hàng này")}> 
-        <Text style={{ color: "red", textAlign: "center" }}>Xóa</Text>
-      </TouchableOpacity>
-    );
-  }
-  return <Text>{data}</Text>;
-};
+// const renderCell = (data, index ) => {
+//   if (index === 3) {
+//     return (
+//       <TouchableOpacity onPress={() => alert("Xóa hàng này")}> 
+//         <Text style={{ color: "red", textAlign: "center" }}>Xóa</Text>
+//       </TouchableOpacity>
+//     );
+//   }
+//   return <Text>{data}</Text>;
+// };
 
-export default function DeviceTimerTable( {setModal}: {setModal: (status: boolean) => void} ) {
+export default function DeviceTimerTable( {setModal, feedId}: {setModal: (status: boolean) => void, feedId: number} ) {
+  
   return (
     <View>
       <View className='flex flex-row justify-between'>

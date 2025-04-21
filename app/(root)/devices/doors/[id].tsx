@@ -10,8 +10,10 @@ import { Table, TableWrapper, Row, Cell } from 'react-native-table-component';
 import { checkDoorPwdService, controlDevice, getDeviceData } from '@/services/deviceService';
 import { deviceStatusObject } from '@/types/device.type';
 import { useLoading } from '@/contexts/LoadingContext';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
+const base_url = process.env.EXPO_PUBLIC_API_URL
 const tableData = [[1, 2, 3], [4, 5, 6], [7, 8, 9], ['OK', 0, 'Del']];
 
 export default function Door() {
@@ -21,14 +23,17 @@ export default function Door() {
     const [doorData, setDoorData] = useState<deviceStatusObject | null>(null);
     const [status, setStatus] = useState<boolean>(false);
     const [token, setToken] = useState(null);
-
     const [visible, setVisible] = useState(false);
     const [password, setPassword] = useState('');
     const { setLoading } = useLoading();
     
     useEffect(() => {
+        
         const fetchCurrentStatus = async () => {
+
         setLoading(true);
+        const token = await AsyncStorage.getItem("authToken")
+        setToken(token)
         try {
             const response = await getDeviceData(feedId as string);
             setDoorData(response);
@@ -43,21 +48,34 @@ export default function Door() {
     }, [feedId]);
  
     async function hanldeOpenDoor() {
+        console.log("open door")
         if (!token) return
+        console.log("check pass: ", password)
         if (password.length == 0) {
             alert("Vui lòng nhập mật khẩu")
             return
         }
         try {
-            const response = await checkDoorPwdService(feedId as string, password);
-            
+            const response = await axios.post(`${base_url}/devices/${id}/checkpwd`, {
+                pwd: password
+            }, {
+                headers: {
+                    Authorization: token
+                }
+            })
             if (response.status == 401) {
                 alert("Mật khẩu không đúng")
             } else {
                 setPassword('')
                 alert("Mở cửa thành công")
                 setStatus(true)
-                await controlDevice(feedId as string, "1")
+                await axios.post(`${base_url}/devices/${id}`, {
+                    value: 1
+                }, {
+                    headers: {
+                        Authorization: token
+                    }
+                })
             }
         } catch (error) {
             console.log(error)
@@ -68,7 +86,13 @@ export default function Door() {
     async function handleCloseDoor() {
         if (!token) return
         try {
-            await controlDevice(feedId as string, "0")
+            const response = await axios.post(`${base_url}/devices/${id}`, {
+                value: "0"
+            }, {
+                headers: {
+                    Authorization: token
+                }
+            })
             setPassword('')
             alert("Khóa cửa thành công")
             setStatus(false)
@@ -80,7 +104,7 @@ export default function Door() {
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} className='min-h-screen flex-1 m-2'>
             <View className="flex-1">            
-                <DeviceHeader feedId={+feedId} title="Door" />
+                <DeviceHeader status={1} feedId={+feedId} title="Door" />
 
                 <View className="mt-6">
                     <View className="flex flex-row mt-6">

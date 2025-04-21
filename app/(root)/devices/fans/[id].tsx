@@ -155,7 +155,7 @@ export default function Fan() {
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="min-h-screen flex flex-col m-2">
-      <DeviceHeader feedId={+feedId} title={deviceData ? `${deviceData.type} ${deviceData.title}` : null} />
+      <DeviceHeader status={1} feedId={+feedId} title={deviceData ? `${deviceData.type} ${deviceData.title}` : null} />
 
       <View className="flex flex-row mt-10">
         <View className="w-1/2">

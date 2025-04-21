@@ -16,6 +16,7 @@ const getAuthHeaders = async () => {
 export const getAllRoomService = async (): Promise<RoomObject[]> => {
     try {
         const headers = await getAuthHeaders();
+        console.log(headers)
         const response = await axios.get(`${API_URL}/rooms`, headers);
         return response?.data;
     } catch (error) {

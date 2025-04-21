@@ -2,12 +2,12 @@ import axios from 'axios';
 import { deviceData } from '../constants/data';
 import { deviceListObject, deviceStatusObject, deviceCreateObject } from '../types/device.type';
 import { getAuthToken } from './authService';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 // Hàm tạo headers với Authorization token
 const getAuthHeaders = async () => {
-    const token = await getAuthToken();
+    const token = await AsyncStorage.getItem("authToken");
     return {
         headers: {
             Authorization: `${token}`,
@@ -53,8 +53,7 @@ export const controlDevice = async (feedId: string, value: string) => {
 export const addNewDeviceService = async (device: deviceCreateObject) => {
     try {
         const headers = await getAuthHeaders();
-        console.log(headers)
-        console.log(device)
+        const token = await getAuthToken();
         const response = await axios.post(`${API_URL}/devices`, device, headers );
         console.log(response.request)
         return response.data;
@@ -67,9 +66,11 @@ export const addNewDeviceService = async (device: deviceCreateObject) => {
 
 export const checkDoorPwdService = async (feedId: string, pwd: string) => {
     try {
-        const headers = await getAuthHeaders();
-        const respone = await axios.post(`${API_URL}/devices/${feedId}/checkpwd`, { pwd: pwd }, headers);
-        return respone;
+        // const headers = await getAuthHeaders();
+        // console.log(headers)
+        console.log(feedId, pwd)
+        // const respone = await axios.post(`${API_URL}/devices/${feedId}/checkpwd`, { pwd: pwd }, headers);
+        // return respone;
     } catch(e) {
         console.log("Error: ", e);
         throw e;
