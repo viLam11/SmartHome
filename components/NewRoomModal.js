@@ -30,7 +30,7 @@ export default function NewRoomModal({newRoomName, setNewRoomName, setModal, set
                         <TextInput
                             className="border border-gray-300 p-3 min-w-80 w-full rounded-md mx-auto"
                             placeholder="Nhập tên phòng..."
-                            keyboardType="visible-password"
+                            // keyboardType="visible-password"
                             value={newRoomName}
                             onChangeText={(text) => setNewRoomName(text)}
                         />
