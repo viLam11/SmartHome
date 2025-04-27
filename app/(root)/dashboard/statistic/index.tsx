@@ -2,18 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { View, Text } from 'react-native';
 import { ScrollView, TouchableOpacity } from 'react-native';
 import { getSummaryDeviceStatisticService, getSummaryStatisticService } from '@/services/statisticService';
-import { PieChart } from 'react-native-gifted-charts';
 import { BarChartAnimated, PieChartAnimated } from '@/components/chart/BarChartAnimated';
 import { useLoading } from '@/contexts/LoadingContext';
 import { DatePickerModal, de } from 'react-native-paper-dates';
 import ChooseCalendar from '@/components/chart/ChooseCalendar';
 import Navigation from '@/components/Navigation';
 import dayjs from 'dayjs';
-import { deviceActive, deviceActiveWColor, deviceRatio, deviceRatioWColor, runningTimeDeviceTypeObjects } from '@/types/statistic.type';
+import { deviceActiveWColor, deviceRatioWColor, runningTimeDeviceTypeObjects } from '@/types/statistic.type';
 
 export default function StatisticMockUI() {
   const { setLoading } = useLoading();
   const [type, setType] = useState('light');
+  const [room, setRoom] = useState('All');
   const [deviceData, setDeviceData] = useState<runningTimeDeviceTypeObjects | null>(null);
   const [runningTime, setRunningTime] = useState<string>("");
   const [deviceRatio, setDeviceRatio] = useState<deviceRatioWColor[]>([]);
@@ -24,7 +24,7 @@ export default function StatisticMockUI() {
   const fetchStatistic = async (type: string, endDate: Date | null) => {
     setLoading(true);
     try {
-      const deviceRunningTime = await getSummaryDeviceStatisticService(type, endDate);
+      const deviceRunningTime = await getSummaryDeviceStatisticService(room, type, endDate);
       setDeviceData(deviceRunningTime);
       const deviceData = await getSummaryStatisticService();
       setRunningTime(deviceData.totalRuntime);
@@ -78,7 +78,7 @@ export default function StatisticMockUI() {
 
         <ChooseCalendar startDate={deviceData?.startDate} endDate={deviceData?.endDate} setOpen={setPickerVisible} />
 
-        <BarChartAnimated setType={setType} barData={deviceData ? deviceData.data : []} />
+        <BarChartAnimated setRoom={setRoom} setType={setType} barData={deviceData ? deviceData.data : []} />
         <View>
           <Text className="mt-10 text-lg font-semibold">Outstanding</Text>
         </View>
