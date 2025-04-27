@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { ScrollView, View, Text, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
@@ -71,6 +72,7 @@ export default function Statistic() {
     <View className="flex-1 bg-white">
       <ScrollView>
         <DeviceHeader
+          status={3}
           feedId={+feedId}
           title={deviceData ? `${deviceData.type} ${deviceData.title}` : null}
         />

@@ -31,6 +31,7 @@ const MAPPING = {
   "humidity": "droplet",
   "temperature": "ac-unit",
   "wind": "air",
+  "warning": "warning", 
 } as const;
   // } as Partial<
 //   Record<

@@ -51,17 +51,29 @@ export const controlDevice = async (feedId: string, value: string) => {
 };
 
 export const addNewDeviceService = async (device: deviceCreateObject) => {
+    console.log("ADD NEW DEVICE: ", device);
     try {
         const headers = await getAuthHeaders();
-        const token = await getAuthToken();
+        console.log("Headers: ", headers); 
         const response = await axios.post(`${API_URL}/devices`, device, headers );
-        console.log(response.request)
-        return response.data;
+        console.log("RESPONSE: ", response.status)
+        return response;
     } catch (error) {
         console.error('Error adding new device:', error);
-        throw error;
+        return error;
     }
 };
+
+export const deleteDevice = async (deviceId: number) => {
+    try {
+        const headers = await getAuthHeaders();
+        const response = await axios.delete(`${API_URL}/devices/${deviceId}`, headers);
+        return response;
+    } catch (error) {
+        console.error('Error deleting device:', error);
+        throw error;
+    }
+}
 
 
 export const checkDoorPwdService = async (feedId: string, pwd: string) => {

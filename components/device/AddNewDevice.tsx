@@ -6,10 +6,12 @@ import { DEVICE_FORMAT, deviceCreateObject } from '@/types/device.type';
 import { RoomObject } from '@/types/room.type';
 import images from '@/constants/images';
 import { addNewDeviceService } from '@/services/deviceService';
- 
+import { useLoading } from '@/contexts/LoadingContext';
+
 
 export default function AddNewDevice({ setModal, room }: { setModal: any, room: RoomObject | null }) {
     const [nameMode, setNameMode] = useState(false);
+    const [passwordMode, setPasswordMode] = useState(false);
     const [finishMode, setFinishMode] = useState(false);
     const [deviceType, setDeviceType] = useState('');
     const [deviceName, setDeviceName] = useState('');
@@ -22,12 +24,14 @@ export default function AddNewDevice({ setModal, room }: { setModal: any, room: 
         feedKey,
         deviceType,
         deviceName,
+        roomID,
         setModal,
         setFeedID,
         setFeedKey,
         setNameMode,
         setFinishMode,
         setDeviceName,
+        setPasswordMode
     };
 
     const newDevice: deviceCreateObject = {
@@ -45,7 +49,7 @@ export default function AddNewDevice({ setModal, room }: { setModal: any, room: 
         }
         setNameMode(true);
     }
-    
+
     const addDevice = async (newDevice: deviceCreateObject) => {
         try {
             await addNewDeviceService(newDevice as deviceCreateObject);
@@ -54,19 +58,20 @@ export default function AddNewDevice({ setModal, room }: { setModal: any, room: 
             console.log(error);
         }
     }
-    
+
     if (nameMode) {
-        return <SetNewName {...newNameProps}/>
-    } else if (finishMode) {
-        const addNewDevice = async () => {
-            await addDevice(newDevice);
-        }
-        addNewDevice();
-        return <FinishModal setModal={setModal} newDevice={newDevice}/>
+        return <SetNewName {...newNameProps} />
     }
-
-
-
+    else if (passwordMode) {
+        return <SetPassWord setPasswordMode={setPasswordMode} newDevice={newDevice} />
+    }
+    else if (finishMode) {
+        // const addNewDevice = async () => {
+        //     await addDevice(newDevice);
+        // }
+        // addNewDevice();
+        return <FinishModal setModal={setModal} newDevice={newDevice} />
+    }
 
     return (
         <View className='flex-1'>
@@ -85,7 +90,7 @@ export default function AddNewDevice({ setModal, room }: { setModal: any, room: 
                 <DeviceSelection deviceType={deviceType} setDeviceType={setDeviceType} />
             </View>
 
-            
+
 
             {/* Button */}
             <View className='w-11/12 mx-auto mt-2 p-2'>
@@ -103,29 +108,58 @@ export default function AddNewDevice({ setModal, room }: { setModal: any, room: 
 const DeviceSelection = ({ deviceType, setDeviceType }: { deviceType: string | null, setDeviceType: any }) => (
     <View className="mt-4 flex flex-row flex-wrap justify-between items-center">
         {Object.entries(DEVICE_FORMAT).map(([key, device], index) => (
-         <View className='w-1/2'>
-            <View className='w-11/12 bg-gray-200 h-24 p-2 rounded-lg mx-auto mb-4'>
-                <TouchableOpacity onPress={() => setDeviceType(device.type)} >
-                    <View className='flex flex-row justify-between'>
-                        <View className="p-2 bg-white rounded-full">
-                            <Image source={device.img} style={{ width: 20, height: 20, tintColor: "black" }} />
-                        </View>
-                        <View className="">
-                            <View className={`border-2 rounded-full w-8 h-8 ${deviceType === device.type ? 'border-green-400' : 'border-black'}`}>
-                                {deviceType === device.type && <View className="bg-green-400 rounded-full w-4 h-4 m-auto"></View>}
+            <View className='w-1/2'>
+                <View className='w-11/12 bg-gray-200 h-24 p-2 rounded-lg mx-auto mb-4'>
+                    <TouchableOpacity onPress={() => setDeviceType(device.type)} >
+                        <View className='flex flex-row justify-between'>
+                            <View className="p-2 bg-white rounded-full">
+                                <Image source={device.img} style={{ width: 20, height: 20, tintColor: "black" }} />
+                            </View>
+                            <View className="">
+                                <View className={`border-2 rounded-full w-8 h-8 ${deviceType === device.type ? 'border-green-400' : 'border-black'}`}>
+                                    {deviceType === device.type && <View className="bg-green-400 rounded-full w-4 h-4 m-auto"></View>}
+                                </View>
                             </View>
                         </View>
-                    </View>
-                    <Text className='text-lg font-bold mt-auto'>{device.displayTittle}</Text>
-                </TouchableOpacity>
+                        <Text className='text-lg font-bold mt-auto'>{device.displayTittle}</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
-        </View>
         ))}
     </View>
 );
 
-const SetNewName = ({ feedID, feedKey, deviceType, deviceName, setModal, setFeedID, setFeedKey, setNameMode, setFinishMode, setDeviceName }: any) => {
+const SetNewName = ({ feedID, feedKey, roomID, deviceType, deviceName, setModal, setFeedID, setFeedKey, setNameMode, setFinishMode, setDeviceName, setPasswordMode }: any) => {
     const device = Object.values(DEVICE_FORMAT).find(d => d.type === deviceType);
+    const { loading, setLoading } = useLoading();
+
+    async function handleContinueName() {
+
+        if (deviceType === "door") {
+            setPasswordMode(true);
+            setNameMode(false);
+            setLoading(false);
+            return;
+        }
+
+        const payload = {
+            "feedId": +feedID,
+            "feedKey": feedKey,
+            "type": deviceType,
+            "title": deviceName,
+            "roomID": +roomID
+        }
+        const response: any = await addNewDeviceService(payload);
+        console.log("received: ", response.status)
+        if (response.status == 201) {
+            setFinishMode(true);
+            setNameMode(false);
+            setLoading(false);
+        } else {
+            alert("Lỗi: " + response);
+        }
+    }
+
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -144,7 +178,8 @@ const SetNewName = ({ feedID, feedKey, deviceType, deviceName, setModal, setFeed
                         <TextInput
                             className="border border-gray-300 p-3 min-w-80 w-full rounded-md mx-auto"
                             placeholder="Nhập tên thiết bị..."
-                            keyboardType="visible-password"
+                            keyboardType="default"
+                            autoCapitalize="sentences"
                             value={deviceName}
                             onChangeText={(text) => setDeviceName(text)}
                         />
@@ -176,7 +211,7 @@ const SetNewName = ({ feedID, feedKey, deviceType, deviceName, setModal, setFeed
 
                     <View className="h-32">
                         <View className="bg-green-300 bottom-4 rounded-md mt-4 p-2 w-full mx-auto">
-                            <TouchableOpacity onPress={(() => { setNameMode(false); setFinishMode(true); })}>
+                            <TouchableOpacity onPress={(() => { handleContinueName() })}>
                                 <Text className="text-black text-center font-bold">Tiếp tục</Text>
                             </TouchableOpacity>
                         </View>
@@ -190,6 +225,45 @@ const SetNewName = ({ feedID, feedKey, deviceType, deviceName, setModal, setFeed
 
             </View>
         </KeyboardAvoidingView>
+    );
+}
+
+const SetPassWord = ({ setPasswordMode, newDevice }: any) => {
+    async function handleContinuePW() {
+        const response : any = await addNewDeviceService(newDevice);
+        if (response.status != 201) {
+            alert("Lỗi: " + response);
+        }
+    }
+
+    return (
+        <View className='flex-1'>
+            <View className="flex items-end m-4 ">
+                <TouchableOpacity onPress={() => setPasswordMode(false)} className='bg-black rounded-full'>
+                    <IconSymbol name="close" color="white" />
+                </TouchableOpacity>
+            </View>
+            <View className='w-11/12 mx-auto flex-col flex-grow'>
+                <Text className='font-bold text-2xl mb-2'>Đặt mật khẩu</Text>
+                <TextInput
+                    className="border border-gray-300 p-3 min-w-80 w-full rounded-md mx-auto"
+                    placeholder="Nhập mật khẩu..."
+                    keyboardType="default"
+                />
+            </View>
+            <View className="h-32 w-11/12 mx-auto">
+                <View className="bg-green-300 bottom-4 rounded-md mt-4 p-2 w-full mx-auto">
+                    <TouchableOpacity onPress={(() => { handleContinuePW() })}>
+                        <Text className="text-black text-center font-bold">Tiếp tục</Text>
+                    </TouchableOpacity>
+                </View>
+                <View className="bg-gray-300 bottom-4 rounded-md mt-4 p-2 w-full mx-auto">
+                    <TouchableOpacity onPress={(() => { })}>
+                        <Text className="text-black text-center font-bold">Quay lại</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </View>
     );
 }
 

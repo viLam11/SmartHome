@@ -62,8 +62,7 @@ export default function History({}) {
     return (
         <View>
             <View className='w-11/12 mx-auto mt-1'>
-                <DeviceHeader status={2} feedId={+feedId} title={deviceData ? `${deviceData.type} ${deviceData.title}` : null} />
-
+                <DeviceHeader status={2} feedId={+feedId} title={deviceData ? `${deviceData.title}` : null} />
                 <View className='h-5/6 mt-4 mb-2'>
                     <TableHistory tableData={tableData} />
                 </View>
