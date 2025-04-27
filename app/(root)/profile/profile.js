@@ -45,7 +45,10 @@ export default function Profile() {
       <View className="flex-grow mx-2">
         <Text className="font-bold text-2xl p-2 mb-4">Profile</Text>
         <View className="flex justify-between items-center">
-          <Image className='w-40 h-40 bg-red-100' source={{ uri: 'https://ui-avatars.com/api/?name=John' }} />
+          <Image
+              source={{ uri: `https://ui-avatars.com/api/?name=${userData ? userData.firstName + '+' + userData.lastName : 'John'}&background=random` }}
+              style={{ width: 100, height: 100, borderRadius: 50 }}
+            />
         </View>
         <Text className="text-center font-bold text-2xl p-2">{userData ? userData.lastName + " " + userData.firstName : ""}</Text>
         <Text className="text-center color-gray-500 text-medium ">{userData ? userData.email : ""}</Text>

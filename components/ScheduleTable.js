@@ -1,4 +1,5 @@
-import React, { Component, useState } from 'react';
+import { getSchedule } from '@/services/scheduleService';
+import React, { Component, useEffect, useState } from 'react';
 import { Button, Text } from 'react-native';
 import { StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native';
 import { Table, TableWrapper, Row, Cell } from 'react-native-table-component';
@@ -7,12 +8,40 @@ import { Table, TableWrapper, Row, Cell } from 'react-native-table-component';
 const tableHead = ['Thời gian', 'Mức độ', 'Ngày lặp', 'Sửa']
 const widthArr = [25, 20, 30, 25]
 
-export default function ScheduleTable({ tableData }) {
-  // tableData = [["12:00", "17:00", "#F0F0F0", "Xóa"]]
+export default function ScheduleTable({ modal, feedId }) {
+  const [tableData, setTableData] = useState([]); 
   function handleDeleteSchedule(index) {
 
   }
-  
+
+  useEffect(() => {
+    const fetchScheduleTable = async () => {
+      const response = await getSchedule(+feedId);
+      if (response.status == 200) {
+        const newSchedules = response.data.map((item) => {
+          let formatedDays = item.repeatDays.split(',').map((day) => {
+            if (day == "Mon") return "T2"
+            if (day == "Tue") return "T3"
+            if (day == "Wed") return "T4"
+            if (day == "Thu") return "T5"
+            if (day == "Fri") return "T6"
+            if (day == "Sat") return "T7"
+            if (day == "Sun") return "CN"
+          })
+          return [
+            item.scheduledTime,
+            item.action,
+            formatedDays.join(", "),
+            item.id
+          ];
+        });
+        console.log(newSchedules);
+        setTableData(newSchedules);
+      }
+    }
+    fetchScheduleTable();
+  }, [modal])
+
   return (
     <View className='h-full' style={{ borderRadius: 8, overflow: 'hidden', margin: 10 }}>
       <Table className="w-10/12 mx-auto text-xl text-black rounded-md" style={styles.header} borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
@@ -45,12 +74,12 @@ export default function ScheduleTable({ tableData }) {
                   flex={widthArr[3]}
                   style={[styles.row, { alignItems: 'center' }]}  // Center nội dung
                   textStyle={styles.textCenter}
-                  data = {
-                    <TouchableOpacity >
+                  data={
+                    <TouchableOpacity onPress={() => handleDeleteDevice(rowData[3])} >
                       <Text className="text-lg color-red-600 font-bold">Xóa</Text>
                     </TouchableOpacity>
                   }
-                
+
                 />
 
 

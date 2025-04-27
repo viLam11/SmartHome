@@ -8,9 +8,10 @@ import Navigation from '@/components/Navigation';
 import AddNewDevice from '@/components/device/AddNewDevice';
 import { deviceListObject, DEVICE_FORMAT } from '@/types/device.type';
 import { RoomObject } from '@/types/room.type';
-import { getRoomDevices } from '@/services/deviceService';
+import { getRoomDevices, deleteDevice } from '@/services/deviceService';
 import { getAllRoomService } from '@/services/roomService';
 import { useLoading } from '@/contexts/LoadingContext';
+import ConfirmDelete from '@/components/ConfirmDelete';
 
 export default function Room() {
     const router = useRouter();
@@ -19,13 +20,26 @@ export default function Room() {
     const [deviceList, setDeviceList] = useState<deviceListObject | null>(null);
     const [deviceCount, setDeviceCount] = useState(0);
     const [editMode, setEditMode] = useState(false);
+    const [deleteMode, setDeleteMode] = useState(false);
+    const [deleteDeviceId, setDeleteDeviceId] = useState<number>(0);
     const [modal, setModal] = useState(false);
 
     const roomId = useLocalSearchParams().id;
 
+    async function handleDelele(feedId: number) { 
+        console.log("Delete device with feedId:", feedId);
+        const response = await deleteDevice(feedId);
+        if (response.status === 200) {  
+            setEditMode(false);
+            setDeleteMode(false);
+        } else {
+            console.error("Error deleting device:", response);
+        }
+    }
+
     useEffect(() => {
-        if (!roomId) return;    
-        (async () => {
+        if (!roomId) return;
+        const fetchDevices = (async () => {
             try {
                 setLoading(true);
                 const response = await getRoomDevices(roomId as string);
@@ -46,19 +60,26 @@ export default function Room() {
                 setLoading(false);
             }
 
-        })();
-    }, [roomId]); 
-    
+        });
+        fetchDevices();
+
+        //    const interval = setInterval(() => {fetchDevices();}, 10000);
+        //    return (() => clearInterval(interval));
+    }, [roomId, editMode, modal]);
+
 
     return (
         <View className="min-h-screen">
             <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="mt-1 mx-2 min-h-screen">
-                {modal || editMode ? <View className="absolute top-0 left-0 z-10 w-full h-full bg-black/50" /> : null}
-
+                {modal || deleteMode ? <View className="absolute top-0 left-0 z-20 w-full h-full bg-black/50" /> : null}
+                {deleteMode && 
+                <View className='absolute top-1/3 mx-auto w-full bg-white z-20 rounded-lg p-4 m-4 '>     
+                    <ConfirmDelete onClose={() => {setDeleteMode(false); setEditMode(false)}} onConfirm={handleDelele} isOpen={deleteMode} deviceName={deleteDeviceId} deleteDeviceId={deleteDeviceId} />
+                    </View>}
                 <View className='flex flex-row justify-between'>
                     <View className="mx -2">
                         <TouchableOpacity onPress={() => { router.push(`/rooms/home`) }}>
-                            <IconSymbol name="back" color="black"/>
+                            <IconSymbol name="back" color="black" />
                         </TouchableOpacity>
                     </View>
                     <View>
@@ -67,18 +88,18 @@ export default function Room() {
                     <View className="flex flex-row space-x-2">
                         {editMode ?
                             <View>
-                                <TouchableOpacity className="bg-black rounded-full p-1" onPress={() => { }}>
+                                <TouchableOpacity className="bg-black rounded-full p-1" onPress={() => { setEditMode(!editMode) }}>
                                     <IconSymbol name="save" size={18} color="white" />
                                 </TouchableOpacity>
                             </View>
                             :
                             <> <View className="mr-2">
-                                <TouchableOpacity className="bg-black rounded-full" onPress={() => {setModal(!modal)}}>
+                                <TouchableOpacity className="bg-black rounded-full" onPress={() => { setModal(!modal) }}>
                                     <IconSymbol name="add" color="white" />
                                 </TouchableOpacity>
                             </View>
                                 <View>
-                                    <TouchableOpacity className="bg-black rounded-full p-1" onPress={() => {setEditMode(!editMode) }}>
+                                    <TouchableOpacity className="bg-black rounded-full p-1" onPress={() => { setEditMode(!editMode) }}>
                                         <IconSymbol name="edit" size={18} color="white" />
                                     </TouchableOpacity>
                                 </View>
@@ -102,17 +123,14 @@ export default function Room() {
 
                 <View className="flex flex-row flex-wrap">
                     {deviceList && Object.entries(deviceList).map(([key, devices]) => {
-                        
-                        console.log(deviceList);
                         const image = DEVICE_FORMAT[key]['img'];
                         const amount = devices.length;
                         const devicesRouter = DEVICE_FORMAT[key]['router'];
                         const displayTittle = DEVICE_FORMAT[key]['displayTittle'];
-                        console.log(devices);
                         let on = false;
-                        if (amount > 0 ) {
+                        if (amount > 0) {
                             devices.forEach((device) => {
-                                if (device.value !== '0' && device.value !== '#000000' ){
+                                if (device.value !== '0' && device.value !== '#000000') {
                                     on = true
                                 }
                             })
@@ -123,7 +141,7 @@ export default function Room() {
                                 <View className="bg-white m-2 p-2 rounded-lg">
                                     <View className="flex flex-row items-center">
                                         <View className='w-1/3'>
-                                            <Image source={image as any} style={{ width: 40, height: 40, tintColor: "black"}} />
+                                            <Image source={image as any} style={{ width: 40, height: 40, tintColor: "black" }} />
                                         </View>
                                         <View className="w-2/3">
                                             <Text className="ml-4 text-xl font-bold">{displayTittle}</Text>
@@ -131,14 +149,28 @@ export default function Room() {
                                         </View>
                                     </View>
                                     <View className="mt-2">
-                                        {devices.map((device, index) =>{ 
+                                        {devices.map((device, index) => {
                                             return (
-                                                <View key={index} className={`mt-2 ${device.value == '0' || device.value == '#000000' ? "bg-disable" : "bg-enable"} p-2 rounded-xl `}>
-                                                    <TouchableOpacity key={index} onPress={() => router.push(`/${devicesRouter}/${device.feedId}` as any)}>
-                                                        <Text className="font-semibold">{device.title}</Text>
-                                                    </TouchableOpacity>
-                                                </View>
-                                        )})}
+                                                <>
+                                                    {editMode ?
+                                                        <View key={index}>
+                                                            <TouchableOpacity onPress={() => {setDeleteMode(true); setDeleteDeviceId(device.feedId)}} className='absolute top-0 right-0 bg-red-300 z-10 rounded-full p-1'>
+                                                                <IconSymbol name="close" size={20} color="black" />
+                                                            </TouchableOpacity>
+                                                            <View className='bg-gray-100 p-2 rounded-xl mt-2'>
+                                                                <Text className="font-semibold">{device.title}</Text>
+                                                            </View>
+                                                        </View>
+                                                        :
+                                                        <View key={index} className={`mt-2 p-2 ${device.value == '0' || device.value == '#000000' ? "bg-disable" : "bg-enable"} rounded-xl `}>
+                                                        <TouchableOpacity key={index} onPress={() => router.push(`/${devicesRouter}/${device.feedId}` as any)}>
+                                                            <Text className="font-semibold">{device.title}</Text>
+                                                        </TouchableOpacity>
+                                                        </View>
+                                                    }
+                                                </>
+                                            )
+                                        })}
                                     </View>
                                 </View>
                             </View>
@@ -154,29 +186,18 @@ export default function Room() {
             <Modal
                 animationType="slide"
                 transparent={true}
-                visible={modal || editMode}
+                visible={modal}
                 onRequestClose={() => {
                     setModal(false);
-                    setEditMode(false);
                 }}
             >
                 <KeyboardAvoidingView
                     behavior={Platform.OS === "ios" ? "padding" : "height"}
                     style={{ flex: 1, justifyContent: 'flex-end' }}
                 >
-                    {editMode ? (
-                        <View className="bg-white h-2/4 w-full bottom-0 z-20 rounded-s-3xl">
-                            <View>
-                                <TouchableOpacity onPress={() => { setEditMode(false) }} className="absolute top-2 right-2">
-                                    <Text>Close</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    ) : (
-                         <View className="bg-white h-1/2 w-full bottom-0 z-20 rounded-s-3xl">
-                            <AddNewDevice setModal={setModal} room={room} />
-                        </View>
-                    )}
+                    <View className="bg-white h-1/2 w-full bottom-0 z-20 rounded-s-3xl">
+                        <AddNewDevice setModal={setModal} room={room} />
+                    </View>
                 </KeyboardAvoidingView>
             </Modal>
         </View>

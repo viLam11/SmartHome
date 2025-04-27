@@ -3,8 +3,17 @@ import { TouchableOpacity, Text, View } from 'react-native';
 import { Table, Row } from 'react-native-table-component';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import ScheduleTable from '@/components/ScheduleTable';
+import { useEffect, useState } from 'react';
+import { getSchedule } from '@/services/scheduleService';
+
+type Schedule = { 
+    scheduledTime: string;
+    action: string;
+    repeatDays: string;
+}
 
 const tableHead = ["Start", "End", "Brightness", "Edit"];
+
 const tableData = [
   ["17:00", "16:00", "nhẹ", ".."],
   ["20:00", "21:00", "nhẹ", ".."]
@@ -22,7 +31,7 @@ const tableData = [
 // };
 
 export default function DeviceTimerTable( {setModal, feedId}: {setModal: (status: boolean) => void, feedId: number} ) {
-  
+
   return (
     <View>
       <View className='flex flex-row justify-between'>

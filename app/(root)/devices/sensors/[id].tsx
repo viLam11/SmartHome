@@ -17,12 +17,30 @@ export default function Sensor() {
     const { id } = useLocalSearchParams()
     const [sensor, setSensor] = useState(null)
     const [roomId, setRoomId] = useState(1);
-    
-    // useEffect(() => {
-    //     const fetchSensorRoom = async () => {
-    //         const response = await axios.post(`${API_URL}`)
-    //     }
-    // })
+    const [currentTime, setCurrentTime] = useState<string | null>(null)
+    const [currentDate, setCurrentDate] = useState<string | null>(null) 
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const now = new Date();
+            const date = now.getDate().toString().padStart(2, '0') + '/' + (now.getMonth() + 1).toString().padStart(2, '0') + '/' + now.getFullYear();
+            setCurrentDate(date);
+            console.log(date);
+        }, 100)
+        return () => clearInterval(interval)
+    })
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2, '0') + ':' +
+                        now.getMinutes().toString().padStart(2, '0') + ':' +
+                        now.getSeconds().toString().padStart(2, '0');
+            const result = `${time}`;
+            setCurrentTime(result);
+            console.log(result); 
+        }, 100)
+        return () => clearInterval(interval)
+    }, [])
 
     return (
 
@@ -44,12 +62,12 @@ export default function Sensor() {
                 {/* Nhiet do */}
                 <View>
                     <View>
-                        <Image source={images.sun_cloud} className="mx-auto" style={{width: 240, height: 150}}/>
+                        <Image source={images.sun_cloud} className="mx-auto" style={{ width: 240, height: 150 }} />
                     </View>
                     <Text className="text-center text-2xl font-bold">Nóng nhẹ</Text>
                     <Text className="text-center text-6xl font-bold m-2">31°C</Text>
                     <Text className="text-center italic">Vị trí: phòng khách</Text>
-                    <Text className="text-center italic">Thời gian: 12:00 12/12/2025</Text>
+                    <Text className="text-center italic">Thời gian: {currentTime} {currentDate} </Text>
                 </View>
 
                 <SensorStatis />
@@ -74,11 +92,11 @@ export default function Sensor() {
                         </View>
                     </View>
                 </View> */}
-                
+
             </ScrollView>
             <View className="absolute bottom-2 w-full">
-                    <Navigation current={2} />
-                </View>
+                <Navigation current={2} />
+            </View>
         </View >
     )
 }

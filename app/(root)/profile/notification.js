@@ -28,7 +28,7 @@ export default function Notification() {
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={{ flex: 1 }}
         >
-            <View className="min-h-screen w-11/12 mx-auto">
+            <View className="min-h-screen w-11/12 mx-auto ">
                 <View className="flex flex-row my-4 items-center">
                     <TouchableOpacity onPress={() => router.back()} className="mr-4">
                         <IconSymbol name="back" color="black" />
