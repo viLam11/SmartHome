@@ -1,22 +1,13 @@
 import axios from 'axios';
 import { RoomObject } from '../types/room.type';
-import { getAuthToken } from './authService';
+import { getAuthHeaders } from './authService';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
-const getAuthHeaders = async () => {
-    const token = await getAuthToken();
-    return {
-        headers: {
-            Authorization: `${token}`,
-            'Content-Type': 'application/json',
-        },
-    };
-};
 
 export const getAllRoomService = async (): Promise<RoomObject[]> => {
     try {
         const headers = await getAuthHeaders();
-        console.log(headers)
+        // console.log(headers)
         const response = await axios.get(`${API_URL}/rooms`, headers);
         return response?.data;
     } catch (error) {
