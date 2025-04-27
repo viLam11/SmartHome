@@ -9,24 +9,12 @@ import Navigation from '@/components/Navigation';
 import { BarChartAnimated } from '@/components/chart/BarChartAnimated';
 import ChooseCalendar from '@/components/chart/ChooseCalendar';
 import { DatePickerModal } from 'react-native-paper-dates';
+import { currentTime } from '@/constants/statistic';
 import dayjs from 'dayjs';
 
 export default function Statistic() {
   const feedId = useLocalSearchParams().id;
   const { setLoading } = useLoading();
-  const [currentTime, setCurrentTime] = useState<{
-    hour: number;
-    minute: number;
-    dayOfWeek: string;
-    day: number;
-    month: string;
-  }>({
-    hour: dayjs().hour(),
-    minute: dayjs().minute(),
-    dayOfWeek: dayjs().format('ddd'),
-    day: dayjs().date(),
-    month: dayjs().format('MMM'),
-  });
   const [deviceData, setDeviceData] = useState<runningTimeObjects | null>(null);
 
   const [endDate, setEndDate] = useState<Date | null>(null);
@@ -81,7 +69,7 @@ export default function Statistic() {
          <Text className="text-2xl color-black">{currentTime.hour}hrs, {currentTime.minute} mins</Text>
          <Text className="text-lg color-black-200">{currentTime.dayOfWeek}, {currentTime.day} {currentTime.month}</Text>
         </View>
-        <BarChartAnimated setType={() => {}} barData={deviceData ? deviceData.data : []} />
+        <BarChartAnimated setRoom={() => {}} setType={() => {}} barData={deviceData ? deviceData.data : []} />
       </ScrollView>
 
       <DatePickerModal

@@ -3,16 +3,24 @@ import { View, Text, Pressable, Modal, TouchableOpacity, FlatList } from 'react-
 import { BarChart, PieChart } from 'react-native-gifted-charts';
 import { timeADayObject } from '@/types/statistic.type';
 
-const typeOptions = ['light', 'fan'];
+const typeOptions = ['light', 'fan', 'door'];
+const roomOptions = ['All', 'room1', 'room2', 'room3'];
 
-export function BarChartAnimated({ setType, barData }: { setType: (type: string) => void, barData: timeADayObject[] }) {
+export function BarChartAnimated({ setRoom, setType, barData }: { setRoom:(room: string) => void, setType: (type: string) => void, barData: timeADayObject[] }) {
   const maxHeight = 160;
   const [selectedType, setSelectedType] = useState('light');
+  const [selectedRoom, setSelectedRoom] = useState('All');
+  const [option, setOption] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
 
   const handleSelectType = (type: string) => {
     setSelectedType(type);
     setType?.(type);
+    setShowDropdown(false);
+  };
+  const handleSelectRoom = (room: string) => {
+    setSelectedRoom(room);
+    setRoom?.(room);
     setShowDropdown(false);
   };
 
@@ -39,9 +47,14 @@ export function BarChartAnimated({ setType, barData }: { setType: (type: string)
       <View className="justify-center items-center bg-white rounded-2xl p-4 pl-1 shadow-md">
         <View className='flex flex-row w-full items-end mb-2'>
           <View className='w-1/2'>
-            <Pressable onPress={() => setShowDropdown(true)}>
-              <Text className="text-md text-gray-500 font-semibold">{selectedType} ▼</Text>
-            </Pressable>
+            <View className='flex flex-row'>
+              <Pressable onPress={() => {setShowDropdown(true); setOption('type')}}>
+                <Text className="text-md text-gray-500 font-semibold">{selectedType} ▼</Text>
+              </Pressable>
+              <Pressable onPress={() => {setShowDropdown(true); setOption('room')}} className='ml-2'>
+                <Text className="text-md text-gray-500 font-semibold">{selectedRoom} ▼</Text>
+              </Pressable>
+            </View>
 
             <Modal visible={showDropdown} transparent animationType="fade">
               <TouchableOpacity
@@ -50,13 +63,22 @@ export function BarChartAnimated({ setType, barData }: { setType: (type: string)
                 onPressOut={() => setShowDropdown(false)}
               >
                 <View className="bg-white rounded-md w-40">
-                  {typeOptions.map((type) => (
+                  {option==='type' && typeOptions.map((type) => (
                     <TouchableOpacity
                       key={type}
                       onPress={() => handleSelectType(type)}
                       className="px-4 py-2 border-b border-gray-200"
                     >
                       <Text className="text-gray-700">{type}</Text>
+                    </TouchableOpacity>
+                  ))}
+                  {option==='room' && roomOptions.map((room) => (
+                    <TouchableOpacity
+                      key={room}
+                      onPress={() => handleSelectRoom(room)}
+                      className="px-4 py-2 border-b border-gray-200"
+                    >
+                      <Text className="text-gray-700">{room}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
