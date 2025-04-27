@@ -1,17 +1,7 @@
 import axios from 'axios';
 import { miniLogObject } from '@/types/log.type';
-import { getAuthToken } from './authService';
+import { getAuthHeaders } from './authService';
 
-
-const getAuthHeaders = async () => {
-    const token = await getAuthToken();
-    return {
-        headers: {
-            Authorization: `${token}`,
-            'Content-Type': 'application/json',
-        },
-    };
-};
 
 export const getDeviceLogService = async (feedId: string): Promise<miniLogObject[]> => {
     try {
