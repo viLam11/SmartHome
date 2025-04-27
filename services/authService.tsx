@@ -45,6 +45,16 @@ export const getAuthToken = async () => {
     }
 };
 
+export const getAuthHeaders = async () => {
+    const token = await getAuthToken();
+    return {
+        headers: {
+            Authorization: `${token}`,
+            'Content-Type': 'application/json',
+        },
+    };
+};
+
 export const signOutService = async () => {
     try {
         await AsyncStorage.removeItem('authToken');
