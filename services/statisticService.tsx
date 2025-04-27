@@ -15,7 +15,8 @@ export const getStatisticService = async (feedId: string, endDate: Date | null):
     }
 }
 
-export const getSummaryDeviceStatisticService = async (type: string, endDate: Date | null): Promise<runningTimeDeviceTypeObjects> => {
+
+export const getSummaryDeviceStatisticService = async (room: string, type: string, endDate: Date | null): Promise<runningTimeDeviceTypeObjects> => {
     try {
         // const headers = await getAuthHeaders();
         // const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/statistic`, headers);
