@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import images from '@/constants/images';
@@ -30,6 +31,14 @@ export default function WelcomeScreen() {
 
             <Text className="text-2xl font-bold text-black">SmartHome</Text>
             <Text className="text-gray-500 mt-2">A new way to control your home</Text>
+
+        {/* COMMENT */}
+            <Link href="/devices/stats/2" > 
+                <Text>Static</Text>
+            </Link>
+            <Link href="/devices/stats/overview" > 
+                <Text className='bg-blue-200 border-black rounded-md p-2'>Overview</Text>
+            </Link>
             { token ? 
                  <TouchableOpacity 
                  className="absolute bottom-10 w-[40%] mx-auto bg-orange-500 px-6 py-3 rounded-lg self-center"

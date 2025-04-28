@@ -7,7 +7,7 @@ const typeOptions = ['light', 'fan', 'door'];
 const roomOptions = ['All', 'room1', 'room2', 'room3'];
 
 export function BarChartAnimated({ setRoom, setType, barData }: { setRoom:(room: string) => void, setType: (type: string) => void, barData: timeADayObject[] }) {
-  const maxHeight = 160;
+  // const maxHeight = 160;
   const [selectedType, setSelectedType] = useState('light');
   const [selectedRoom, setSelectedRoom] = useState('All');
   const [option, setOption] = useState('');
@@ -93,10 +93,9 @@ export function BarChartAnimated({ setRoom, setType, barData }: { setRoom:(room:
 
         <BarChart
           data={data}
-          height={maxHeight}
-          barWidth={22}
-          noOfSections={6}
-          maxValue={24}
+          barWidth={20}
+          // noOfSections={6
+          // maxValue={24}
           isAnimated
           animationDuration={500}
           yAxisTextStyle={{ fontSize: 12 }}
