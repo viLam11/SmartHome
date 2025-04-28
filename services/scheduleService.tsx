@@ -1,16 +1,7 @@
 import axios from 'axios';
-import { getAuthToken } from './authService';
+import { getAuthHeaders } from './authService';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
-const getAuthHeaders = async () => {
-    const token = await getAuthToken();
-    return {
-        headers: {
-            Authorization: `${token}`,
-            'Content-Type': 'application/json',
-        },
-    };
-};
 export const getSchedule = async ( feedId: string) => {
     try {
         const headers = await getAuthHeaders();

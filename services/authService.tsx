@@ -21,6 +21,7 @@ export const registerService = async (userData: { firstname: string, lastname: s
 
 export const signInService = async (credentials: { email: string, password: string }) => {
     try {
+        console.log("ket qua dang nhap", credentials)
         const response = await axios.post(`${API_URL}/login`, credentials);
         const { token } = response.data;
         
@@ -43,6 +44,16 @@ export const getAuthToken = async () => {
         console.error('Lỗi khi lấy token:', error);
         return null;
     }
+};
+
+export const getAuthHeaders = async () => {
+    const token = await getAuthToken();
+    return {
+        headers: {
+            Authorization: `${token}`,
+            'Content-Type': 'application/json',
+        },
+    };
 };
 
 export const signOutService = async () => {

@@ -1,20 +1,10 @@
 import axios from 'axios';
-import { deviceData } from '../constants/data';
+// import { deviceData } from '../constants/data';
 import { deviceListObject, deviceStatusObject, deviceCreateObject } from '../types/device.type';
-import { getAuthToken } from './authService';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAuthHeaders } from './authService';
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 // Hàm tạo headers với Authorization token
-const getAuthHeaders = async () => {
-    const token = await AsyncStorage.getItem("authToken");
-    return {
-        headers: {
-            Authorization: `${token}`,
-            'Content-Type': 'application/json',
-        },
-    };
-};
 
 export const getRoomDevices = async (roomID: string): Promise<deviceListObject> => {
     try {
