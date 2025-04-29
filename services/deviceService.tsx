@@ -78,3 +78,13 @@ export const checkDoorPwdService = async (feedId: string, pwd: string) => {
         throw e;
     }   
 }
+
+export const fetchSensorData = async (feedId: number) => {
+    try {
+        const response = await axios.get(`${API_URL}/sensors/3014285`);
+        return response;
+    } catch (error) {
+        console.error('Error fetching sensor data:', error);
+        return error;
+    }
+}

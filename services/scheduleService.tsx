@@ -26,3 +26,14 @@ export const setSchedule = async ( payload: any) => {
         return error;
     }
 };
+
+
+export const deleteSchedule = async (scheduleId: number) => {
+    try {
+        const response = await axios.delete(`${API_URL}/schedules/${scheduleId}`);
+        return response;
+    } catch (error) {
+        console.error('Error deleting device:', error);
+        throw error;
+    }   
+}

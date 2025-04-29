@@ -44,7 +44,7 @@ export default function Navigation({ current }: { current: number }) {
   );
 
   return (
-    <View className='h-14 mx-2 rounded-2xl overflow-hidden'>
+    <View className='h-14 my-auto mx-2 rounded-2xl overflow-hidden'>
       <View className='h-full bg-black w-full flex flex-row'>
         {tabs.map(renderTab)}
       </View>

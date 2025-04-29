@@ -1,5 +1,5 @@
 import React from 'react';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ScrollView, View, Text, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import DeviceHeader from '@/components/device/DeviceHeader';

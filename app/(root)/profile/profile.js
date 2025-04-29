@@ -5,7 +5,7 @@ import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 const base_url = process.env.EXPO_PUBLIC_API_URL;
 
 export default function Profile() {
@@ -86,6 +86,9 @@ export default function Profile() {
               <Text className='text-black text-2xl font-semibold ml-4'>
                 Hỗ trợ
               </Text>
+              <Link href="/explore" className="absolute right-4"> 
+                 <Text>dfd</Text>
+              </Link>
             </View>
             <View className="my-2">
               <View className="bg-white mx-2 p-4 shadow-transparent my-2 flex flex-row align-middle items-center border rounded-3xl">

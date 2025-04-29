@@ -51,3 +51,17 @@ export const DEVICE_FORMAT: Record<string, Record<string, string>> = {
         "router": "devices/sensors/"
     }
 };
+
+
+
+export type SensorDataType = {
+    image: string ,
+    message: string | null,
+    value: number,
+    roomId: number, 
+    feedId: number, 
+    feedKey: string,   
+    title: string,   
+    type: 'temperature' | 'humidity' | 'brightness',  
+    unit: string | null
+}
