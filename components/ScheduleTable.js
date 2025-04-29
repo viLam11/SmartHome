@@ -3,15 +3,21 @@ import React, { Component, useEffect, useState } from 'react';
 import { Button, Text } from 'react-native';
 import { StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native';
 import { Table, TableWrapper, Row, Cell } from 'react-native-table-component';
-
+import { deleteSchedule } from '@/services/scheduleService';
 
 const tableHead = ['Thời gian', 'Mức độ', 'Ngày lặp', 'Sửa']
 const widthArr = [25, 20, 30, 25]
 
 export default function ScheduleTable({ modal, feedId }) {
   const [tableData, setTableData] = useState([]); 
-  function handleDeleteSchedule(index) {
-
+  async function handleDeleteSchedule(index) {
+      cosnole.log("Delete schedule with id: ", index);  
+      response = await deleteSchedule(index);
+      if (response.status == 200) {
+        console.log("Delete schedule successfully");
+        const newSchedules = tableData.filter((item) => item[3] !== index);
+        setTableData(newSchedules); 
+      }
   }
 
   useEffect(() => {
@@ -75,7 +81,7 @@ export default function ScheduleTable({ modal, feedId }) {
                   style={[styles.row, { alignItems: 'center' }]}  // Center nội dung
                   textStyle={styles.textCenter}
                   data={
-                    <TouchableOpacity onPress={() => handleDeleteDevice(rowData[3])} >
+                    <TouchableOpacity onPress={() => handleDeleteSchedule(rowData[3])} >
                       <Text className="text-lg color-red-600 font-bold">Xóa</Text>
                     </TouchableOpacity>
                   }

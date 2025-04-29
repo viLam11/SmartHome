@@ -1,14 +1,11 @@
-import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import React, { useEffect } from 'react';
+import { connectAndSend } from '@/services/mqttService';
 
-const Explore = () => {
-    return (
-        <View>
-            <Text>Explore</Text>
-        </View>
-    );
+
+export default function App() {
+  useEffect(() => {
+    connectAndSend();
+  }, []);
+
+  return null;
 }
-
-const styles = StyleSheet.create({})
-
-export default Explore;

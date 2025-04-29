@@ -20,6 +20,7 @@ export const registerService = async (userData: { firstname: string, lastname: s
 };
 
 export const signInService = async (credentials: { email: string, password: string }) => {
+    console.log(API_URL)
     try {
         console.log("ket qua dang nhap", credentials)
         const response = await axios.post(`${API_URL}/login`, credentials);

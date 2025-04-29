@@ -98,7 +98,7 @@ export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
                     <View className="flex-1 h-[1px] bg-gray-300" />
                 </View>
 
-                {[
+                {/* {[
                     { name: 'google', color: 'red', text: 'Sign Up with Google' },
                     { name: 'apple', color: 'black', text: 'Sign Up with Apple' }
                 ].map(({ name, color, text }) => (
@@ -110,7 +110,7 @@ export default function AuthForm({ type }: { type: 'sign-in' | 'register' }) {
 
                 <TouchableOpacity className="mt-6">
                     <Text className="text-center font-bold text-gray-500">CONTINUE AS A GUEST</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
                 <View className="flex flex-row justify-center items-center my-4">
                     <Text className="text-gray-500">{isSignIn ? 'New here?' : 'Already have an account?'}</Text>
