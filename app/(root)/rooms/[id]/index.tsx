@@ -12,6 +12,9 @@ import { getRoomDevices } from '@/services/deviceService';
 import { getAllRoomService } from '@/services/roomService';
 import { useLoading } from '@/contexts/LoadingContext';
 
+import { calculateActiveDevice } from '@/components/CaculateData';
+import { deviceActiveWColorType } from '@/types/statistic.type';
+
 export default function Room() {
     const router = useRouter();
     const { setLoading } = useLoading();
@@ -20,6 +23,8 @@ export default function Room() {
     const [deviceCount, setDeviceCount] = useState(0);
     const [editMode, setEditMode] = useState(false);
     const [modal, setModal] = useState(false);
+
+    const [activesDevice, setActivesDevice] = useState<deviceActiveWColorType[]>([]);
 
     const roomId = useLocalSearchParams().id;
 
@@ -30,6 +35,7 @@ export default function Room() {
                 setLoading(true);
                 const response = await getRoomDevices(roomId as string);
                 setDeviceList(response);
+                setActivesDevice(calculateActiveDevice(response));
                 const roomList = await getAllRoomService();
                 const room = roomList.find((room: RoomObject) => room.id === Number(roomId));
                 if (room) {
@@ -103,20 +109,10 @@ export default function Room() {
                 <View className="flex flex-row flex-wrap">
                     {deviceList && Object.entries(deviceList).map(([key, devices]) => {
                         
-                        console.log(deviceList);
                         const image = DEVICE_FORMAT[key]['img'];
                         const amount = devices.length;
                         const devicesRouter = DEVICE_FORMAT[key]['router'];
                         const displayTittle = DEVICE_FORMAT[key]['displayTittle'];
-                        console.log(devices);
-                        let on = false;
-                        if (amount > 0 ) {
-                            devices.forEach((device) => {
-                                if (device.value !== '0' && device.value !== '#000000' ){
-                                    on = true
-                                }
-                            })
-                        }
 
                         return (
                             <View key={key} className="w-1/2 flex flex-col">

@@ -1,34 +1,30 @@
 import { subDays, format, addDays } from 'date-fns';
+import { runningTimeDeviceType, runningTimeOneDeviceType, summaryStatisticType } from '@/types/statistic.type';
 import dayjs from 'dayjs';
 
-const endDate = subDays(new Date(), 1);
-const startDate = subDays(endDate, 6);
+export const endDateData = subDays(new Date(), 1);
+export const startDateData = subDays(endDateData, 6);
 
-export const runningTime = {
-  type: 'light',
-  title: 'So 1',
-  data: Array.from({ length: 7 }, (_, i) => {
-    const currentDate = addDays(startDate, i);
-    return {
-      date: format(currentDate, 'dd/MM'),
-      value: Math.floor(Math.random() * 24),
-    };
-  }),
-  startDate: format(startDate, 'dd/MM/yyyy'),
-  endDate: format(endDate, 'dd/MM/yyyy'),
-};
+export const runningTime: runningTimeOneDeviceType = Object.fromEntries(
+  Array.from({ length: 7 }, (_, i) => {
+    const currentDate = addDays(startDateData, i);
+    return [format(currentDate, 'dd/MM'), Math.floor(Math.random() * 24)];
+  })
+);
 
-export const runningTimeDeviceType = {
-  type: 'light',
-  data: Array.from({ length: 7 }, (_, i) => {
-    const currentDate = addDays(startDate, i);
-    return {
-      date: format(currentDate, 'dd/MM'),
-      value: Math.floor(Math.random() * 24),
-    };
-  }),
-  startDate: format(startDate, 'dd/MM/yyyy'),
-  endDate: format(endDate, 'dd/MM/yyyy'),
+export const runningTimeDeviceData: runningTimeDeviceType = {
+  light: Object.fromEntries(
+    Array.from({ length: 7 }, (_, i) => {
+      const currentDate = addDays(startDateData, i);
+      return [format(currentDate, 'yy-MM-dd'), Math.floor(Math.random() * 24)];
+    })
+  ),
+  fan: Object.fromEntries(
+    Array.from({ length: 7 }, (_, i) => {
+      const currentDate = addDays(startDateData, i);
+      return [format(currentDate, 'yy-MM-dd'), Math.floor(Math.random() * 24)];
+    })
+  ),
 };
 
 export const currentTime = {
@@ -39,16 +35,17 @@ export const currentTime = {
   month: dayjs().format('MMM'),
 };
 
-export const summaryStatisticData = {
+export const summaryStatisticData: summaryStatisticType = {
   totalRuntime: `${currentTime.hour}hrs, ${currentTime.minute} mins`,
-  deviceRatio: [
-    { value: 0.488, label: 'Light'},
-    { value: 0.242, label: 'Fan' },
-    { value: 0.27, label: 'Door'},
-  ],
-  deviceActive: [
-    { type: 'light', active: 2, inactive: 4},
-    { type: 'fan', active: 1, inactive: 2 },
-    { type: 'doors', active: 1, inactive: 0 },
+  deviceRatioType: [
+    { value: 0.488, label: 'Living Room' },
+    { value: 0.242, label: 'Garage' },
+    { value: 0.27, label: 'Bedroom' },
   ],
 }
+
+export const deviceActive = [
+  { type: 'light', active: 2, inactive: 4},
+  { type: 'fan', active: 1, inactive: 2 },
+  { type: 'doors', active: 1, inactive: 0 },
+]

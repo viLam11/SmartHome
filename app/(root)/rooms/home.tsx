@@ -11,6 +11,9 @@ import { getAllRoomService } from "@/services/roomService";
 import { RoomObject } from "@/types/room.type";
 import images from "@/constants/images";
 import { useLoading } from "@/contexts/LoadingContext";
+import { getRoomDevices } from "@/services/deviceService";
+import { calculateActiveDevice } from "@/components/CaculateData";
+import { deviceActiveWColorType } from "@/types/statistic.type";
 
 
 export default function HomeIndex() {
@@ -25,6 +28,8 @@ export default function HomeIndex() {
     const [deleteMode, setDeleteMode] = useState(false);
     const [newRoomName, setNewRoomName] = useState('');
     const [count, setCount] = useState(0);
+    
+    const [deviceActive, setDeviceActive] = useState<deviceActiveWColorType[]>([]);
     // function handleDeleteMode() {
     //     setCount(count + 1);
     //     setDeleteMode(!deleteMode);
@@ -35,9 +40,13 @@ export default function HomeIndex() {
         const fetchRoomData = async () => {
             setLoading(true);
             try {
-              const response = await getAllRoomService();
-              if (!response) throw new Error("Failed to fetch image");
-              setAllRoomData(response);
+                const response = await getAllRoomService();
+                if (!response) throw new Error("Failed to fetch image");
+                setAllRoomData(response);
+              
+                const deviceActiveData = await getRoomDevices("4");
+                setDeviceActive(calculateActiveDevice(deviceActiveData));
+                console.log("deviceActive", deviceActive);
             } catch (error) {
               console.error("Error fetching room data:", error);
             } finally {
@@ -95,6 +104,22 @@ export default function HomeIndex() {
                                 </View>
                             ))}
                         </View>
+                        
+                        <View className="grid grid-cols-2 gap-2 mt-5 mb-5">
+                            {deviceActive.map((device, index) => (
+                                
+                                <View key={index} className={`rounded-2xl shadow-md ${device.color} `}>
+                                <View className={`items-center`}>
+                                    <Text className="text-lg font-semibold text-white">{device.type}</Text>
+                                </View>
+                                <View className={`rounded-b-2xl shadow-md bg-white items-center`}>
+                                    <Text className="">Active: {device.active}</Text>
+                                    <Text className="">Inactive: {device.inactive}</Text>
+                                </View>
+                            </View>
+                            ))}
+                        </View>
+
                         <View className="h-28">
                             <View className="w-full bottom-2">
                                 <Navigation current={2} />

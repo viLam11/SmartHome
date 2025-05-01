@@ -1,47 +1,32 @@
-export type runningTimeObjects = {
-    type: string,
-    title: string,
-    data: timeADayObject[],
-    startDate: string,
-    endDate: string
+
+export type runningTimeDeviceType = {
+    [key: string]: {
+        [date: string]: number
+    }
 };
 
-export type runningTimeDeviceTypeObjects = {
-    type: string,
-    data: timeADayObject[],
-    startDate: string,
-    endDate: string
+export type runningTimeOneDeviceType = {
+    [date: string]: number
 };
 
-export type timeADayObject = {
-    date: string,
-    value: number
-};
-
-export type summaryStatisticObjects = {
+export type summaryStatisticType = {
     totalRuntime: string,
-    deviceRatio: deviceRatio[],
-    deviceActive: deviceActive[]
+    deviceRatioType: deviceRatioType[]
 };
-export type deviceRatio = {
+export type deviceRatioType = {
     value: number,
     label: string
 };
-
-export type deviceActive = {
-    type: string,
-    active: number,
-    inactive: number
-};
-
-export type deviceRatioWColor = {
+export type deviceRatioWColorType = {
     value: number,
     label: string,
-    color: string
+    color: string,
+    gradientCenterColor: string,
 };
 
-export type deviceActiveWColor = {
+export type deviceActiveWColorType = {
     type: string,
+    displayTitle: string,
     active: number,
     inactive: number,
     color: string
