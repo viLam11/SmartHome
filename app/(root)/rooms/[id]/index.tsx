@@ -163,7 +163,10 @@ export default function Room() {
                                                         </View>
                                                         :
                                                         <View key={index} className={`mt-2 p-2 ${device.value == '0' || device.value == '#000000' ? "bg-disable" : "bg-enable"} rounded-xl `}>
-                                                        <TouchableOpacity key={index} onPress={() => router.push(`/${devicesRouter}/${device.feedId}` as any)}>
+                                                        <TouchableOpacity key={index} onPress={() => router.push({
+                                                                pathname: `/${devicesRouter}/${device.feedId}` as any,
+                                                                params: { roomName: room?.title }
+                                                        })}>
                                                             <Text className="font-semibold">{device.title}</Text>
                                                         </TouchableOpacity>
                                                         </View>

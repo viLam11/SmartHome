@@ -1,11 +1,14 @@
 import axios from "axios"
-const base_url = process.env.EXPO_PUBLIC_API_URL;   
 
+const base_url = process.env.EXPO_PUBLIC_API_URL;   
+const ADA_USER = process.env.ADAFRUIT_USERNAME;
 export const fetchSensorDataByTime = async ({ startTime, endTime, feedKey }: { startTime: string, endTime: string, feedKey: string }) => {
     try {
         console.log("Start time: ", startTime);
         console.log("End time: ", endTime);
-        const response = await axios.get(`https://io.adafruit.com/api/v2/olivia0307/feeds/bbc-temp/data/chart`, {
+        console.log("Feed key: ", feedKey); 
+        console.log("ADA USER: ", ADA_USER);    
+        const response = await axios.get(`https://io.adafruit.com/api/v2/${ADA_USER}/feeds/${feedKey}/data/chart`, {
             params: {
                 start_time: startTime,
                 end_time: endTime,
@@ -31,7 +34,7 @@ export const fetchSensorDataByTime = async ({ startTime, endTime, feedKey }: { s
         });
         return sensorData   
     } catch (error) {
-        return error
+        return [];
     }
 }
 
@@ -58,7 +61,6 @@ export const fetchSensorDataByDay = async ({ startTime, endTime, feedId }: { sta
                 dataPointTextColor: "black", // Màu chữ hiển thị trên điểm dữ liệu
             };
         });
-        
         return result;   
     } catch (error) {
         return {

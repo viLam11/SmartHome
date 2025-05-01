@@ -56,3 +56,12 @@ export const updateRoomService = async (roomId: string, title: string) => {
         throw error;
     }
 };
+
+export const getRoomNameById = async (roomId: number) => {
+    const allRooms = await getAllRoomService();
+    console.log("Room id: ", roomId);
+    console.log("ALL ROOM: ", allRooms);
+    const room = allRooms.find((value, index) => value.id == roomId)
+    console.log("FOUND ROOM: ", room);
+    return room?.title
+}
