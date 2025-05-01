@@ -91,10 +91,10 @@ export default function Statistic() {
         />
         
         <View className="flex flex-col w-9/12 mt-4 mx-auto p-1 bg-white justify-center items-center">
-         <Text className="text-2xl color-black">{currentTime.hour}hrs, {currentTime.minute} mins</Text>
+         <Text className="text-2xl color-black">{currentTime.hour} Giờ, {currentTime.minute} Phút</Text>
          <Text className="text-lg color-black-200">{currentTime.dayOfWeek}, {currentTime.day} {currentTime.month}</Text>
         </View>
-        <BarChartAnimated setRoom={() => {}} setType={() => {}} barData={deviceData ?? {}} />
+        <BarChartAnimated setRoom={() => {}} barData={deviceData ?? {}} />
       </ScrollView>
 
       <DatePickerModal

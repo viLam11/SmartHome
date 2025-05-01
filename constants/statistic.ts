@@ -36,7 +36,6 @@ export const currentTime = {
 };
 
 export const summaryStatisticData: summaryStatisticType = {
-  totalRuntime: `${currentTime.hour}hrs, ${currentTime.minute} mins`,
   deviceRatioType: [
     { value: 0.488, label: 'Living Room' },
     { value: 0.242, label: 'Garage' },

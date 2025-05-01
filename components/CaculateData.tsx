@@ -70,7 +70,6 @@ export const DTOBarData = (OriginData: runningTimeDeviceType) => { // Origindata
 export const formatBarData = (OriginData: runningTimeDeviceType) => {
   const DTOData = DTOBarData(OriginData); //DTOData: [{date: "25/04", value: 7.615}, ...]
   const keys = Object.keys(OriginData);
-  console.log(DTOData)
   if (keys.length === 1) {
     return DTOData.map((bar) => {
       const numericValue = Number(bar.value);
