@@ -8,18 +8,19 @@ import { DatePickerModal, de } from 'react-native-paper-dates';
 import ChooseCalendar from '@/components/chart/ChooseCalendar';
 import Navigation from '@/components/Navigation';
 import dayjs from 'dayjs';
-import { deviceActiveWColor, deviceRatioWColor, runningTimeDeviceTypeObjects } from '@/types/statistic.type';
+import { deviceRatioWColorType, runningTimeDeviceType } from '@/types/statistic.type';
 
 export default function StatisticMockUI() {
   const { setLoading } = useLoading();
   const [type, setType] = useState('light');
   const [room, setRoom] = useState('All');
-  const [deviceData, setDeviceData] = useState<runningTimeDeviceTypeObjects | null>(null);
+  const [deviceData, setDeviceData] = useState<runningTimeDeviceType | null>(null);
   const [runningTime, setRunningTime] = useState<string>("");
-  const [deviceRatio, setDeviceRatio] = useState<deviceRatioWColor[]>([]);
-  const [deviceActive, setDeviceActive] = useState<deviceActiveWColor[]>([]);
+  const [deviceRatio, setDeviceRatio] = useState<deviceRatioWColorType[]>([]);
   const [isPickerVisible, setPickerVisible] = useState(false);
   const [endDate, setEndDate] = useState<Date | null>(null);
+
+
 
   const fetchStatistic = async (type: string, endDate: Date | null) => {
     setLoading(true);
@@ -29,15 +30,10 @@ export default function StatisticMockUI() {
       const deviceData = await getSummaryStatisticService();
       setRunningTime(deviceData.totalRuntime);
       setDeviceRatio(
-        deviceData.deviceRatio.map((item, index) => ({
+        deviceData.deviceRatioType.map((item, index) => ({
           ...item,
-          color: ['#6B46C1', '#7F9CF5', '#90CDF4'][index % 3],
-        }))
-      );
-      setDeviceActive(
-        deviceData.deviceActive.map((item, index) => ({
-          ...item,
-          color: ['bg-yellow', 'bg-green-400', 'bg-orange-400'][index % 3],
+          color: ['#009FFF', '#93FCF8', '#BDB2FA'][index % 3],
+          gradientCenterColor: ['#006DFF', '#3BE9DE', '#8F80F3'][index % 3],
         }))
       );
 
@@ -75,36 +71,30 @@ export default function StatisticMockUI() {
             <Text className="text-2xl font-bold text-center">Statistics </Text>
           </View>
         </View>
+        
 
-        <ChooseCalendar startDate={deviceData?.startDate} endDate={deviceData?.endDate} setOpen={setPickerVisible} />
+        {/* <ChooseCalendar startDate={deviceData?.startDate} endDate={deviceData?.endDate} setOpen={setPickerVisible} /> */}
+        
+        <ChooseCalendar 
+          startDate={deviceData ? Object.keys(deviceData[type] ?? {})[0] : null} 
+          endDate={deviceData ? Object.keys(deviceData[type] ?? {})[Object.keys(deviceData[type] ?? {}).length - 1] : null} 
+          setOpen={setPickerVisible} 
+        />
 
-        <BarChartAnimated setRoom={setRoom} setType={setType} barData={deviceData ? deviceData.data : []} />
+        <BarChartAnimated setRoom={setRoom} setType={setType} barData={deviceData ?? {}} />
         <View>
           <Text className="mt-10 text-lg font-semibold">Outstanding</Text>
         </View>
         <View className='flex flex-col px-2'>
-          <View className="w-full mt-4 bg-sky-100 p-2 rounded-md">
+          <View className="w-full mt-4 bg-sky-100 p-2 rounded-md shadow-lg">
             {outStand.map((item, index) => (
               <View key={index} className='flex flex-col items-center mt-2'>
-                <Text className="text-sm font-semibold">{item.key}</Text>
-                <Text>{item.value}</Text>
+                <Text className="text-sm">{item.key}</Text>
+                <Text className='text-lg font-semibold'>{item.value}</Text>
               </View>
             ))}
           </View>
-          
-          <View className="flex flex-row mt-4 bg-white rounded-md shadow-md justify-between py-3">
-            <View className='w-1/2'>
-              <PieChartAnimated pieData={deviceRatio} />
-            </View>
-            <View className='w-1/2 justify-center'>
-              {deviceRatio.map((item, index) => (
-                <View key={index} className="flex-row items-center">
-                  <View style={{ width: 12, height: 12, backgroundColor: item.color, marginRight: 8, borderRadius: 6 }} />
-                  <Text className="text-sm">{`(${item.value * 100}%) ${item.label}`}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
+          <PieChartAnimated pieData={deviceRatio} />
         </View>
 
         <View className="mt-12">
@@ -112,20 +102,6 @@ export default function StatisticMockUI() {
             <View className='w-1/2 bg-sky-300 p-1 rounded-xl'>
               <Text className="text-xl font-bold text-center">Devices</Text>
             </View>
-          </View>
-          <View className="grid grid-cols-2 gap-2 mt-5 mb-16">
-            {deviceActive.map((device, index) => (
-              
-              <View key={index} className={`rounded-2xl shadow-md ${device.color} `}>
-                <View className={`items-center`}>
-                  <Text className="text-lg font-semibold text-white">{device.type}</Text>
-                </View>
-                <View className={`rounded-b-2xl shadow-md bg-white items-center`}>
-                  <Text className="">Active: {device.active}</Text>
-                  <Text className="">Inactive: {device.inactive}</Text>
-                </View>
-              </View>
-            ))}
           </View>
         </View>
       </ScrollView>
