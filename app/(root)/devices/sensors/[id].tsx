@@ -15,6 +15,7 @@ import { fetchSensorData } from "@/services/deviceService"
 import { useLoading } from "@/contexts/LoadingContext"
 import { set } from "date-fns"
 import SensorWeek from "@/components/SensorWeek"
+import { getRoomNameById } from "@/services/roomService"
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL
 const imgTemp = [images.sun_cloud, images.day, images.night, images.sun_cloud, images.sun_humid, images.night_humid, images.night_snow, images.night_wind]
@@ -25,16 +26,18 @@ const timeToSeconds = (time: string) => {
 };
 
 export default function Sensor() {
-    const router = useRouter()
-    const id = useLocalSearchParams().id
-    const { loading, setLoading } = useLoading()
-    const [sensor, setSensor] = useState(null)
+    const router = useRouter();
+    const id = useLocalSearchParams().id;
+    const roomName = useLocalSearchParams().roomName;
+    const { loading, setLoading } = useLoading();
+    const [sensor, setSensor] = useState(null);
     const [roomId, setRoomId] = useState(1);
-    const [startTime, setStartTime] = useState<string | null>(null)
-    const [endTime, setEndTime] = useState<string | null>(null)
-    const [currentTime, setCurrentTime] = useState<string | null>(null)
-    const [currentDate, setCurrentDate] = useState<string | null>(null)
-    const [sensorData, setSensorData] = useState<SensorDataType | null>(null)
+    // const [roomName, setRoomName] = useState('');
+    const [startTime, setStartTime] = useState<string | null>(null);
+    const [endTime, setEndTime] = useState<string | null>(null);
+    const [currentTime, setCurrentTime] = useState<string | null>(null);
+    const [currentDate, setCurrentDate] = useState<string | null>(null);
+    const [sensorData, setSensorData] = useState<SensorDataType>({value: 0, unit: '', image: '', message: null, feedKey: '', roomId: 0, feedId: 0, title: '', type: 'temperature'}) 
     useEffect(() => {
         const interval = setInterval(() => {
             const now = new Date();
@@ -52,8 +55,8 @@ export default function Sensor() {
         const x = startOfDayAt7AMUTC .toISOString();
         setStartTime(x)
         return () => clearInterval(interval)
-    }, [])
 
+    }, [])
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -68,14 +71,13 @@ export default function Sensor() {
         return () => clearInterval(interval)
     }, [])
 
-
     // FETCH SENSOR DATA
     useEffect(() => {
         setLoading(true)
         const fetchData = async () => {
-            const response: any = await fetchSensorData(2)
+            const response: any = await fetchSensorData(+id)
             const data: SensorDataType = { ...response.data, image: null, message: null, unit: null };
-            console.log("Sensor data 2: ", data)
+            console.log("SENSOR DATA: ", data)
             if (data.type == 'temperature') {
                 data.unit = '°C'
                 if (currentTime && timeToSeconds(currentTime) < timeToSeconds('10:00:00') && timeToSeconds(currentTime) > timeToSeconds('6:00:00')) {
@@ -94,11 +96,8 @@ export default function Sensor() {
                         data.image = images.night_humid
                         data.message = "Mát mẻ"
                     }
-
                 }
-
-            }
-
+            } 
             setSensorData(data)
         }
         fetchData()
@@ -128,13 +127,14 @@ export default function Sensor() {
                     </View>
                     <Text className="text-center text-xl font-bold">{sensorData ? sensorData.message : ''}</Text>
                     <Text className="text-center text-4xl font-bold m-2"> {sensorData ? sensorData.value : ''} °C</Text>
-                    <Text className="text-center italic">Vị trí: phòng khách</Text>
+                    <Text className="text-center italic">Vị trí: {roomName}</Text>
                     <Text className="text-center italic">Thời gian: {currentTime} {currentDate} </Text>
                 </View>
 
-                <SensorStatis />
+                <SensorStatis feedKey={sensorData.feedKey} />
 
-                <SensorWeek />
+                <SensorWeek feedId={id} />
+                
             </ScrollView>
             <View className=" bottom-0 h-28">
                 <Navigation current={2} />

@@ -4,15 +4,27 @@ import { LineChart } from 'react-native-gifted-charts';
 import { useState, useEffect } from 'react';
 import { fetchSensorDataByDay } from '@/services/sensorService';
 import { SelectDayRange } from './SelectDayRange';
+import { useLoading } from '@/contexts/LoadingContext';
+import dayjs from 'dayjs';
+
 
 const dumData = [
     { value: 26.5, label: '10:00', dataPointText: '26.5' },
     { value: 27.2, label: '11:00', dataPointText: '27.2' }
 ]
 
-export default function SensorWeek() {
-    const [visible, setVisible] = useState(false);
+export default function SensorWeek({feedId}) {
+    const {setLoading} = useLoading();  
+    const [isVisible, setIsVisible] = useState(false);
     const [lineData, setLineData] = useState(dumData);
+    const [initDates, setInitDates] = useState({
+        startDate: dayjs().subtract(7, 'day'),
+        endDate: dayjs(),
+    })
+    const [selectedDates, setSelectedDates] = useState({
+        startDate: dayjs(),
+        endDate: dayjs().add(2, 'day'),
+    });
 
     useEffect(() => {
         const now = new Date();
@@ -25,20 +37,46 @@ export default function SensorWeek() {
             const data = await fetchSensorDataByDay({ startTime: sevenDaysAgoVN.toISOString(), endTime: vnEndOfDay.toISOString(), feedId: 3014285 });
             setLineData(data);
         }
+        setInitDates({
+            startDate: dayjs(sevenDaysAgoVN),
+            endDate: dayjs(vnEndOfDay), 
+        })
+        setSelectedDates({
+            startDate: dayjs(sevenDaysAgoVN),
+            endDate: dayjs(vnEndOfDay), 
+        })
         fetch7DaysData()
     }, [])
+
+    function onCancel() {
+        setSelectedDates(initDates);
+        setIsVisible(false);
+    }
+
+    async function onConfirm() {
+        console.log('Selected range:', selectedDates.startDate.format('DD MMM, YYYY'), '-', selectedDates.endDate.format('DD MMM, YYYY'));  
+        setLoading(true);
+        const sensorData = await fetchSensorDataByDay({ 
+            startTime: selectedDates.startDate.toISOString(), 
+            endTime: selectedDates.endDate.toISOString(), 
+            feedId: +feedId 
+        });
+        console.log('Sensor data 2:', sensorData);   
+        setLineData(sensorData);    
+        setLoading(false);   
+        setIsVisible(false);
+    }
 
     return (
         <View className='w-11/12 mx-auto mt-4'>
             <Text className='text-center font-bold text-lg'>Biều đồ nhiệt theo ngày</Text>
 
-            
-            <SelectDayRange />
+            <SelectDayRange selectedDates={selectedDates} setSelectedDates={setSelectedDates} onCancel={onCancel} onConfirm={onConfirm} isVisible={isVisible} setIsVisible={setIsVisible} />
 
-            <ScrollView horizontal={true}>
+            <ScrollView horizontal={true} className="mt-4">
                 <LineChart
                     data={lineData}
-                    height={250}
+                    width={Math.max(lineData.length * 60, 300)}
                     showVerticalLines
                     spacing={60}
                     initialSpacing={20}
@@ -50,6 +88,9 @@ export default function SensorWeek() {
                     textShiftY={0}
                     textShiftX={0}
                     textFontSize={13}
+                    style={{
+                        'bottom-margin': 20,  
+                    }}
                 />
             </ScrollView>
         </View>
