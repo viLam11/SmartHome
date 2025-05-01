@@ -7,12 +7,10 @@ import { DTOBarData, formatBarData } from '../CaculateData';
 const roomOptions = ['All', 'room1', 'room2', 'room3'];
 
 export function BarChartAnimated({ 
-  setRoom, 
-  setType, 
+  setRoom,
   barData
 }: { 
-  setRoom:(room: string) => void, 
-  setType: (type: string) => void, 
+  setRoom:(room: string) => void,
   barData: runningTimeDeviceType
 }) {
   const maxHeight = 160;
@@ -26,7 +24,6 @@ export function BarChartAnimated({
     setShowDropdown(false);
   };
   const data = formatBarData(barData);
-  console.log('barData', data);
   return (
     <View className='rounded-md mt-4 w-11/12 mx-auto'>
       <View className="justify-center items-center bg-[#333340] rounded-2xl p-4 pl-0 pl-1 shadow-md">

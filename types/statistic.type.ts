@@ -10,7 +10,6 @@ export type runningTimeOneDeviceType = {
 };
 
 export type summaryStatisticType = {
-    totalRuntime: string,
     deviceRatioType: deviceRatioType[]
 };
 export type deviceRatioType = {

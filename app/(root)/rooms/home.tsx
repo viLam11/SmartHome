@@ -46,7 +46,6 @@ export default function HomeIndex() {
               
                 const deviceActiveData = await getRoomDevices("4");
                 setDeviceActive(calculateActiveDevice(deviceActiveData));
-                console.log("deviceActive", deviceActive);
             } catch (error) {
               console.error("Error fetching room data:", error);
             } finally {

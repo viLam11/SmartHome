@@ -30,19 +30,18 @@ export default function Door() {
     useEffect(() => {
         
         const fetchCurrentStatus = async () => {
-
-        setLoading(true);
-        const token = await AsyncStorage.getItem("authToken")
-        setToken(token)
-        try {
-            const response = await getDeviceData(feedId as string);
-            setDoorData(response);
-            setStatus(response.value == '0' ? false : true) 
-        } catch (error) {
-            console.error("Error fetching device data:", error);
-        } finally {
-            setLoading(false);
-        }
+            setLoading(true);
+            const token = await AsyncStorage.getItem("authToken")
+            setToken(token)
+            try {
+                const response = await getDeviceData(feedId as string);
+                setDoorData(response);
+                setStatus(response.value == '0' ? false : true) 
+            } catch (error) {
+                console.error("Error fetching device data:", error);
+            } finally {
+                setLoading(false);
+            }
         };
         fetchCurrentStatus();
     }, [feedId]);
