@@ -11,6 +11,9 @@ import { RoomObject } from '@/types/room.type';
 import { getRoomDevices, deleteDevice } from '@/services/deviceService';
 import { getAllRoomService } from '@/services/roomService';
 import { useLoading } from '@/contexts/LoadingContext';
+
+import { calculateActiveDevice } from '@/components/CaculateData';
+import { deviceActiveWColorType } from '@/types/statistic.type';
 import ConfirmDelete from '@/components/ConfirmDelete';
 
 export default function Room() {
@@ -23,6 +26,8 @@ export default function Room() {
     const [deleteMode, setDeleteMode] = useState(false);
     const [deleteDeviceId, setDeleteDeviceId] = useState<number>(0);
     const [modal, setModal] = useState(false);
+
+    const [activesDevice, setActivesDevice] = useState<deviceActiveWColorType[]>([]);
 
     const roomId = useLocalSearchParams().id;
 
@@ -44,6 +49,7 @@ export default function Room() {
                 setLoading(true);
                 const response = await getRoomDevices(roomId as string);
                 setDeviceList(response);
+                setActivesDevice(calculateActiveDevice(response));
                 const roomList = await getAllRoomService();
                 const room = roomList.find((room: RoomObject) => room.id === Number(roomId));
                 if (room) {
@@ -127,14 +133,6 @@ export default function Room() {
                         const amount = devices.length;
                         const devicesRouter = DEVICE_FORMAT[key]['router'];
                         const displayTittle = DEVICE_FORMAT[key]['displayTittle'];
-                        let on = false;
-                        if (amount > 0) {
-                            devices.forEach((device) => {
-                                if (device.value !== '0' && device.value !== '#000000') {
-                                    on = true
-                                }
-                            })
-                        }
 
                         return (
                             <View key={key} className="w-1/2 flex flex-col">
