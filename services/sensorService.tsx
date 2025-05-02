@@ -29,9 +29,11 @@ export const fetchSensorDataByTime = async ({ startTime, endTime, feedKey }: { s
             return {
                 value: value,
                 dataPointText: value.toString(),
-                label: vnTime
+                label: vnTime,
+                hidden: value == 0.0 ? true : false
             };
         });
+        console.log("SENSOR DATA: ", sensorData);
         return sensorData   
     } catch (error) {
         return [];
@@ -59,8 +61,10 @@ export const fetchSensorDataByDay = async ({ startTime, endTime, feedId }: { sta
                 value: parseFloat(value.toFixed(2)), // Làm tròn còn 2 chữ số
                 dataPointText: parseFloat(value.toFixed(2)).toString(), // Giá trị hiển thị trên điểm dữ liệu
                 dataPointTextColor: "black", // Màu chữ hiển thị trên điểm dữ liệu
+                hidden: parseFloat(value.toFixed(2)) == 0.0 ? true : false
             };
         });
+        console.log("RESULT: ", result);
         return result;   
     } catch (error) {
         return {
