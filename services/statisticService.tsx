@@ -7,8 +7,10 @@ import { subDays } from 'date-fns';
 export const getStatisticService = async (feedId: string, endDate: Date | null): Promise<runningTimeOneDeviceType> => {
     try {
         const headers = await getAuthHeaders();
-        endDate = !endDate ? endDateData : new Date(endDate.setHours(23, 59, 59, 999));
-        const startDate = new Date(subDays(endDate, 6).setHours(0, 0, 0, 0));
+        endDate = endDate ? new Date(endDate.setUTCHours(23, 59, 59, 999)) : endDateData;
+        const startDate = new Date(subDays(endDate, 6).setUTCHours(0, 0, 0, 0));
+        console.log('startDate (UTC)', startDate.toISOString());
+        console.log('endDate (UTC)', endDate.toISOString());
 
         const response = await axios.post(
             `${process.env.EXPO_PUBLIC_API_URL}/statistic/device/${feedId}`,
