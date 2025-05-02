@@ -8,11 +8,7 @@ import { useLoading } from '@/contexts/LoadingContext';
 import dayjs from 'dayjs';
 
 
-const dumData = [
-    { value: 26.5, label: '10:00', dataPointText: '26.5' },
-    { value: 27.2, label: '11:00', dataPointText: '27.2' }
-]
-
+const dumData = [{"dataPointText": "0", "dataPointTextColor": "black", "hidden": true, "label": "24/04", "value": 0}, {"dataPointText": "0", "dataPointTextColor": "black", "hidden": true, "label": "25/04", "value": 0}, {"dataPointText": "0", "dataPointTextColor": "black", "hidden": true, "label": "26/04", "value": 0}, {"dataPointText": "26.02", "dataPointTextColor": "black", "hidden": false, "label": "27/04", "value": 26.02}, {"dataPointText": "26", "dataPointTextColor": "black", "hidden": false, "label": "28/04", "value": 26}, {"dataPointText": "26", "dataPointTextColor": "black", "hidden": false, "label": "29/04", "value": 26}, {"dataPointText": "26", "dataPointTextColor": "black", "hidden": false, "label": "30/04", "value": 26}, {"dataPointText": "26", "dataPointTextColor": "black", "hidden": false, "label": "01/05", "value": 26}, {"dataPointText": "26", "dataPointTextColor": "black", "hidden": false, "label": "02/05", "value": 26}]
 export default function SensorWeek({feedId}) {
     const {setLoading} = useLoading();  
     const [isVisible, setIsVisible] = useState(false);
