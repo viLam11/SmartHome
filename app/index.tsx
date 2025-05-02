@@ -5,11 +5,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import images from '@/constants/images';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Notifications from 'expo-notifications';
 
 export default function WelcomeScreen() {
     const router = useRouter();
     const [token, setToken] = useState<null | string>(null);
-    
     useEffect(() => {
         const loadToken = async () => {
             let t = await AsyncStorage.getItem('authToken');
@@ -19,6 +19,20 @@ export default function WelcomeScreen() {
         }
         loadToken();
     }, [])
+    
+    useEffect(() => {
+        const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+          console.log(
+            "🔔 Notification Response: ",
+            JSON.stringify(response.notification.request.content.data, null, 2)
+          );
+          
+          // Điều hướng khi người dùng bấm vào thông báo
+          router.push('/(root)/profile/notification');
+        });
+      
+        return () => subscription.remove();
+      }, []);
 
     return (
         <SafeAreaView className="flex-1 bg-white items-center justify-center">

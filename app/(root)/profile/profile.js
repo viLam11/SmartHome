@@ -86,8 +86,8 @@ export default function Profile() {
               <Text className='text-black text-2xl font-semibold ml-4'>
                 Hỗ trợ
               </Text>
-              <Link href="/explore" className="absolute right-4"> 
-                 <Text>dfd</Text>
+              <Link href="/(root)/profile/noti" className="absolute right-4"> 
+                 <Text>THÔNG BÁO</Text>
               </Link>
             </View>
             <View className="my-2">

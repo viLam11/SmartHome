@@ -8,6 +8,33 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { LoadingProvider, useLoading } from "../contexts/LoadingContext";
 import Loading from "../components/common/Loading";
+import * as Notifications from "expo-notifications";
+import { NotificationProvider } from "@/contexts/NotificationContext";
+import * as TaskManager from "expo-task-manager";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
+const BACKGROUND_NOTIFICATION_TASK = "BACKGROUND-NOTIFICATION-TASK";
+
+TaskManager.defineTask(
+  BACKGROUND_NOTIFICATION_TASK,
+  ({ data, error, executionInfo }) => {
+    console.log("✅ Received a notification in the background!", {
+      data,
+      error,
+      executionInfo,
+    });
+    // Do something with the notification data
+  }
+);
+Notifications.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK);
+SplashScreen.preventAutoHideAsync();
+
 
 function AppLayout() {
   const [isAuth, setIsAuth] = useState<boolean | null>(null);
@@ -46,9 +73,21 @@ function AppLayout() {
 }
 
 export default function RootLayout() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+      router.push('/(root)/profile/notification');
+    });
+  
+    return () => subscription.remove();
+  }, []);
+
   return (
-    <LoadingProvider>
-      <AppLayout />
-    </LoadingProvider>
+    <NotificationProvider>
+      <LoadingProvider>
+        <AppLayout />
+      </LoadingProvider>
+    </NotificationProvider>
   );
 }
