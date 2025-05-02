@@ -2,6 +2,7 @@ import axios from 'axios';
 // import { deviceData } from '../constants/data';
 import { deviceListObject, deviceStatusObject, deviceCreateObject } from '../types/device.type';
 import { getAuthHeaders } from './authService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 // Hàm tạo headers với Authorization token
@@ -21,6 +22,8 @@ export const getDeviceData = async (feedId: string): Promise<deviceStatusObject>
     try {
         const headers = await getAuthHeaders();
         const response = await axios.get(`${API_URL}/devices/${feedId}`, headers);
+        await AsyncStorage.setItem('deviceType', response.data.type);
+        await AsyncStorage.setItem('deviceTitle', response.data.title);
         return response.data;
         // return deviceData;
     } catch (error) {

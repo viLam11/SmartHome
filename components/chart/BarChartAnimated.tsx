@@ -1,58 +1,37 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, Modal, TouchableOpacity, FlatList } from 'react-native';
 import { BarChart, PieChart } from 'react-native-gifted-charts';
-import { timeADayObject } from '@/types/statistic.type';
+import { deviceRatioWColorType, runningTimeDeviceType } from '@/types/statistic.type';
+import { DTOBarData, formatBarData } from '../CaculateData';
 
-const typeOptions = ['light', 'fan', 'door'];
 const roomOptions = ['All', 'room1', 'room2', 'room3'];
 
-export function BarChartAnimated({ setRoom, setType, barData }: { setRoom:(room: string) => void, setType: (type: string) => void, barData: timeADayObject[] }) {
-  // const maxHeight = 160;
-  const [selectedType, setSelectedType] = useState('light');
+export function BarChartAnimated({ 
+  setRoom,
+  barData
+}: { 
+  setRoom:(room: string) => void,
+  barData: runningTimeDeviceType
+}) {
+  const maxHeight = 160;
   const [selectedRoom, setSelectedRoom] = useState('All');
   const [option, setOption] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
-
-  const handleSelectType = (type: string) => {
-    setSelectedType(type);
-    setType?.(type);
-    setShowDropdown(false);
-  };
+  
   const handleSelectRoom = (room: string) => {
     setSelectedRoom(room);
     setRoom?.(room);
     setShowDropdown(false);
   };
-
-  const data = barData.map((bar) => {
-    const opacity = Math.max(0.2, bar.value / 24);
-    const color = `rgba(128, 0, 128, ${opacity})`;
-
-    return {
-      value: bar.value,
-      label: bar.date,
-      frontColor: color,
-      spacing: 12,
-      barBorderRadius: 12,
-      labelTextStyle: {
-        fontSize: 12,
-        fontFamily: 'FiraCode-Regular',
-        color: 'black',
-      },
-    };
-  });
-
+  const data = formatBarData(barData);
   return (
     <View className='rounded-md mt-4 w-11/12 mx-auto'>
-      <View className="justify-center items-center bg-white rounded-2xl p-4 pl-1 shadow-md">
+      <View className="justify-center items-center bg-[#333340] rounded-2xl p-4 pl-0 pl-1 shadow-md">
         <View className='flex flex-row w-full items-end mb-2'>
           <View className='w-1/2'>
             <View className='flex flex-row'>
-              <Pressable onPress={() => {setShowDropdown(true); setOption('type')}}>
-                <Text className="text-md text-gray-500 font-semibold">{selectedType} ▼</Text>
-              </Pressable>
               <Pressable onPress={() => {setShowDropdown(true); setOption('room')}} className='ml-2'>
-                <Text className="text-md text-gray-500 font-semibold">{selectedRoom} ▼</Text>
+                <Text className="text-md text-white font-semibold">{selectedRoom} ▼</Text>
               </Pressable>
             </View>
 
@@ -63,15 +42,6 @@ export function BarChartAnimated({ setRoom, setType, barData }: { setRoom:(room:
                 onPressOut={() => setShowDropdown(false)}
               >
                 <View className="bg-white rounded-md w-40">
-                  {option==='type' && typeOptions.map((type) => (
-                    <TouchableOpacity
-                      key={type}
-                      onPress={() => handleSelectType(type)}
-                      className="px-4 py-2 border-b border-gray-200"
-                    >
-                      <Text className="text-gray-700">{type}</Text>
-                    </TouchableOpacity>
-                  ))}
                   {option==='room' && roomOptions.map((room) => (
                     <TouchableOpacity
                       key={room}
@@ -85,20 +55,19 @@ export function BarChartAnimated({ setRoom, setType, barData }: { setRoom:(room:
               </TouchableOpacity>
             </Modal>
           </View>
-
           <View className='w-1/2 items-end'>
-            <Text className="text-md text-gray-500 font-semibold">Running Time</Text>
+            <Text className="text-md text-white font-semibold">Running Time</Text>
           </View>
         </View>
 
         <BarChart
           data={data}
-          barWidth={20}
-          // noOfSections={6
-          // maxValue={24}
+          height={maxHeight}
+          noOfSections={6}
+          maxValue={24}
           isAnimated
           animationDuration={500}
-          yAxisTextStyle={{ fontSize: 12 }}
+          yAxisTextStyle={{ fontSize: 12, color: 'white' }}
           barBorderRadius={10}
           initialSpacing={10}
           yAxisThickness={0}
@@ -109,30 +78,73 @@ export function BarChartAnimated({ setRoom, setType, barData }: { setRoom:(room:
   );
 }
 
-export function PieChartAnimated({ pieData }: { pieData: { label: string, value: number }[] }) {  
-  const [containerWidth, setContainerWidth] = useState(0);
+export function PieChartAnimated({ pieData }: { pieData: deviceRatioWColorType[] }) {
+  const formattedPieData = pieData.map((item, index) => ({
+    value: item.value,
+    color: item.color,
+    label: item.label,
+    gradientCenterColor: item.gradientCenterColor || item.color,
+    focused: index === 0,
+  }));
+
+  const focusedItem = formattedPieData.find((item) => item.focused) || formattedPieData[0] || { value: 0, label: '' };
+
+  const renderDot = (color: string) => (
+    <View className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color, marginRight: 10 }} />
+  );
+
+  const renderLegendComponent = () => {
+    const pairs = [];
+    for (let i = 0; i < formattedPieData.length; i += 2) {
+      pairs.push(formattedPieData.slice(i, i + 2));
+    }
+
+    return (
+      <>
+        {pairs.map((pair, index) => (
+          <View key={index} className="flex-row justify-start mb-2.5">
+            {pair.map((item, idx) => (
+                <View
+                key={idx}
+                className={`flex-row items-center ${idx === 0 && pair.length > 1 ? 'mr-5' : ''} w-30`}
+                >
+                {renderDot(item.gradientCenterColor)}
+                <Text className="text-white">{`${item.label}: ${(item.value * 100).toFixed(0)}%`}</Text>
+              </View>
+            ))}
+          </View>
+        ))}
+      </>
+    );
+  };
+
   return (
-    <View className=""            
-      onLayout={(event) => {
-      const width = event.nativeEvent.layout.width;
-      setContainerWidth(width);
-      }}>
-      {containerWidth > 0 && (
-        <PieChart
-          data={pieData}
-          donut
-          radius={containerWidth / 2.2}
-          innerRadius={containerWidth  / 6}
-          showText
-          textColor="black"
-          focusOnPress
-          centerLabelComponent={() => (
-            <Text className="text-sm font-semibold text-center">
-            Total Uptime
-            </Text>
-          )}
-        />
-      )}
+    <View className="rounded-2xl bg-[#34448B] flex-1 mt-4 p-2 shadow-md">
+      <View className="m-5 p-4 rounded-2xl bg-[#232B5D]">
+        <Text className="text-white text-lg font-bold">Total Room Uptime</Text>
+        <View className="p-5 items-center">
+          <PieChart
+            data={formattedPieData}
+            donut
+            showGradient
+            sectionAutoFocus
+            radius={90}
+            innerRadius={60}
+            innerCircleColor="#232B5D"
+            showText
+            textColor="white"
+            textSize={12}
+            focusOnPress
+            centerLabelComponent={() => (
+              <View className="justify-center items-center">
+                <Text className="text-white text-2xl font-bold">{(focusedItem.value * 100).toFixed(0)}%</Text>
+                <Text className="text-white text-sm">{focusedItem.label}</Text>
+              </View>
+            )}
+          />
+        </View>
+        {renderLegendComponent()}
+      </View>
     </View>
-  )
+  );
 }
