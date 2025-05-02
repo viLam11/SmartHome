@@ -65,7 +65,7 @@ export const connectAndSend = async () => {
     // Gửi thử 1 message
     const message = new Message('1');
     message.destinationName = 'olivia0307/feeds/bbc-led';
-    client.send(message);
+    client.send(message);g
     console.log('📤 Message sent');
   } catch (err) {
     console.log('❌ Connection or subscription error:', err);

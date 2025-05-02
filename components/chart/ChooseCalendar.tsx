@@ -22,11 +22,6 @@ export default function ChooseCalendar({ startDate, endDate, setOpen }: any) {
             </Text>
           </View>
         </View>
-        <View className="w-2/12 flex items-center justify-center">
-          <IconSymbol name="calendar" color="black" />
-        </View>
-      </View>
-    </TouchableOpacity>
-
+      </TouchableOpacity>
   )
 }

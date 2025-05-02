@@ -65,11 +65,12 @@ export default function HomeIndex() {
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={{ flex: 1 }}
         >
-            <View className="min-h-screen">
-                <ScrollView contentContainerStyle={{ flexGrow: 1 }} className='min-h-screen flex flex-col'>
+            <View className="flex-1">
+                <ScrollView className='flex flex-col'>
                     {modal || imageMode ? <View className="absolute top-0 left-0 z-10 w-full h-full bg-black/50" /> : <></>}
 
                     <View className={`m-2 ${modal ? 'min-h-screen' : ' min-h-screen'}`}>
+
                         <View className="flex-grow mx-2">
                             <View className="flex flex-row justify-between">
                                 <Text className="text-2xl font-extrabold mb-4">My Rooms</Text>
@@ -95,15 +96,6 @@ export default function HomeIndex() {
                                     }
                                 </View>
                             </View>
-                            {allRoomData && allRoomData.map((room, index) => (
-                                <View>
-                                    <TouchableOpacity key={index} onPress={() => { router.push(`/rooms/${room.id}`) }}>
-                                        <Room key={index} deleteMode={deleteMode} setDeleteMode={setDeleteMode} id={room.id} img={images.home1} title={room.title} allDeviceCount={calculateDeviceNumber(room)} lightCount={room.lightCount} lightStatus={room.lightStatus} fanCount={room.fanCount} fanStatus={room.fanStatus} sensorCount={room.sensorCount} sensorStatus={room.sensorStatus} doorCount={room.doorCount} doorStatus={room.doorStatus} />
-                                    </TouchableOpacity>
-                                </View>
-                            ))}
-                        </View>
-                        
                         <View className="grid grid-cols-2 gap-2 mt-5 mb-5">
                             {deviceActive.map((device, index) => (
                                 
@@ -118,12 +110,15 @@ export default function HomeIndex() {
                             </View>
                             ))}
                         </View>
-
-                        <View className="h-28">
-                            <View className="w-full bottom-2">
-                                <Navigation current={2} />
-                            </View>
+                            {allRoomData && allRoomData.map((room, index) => (
+                                <View>
+                                    <TouchableOpacity key={index} onPress={() => { router.push(`/rooms/${room.id}`) }}>
+                                        <Room key={index} deleteMode={deleteMode} setDeleteMode={setDeleteMode} id={room.id} img={images.home1} title={room.title} allDeviceCount={calculateDeviceNumber(room)} lightCount={room.lightCount} lightStatus={room.lightStatus} fanCount={room.fanCount} fanStatus={room.fanStatus} sensorCount={room.sensorCount} sensorStatus={room.sensorStatus} doorCount={room.doorCount} doorStatus={room.doorStatus} />
+                                    </TouchableOpacity>
+                                </View>
+                            ))}
                         </View>
+
                     </View>
                 </ScrollView>
                 <Modal
@@ -150,6 +145,10 @@ export default function HomeIndex() {
                         }
                     </KeyboardAvoidingView>
                 </Modal>
+                
+                <View className="absolute w-full bottom-2">
+                    <Navigation current={2} />
+                </View>
             </View>
         </KeyboardAvoidingView>
     )
