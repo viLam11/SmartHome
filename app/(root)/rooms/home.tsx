@@ -96,20 +96,7 @@ export default function HomeIndex() {
                                     }
                                 </View>
                             </View>
-                        <View className="grid grid-cols-2 gap-2 mt-5 mb-5">
-                            {deviceActive.map((device, index) => (
-                                
-                                <View key={index} className={`rounded-2xl shadow-md ${device.color} `}>
-                                <View className={`items-center`}>
-                                    <Text className="text-lg font-semibold text-white">{device.type}</Text>
-                                </View>
-                                <View className={`rounded-b-2xl shadow-md bg-white items-center`}>
-                                    <Text className="">Active: {device.active}</Text>
-                                    <Text className="">Inactive: {device.inactive}</Text>
-                                </View>
-                            </View>
-                            ))}
-                        </View>
+                       
                             {allRoomData && allRoomData.map((room, index) => (
                                 <View>
                                     <TouchableOpacity key={index} onPress={() => { router.push(`/rooms/${room.id}`) }}>

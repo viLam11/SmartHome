@@ -4,13 +4,14 @@ import DateTimePicker, { DateType, useDefaultStyles } from 'react-native-ui-date
 import dayjs from 'dayjs';
 import { IconSymbol } from './ui/IconSymbol';
 
-export function SelectDayRange({selectedDates, setSelectedDates, onCancel, onConfirm, isVisible, setIsVisible}) {
+export function SelectDayRange({ selectedDates, setSelectedDates, onCancel, onConfirm }) {
+    const [isVisible, setIsVisible] = useState(false);
     const defaultStyles = useDefaultStyles();
-    
+
     return (
         <View>
             <View className='flex flex-row w-11/12 mx-auto border rounded-lg items-center max-h-12'>
-                <View className=" w-4/5 rounded-lg p-3 flex flex-row  mx-autoitems-center justify-center">    
+                <View className=" w-4/5 rounded-lg p-3 flex flex-row  mx-autoitems-center justify-center">
                     <View className="text-center ">
                         <Text className="text-center">{selectedDates.startDate.format('DD MMM, YYYY')}</Text>
                     </View>
@@ -22,13 +23,13 @@ export function SelectDayRange({selectedDates, setSelectedDates, onCancel, onCon
                     </View>
                 </View>
                 <View className="mx-auto w-1/5 h-full jusitfy-center items-center rounded-lg">
-                    <TouchableOpacity onPress={() => { 
-                        setSelectedDates({
-                            startDate: dayjs(new Date()),
-                            endDate: dayjs(new Date()),
-                        })
-                        setIsVisible(!isVisible) 
-                        }}>
+                    <TouchableOpacity onPress={() => {
+                        // setSelectedDates({
+                        //     startDate: dayjs(new Date()),
+                        //     endDate: dayjs(new Date()),
+                        // })
+                        setIsVisible(!isVisible);
+                    }}>
                         <View className='w-full h-full mx-auto justify-center items-center'>
                             <IconSymbol name="calendar" color="black" />
                         </View>
@@ -42,7 +43,7 @@ export function SelectDayRange({selectedDates, setSelectedDates, onCancel, onCon
                         startDate={selectedDates.startDate}
                         endDate={selectedDates.endDate}
                         onChange={({ startDate, endDate }) => {
-                            const finalEndDate = endDate ?? startDate; 
+                            const finalEndDate = endDate ?? startDate;
                             setSelectedDates({
                                 startDate: dayjs(startDate),
                                 endDate: dayjs(endDate),
@@ -63,9 +64,9 @@ export function SelectDayRange({selectedDates, setSelectedDates, onCancel, onCon
                                 borderRadius: 8,
                             },
                             'selected_month': { backgroundColor: '#B7D5EE', borderRadius: 0 },
-                            'months': {textTransform: 'capitalize'},
-                            'month_label': {textTransform: 'capitalize'},
-                            'month': { fontWeight: 'bold', fontSize: 16,  textTransform: 'uppercase' },
+                            'months': { textTransform: 'capitalize' },
+                            'month_label': { textTransform: 'capitalize' },
+                            'month': { fontWeight: 'bold', fontSize: 16, textTransform: 'uppercase' },
                             'month_selector_label': { fontWeight: 'bold', color: 'black', fontSize: 14, textTransform: 'uppercase' },
                             'year_selector_label': { fontWeight: 'bold', color: 'black', fontSize: 14 },
                             'header': { fontFamily: 'Arial', fontSize: 16, color: '#1c1c1e', textTransform: 'uppercase' },
@@ -79,11 +80,11 @@ export function SelectDayRange({selectedDates, setSelectedDates, onCancel, onCon
                             'start_date': {
                                 backgroundColor: '#007AFF',
                                 borderRadius: 0,
-                                },
-                                'start_date_label': {
+                            },
+                            'start_date_label': {
                                 color: '#fff',
                                 fontWeight: 'bold',
-                                },
+                            },
                         }}
                     />
                     <View className="flex flex-row items-center justify-center w-11/12 mx-auto mb-2 mt-safe-or-2">
@@ -94,7 +95,7 @@ export function SelectDayRange({selectedDates, setSelectedDates, onCancel, onCon
                         </View>
                         <View className=" bg-blue-500 p-2 ml-2 w-20 items-center ">
                             <TouchableOpacity onPress={onConfirm}>
-                               <Text className='text-white font-bold text-md uppercase'>Lưu</Text>
+                                <Text className='text-white font-bold text-md uppercase'>Lưu</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
