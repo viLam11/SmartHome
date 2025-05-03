@@ -2,8 +2,9 @@ import { subDays, format, addDays } from 'date-fns';
 import { runningTimeDeviceType, runningTimeOneDeviceType, summaryStatisticType } from '@/types/statistic.type';
 import dayjs from 'dayjs';
 
-export const endDateData = new Date(subDays(new Date(), 1).setUTCHours(23, 59, 59, 999));
-export const startDateData =  new Date(subDays(endDateData, 6).setUTCHours(0, 0, 0, 0));
+const now = new Date();
+export const endDateData = now.getHours() > 7 ? now : new Date(subDays(now, 1));
+export const startDateData =  new Date(subDays(endDateData, 6));
 
 export const runningTime: runningTimeOneDeviceType = Object.fromEntries(
   Array.from({ length: 7 }, (_, i) => {

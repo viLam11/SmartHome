@@ -1,57 +1,64 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Pressable, Modal, TouchableOpacity, FlatList } from 'react-native';
 import { BarChart, PieChart } from 'react-native-gifted-charts';
 import { deviceRatioWColorType, runningTimeDeviceType } from '@/types/statistic.type';
 import { DTOBarData, formatBarData } from '../CaculateData';
+import { set } from 'date-fns';
 
-const roomOptions = ['All', 'room1', 'room2', 'room3'];
-
-export function BarChartAnimated({ 
-  setRoom,
+export function BarChartAnimated({
+  roomOptions,
+  setRoomOptionBar,
   barData
-}: { 
-  setRoom:(room: string) => void,
+}: {
+  roomOptions: { title: string; id: number }[],
+  setRoomOptionBar: (roomOption: { title: string; id: number }) => void,
   barData: runningTimeDeviceType
 }) {
   const maxHeight = 160;
-  const [selectedRoom, setSelectedRoom] = useState('All');
-  const [option, setOption] = useState('');
+  const [selectedRoom, setSelectedRoom] = useState(roomOptions[0]?.title || '');
   const [showDropdown, setShowDropdown] = useState(false);
-  
-  const handleSelectRoom = (room: string) => {
-    setSelectedRoom(room);
-    setRoom?.(room);
+  const handleSelectRoom = (option: { title: string; id: number }) => {
+    setSelectedRoom(option.title);
+    setRoomOptionBar(option);
     setShowDropdown(false);
   };
   const data = formatBarData(barData);
+
+  useEffect(() => {
+    setSelectedRoom(roomOptions[0]?.title || '');
+  },[roomOptions]);
   return (
     <View className='rounded-md mt-4 w-11/12 mx-auto'>
       <View className="justify-center items-center bg-[#333340] rounded-2xl p-4 pl-0 pl-1 shadow-md">
         <View className='flex flex-row w-full items-end mb-2'>
           <View className='w-1/2'>
-            <View className='flex flex-row'>
-              <Pressable onPress={() => {setShowDropdown(true); setOption('room')}} className='ml-2'>
+            {roomOptions.length > 0 && (
+              <View className='flex flex-row'>
+                <Pressable onPress={() => setShowDropdown(true)} className='ml-2'>
                 <Text className="text-md text-white font-semibold">{selectedRoom} ▼</Text>
-              </Pressable>
-            </View>
+                </Pressable>
+              </View>
+              )}
 
             <Modal visible={showDropdown} transparent animationType="fade">
               <TouchableOpacity
-                style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000088' }}
-                activeOpacity={1}
-                onPressOut={() => setShowDropdown(false)}
+              style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#00000088' }}
+              activeOpacity={1}
+              onPressOut={() => setShowDropdown(false)}
               >
-                <View className="bg-white rounded-md w-40">
-                  {option==='room' && roomOptions.map((room) => (
-                    <TouchableOpacity
-                      key={room}
-                      onPress={() => handleSelectRoom(room)}
-                      className="px-4 py-2 border-b border-gray-200"
-                    >
-                      <Text className="text-gray-700">{room}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
+              <View className="bg-white rounded-md w-40">
+                {roomOptions.map((option) => (
+                <TouchableOpacity
+                  key={option.id}
+                  onPress={() => {
+                  handleSelectRoom(option);
+                  }}
+                  className="px-4 py-2 border-b border-gray-200"
+                >
+                  <Text className="text-gray-700">{option.title}</Text>
+                </TouchableOpacity>
+                ))}
+              </View>
               </TouchableOpacity>
             </Modal>
           </View>

@@ -67,6 +67,28 @@ export const DTOBarData = (OriginData: runningTimeDeviceType) => { // Origindata
   );
 };
 
+const reorderDTOData: (DTOData: { date: string; value: number }[]) => { date: string; value: number }[] = (DTOData) => {
+  if (DTOData.length <= 1) {
+    return [...DTOData];
+  }
+
+  const generateCustomIndices = (length: number): number[] => {
+    const indices: number[] = [];
+    const half = Math.floor(length / 2);
+    for (let i = 0; i < half; i++) {
+      indices.push(i);
+      indices.push(i + half);
+    }
+    if (length % 2 !== 0) {
+      indices.push(half);
+    }
+    return indices;
+  };
+
+  const customIndices = generateCustomIndices(DTOData.length);
+  return customIndices.map((index) => DTOData[index]);
+};
+
 export const formatBarData = (OriginData: runningTimeDeviceType) => {
   const DTOData = DTOBarData(OriginData); //DTOData: [{date: "25/04", value: 7.615}, ...]
   const keys = Object.keys(OriginData);
@@ -94,14 +116,15 @@ export const formatBarData = (OriginData: runningTimeDeviceType) => {
       };
     });
   }
-  return DTOData.map((bar, index) => {
+  const reorderedDTOData = reorderDTOData(DTOData);
+  
+  return reorderedDTOData.map((bar, index) => {
     const isEven = index % 2 === 0;
     const numericValue = Number(bar.value);
     const opacity = 1;
     const color = isEven
       ? `rgba(255, 80, 80, ${opacity})`
       : `rgba(0, 102, 204, ${opacity})`;
-
     return {
       value: numericValue,
       frontColor: color,

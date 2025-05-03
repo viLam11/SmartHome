@@ -4,55 +4,13 @@ import { runningTimeDeviceType, runningTimeOneDeviceType, summaryStatisticType }
 import { getAuthHeaders } from './authService';
 import { subDays } from 'date-fns';
 
-export const getStatisticService = async (feedId: string, endDate: Date | null): Promise<runningTimeOneDeviceType> => {
+export const getTotaltimeOneDeviceService = async (feedId: string, endDate: Date): Promise<{ total: number }> => {
     try {
         const headers = await getAuthHeaders();
-        endDate = endDate ? new Date(endDate.setUTCHours(23, 59, 59, 999)) : endDateData;
-        const startDate = new Date(subDays(endDate, 6).setUTCHours(0, 0, 0, 0));
-        console.log('startDate (UTC)', startDate.toISOString());
-        console.log('endDate (UTC)', endDate.toISOString());
+        endDate = new Date(endDate.setHours(6, 59, 59, 999));
+        const startDate = new Date(subDays(endDate, 7).setHours(7, 0, 0, 0));
 
-        const response = await axios.post(
-            `${process.env.EXPO_PUBLIC_API_URL}/statistic/device/${feedId}`,
-            {
-                start: startDate.toISOString(),
-                end: endDate ? endDate.toISOString() : new Date().toISOString(),
-            },
-            headers
-        );
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching statistic:', error);
-        throw error;
-    }
-}
-
-export const getSummaryDeviceStatisticService = async (roomId: string, endDate: Date | null): Promise<runningTimeDeviceType> => {
-    try {
-        const headers = await getAuthHeaders();
-        // if (roomId === 'All') {
-        //     const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/statistic/rooms`, headers);
-        //     return response.data;
-        // }
-        // else {
-        //     const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/statistic/room/${roomId}`, headers);
-        //     return response.data;
-        // }
-        const response = runningTimeDeviceData;
-        return response;
-    } catch (error) {
-        console.error('Error fetching statistic:', error);
-        throw error;
-    }
-}
-
-export const getDeviceKindUptimeService = async (roomId: string, deviceType: string, endDate: Date | null): Promise<{ total: number }> => {
-    try {
-        const headers = await getAuthHeaders();
-        endDate = !endDate ? endDateData : new Date(endDate.setHours(23, 59, 59, 999));
-        const startDate = new Date(subDays(endDate, 6).setHours(0, 0, 0, 0));
-
-        const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/statistic/rooms/${roomId}/${deviceType}`,
+        const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/statistic/device/${feedId}/total`,
             {
                 start: startDate.toISOString(),
                 end: endDate ? endDate.toISOString() : new Date().toISOString(),
@@ -65,12 +23,83 @@ export const getDeviceKindUptimeService = async (roomId: string, deviceType: str
     }
 }
 
-export const getRoomsUptimeService = async (roomId: string, type: string, endDate: Date | null): Promise<summaryStatisticType> => {
+export const getRunningTimeOneDeviceService = async (feedId: string, endDate: Date): Promise<runningTimeOneDeviceType> => {
+    try {
+        const headers = await getAuthHeaders();
+        endDate = new Date(endDate.setHours(6, 59, 59, 999));
+        const startDate = new Date(subDays(endDate, 7).setHours(7, 0, 0, 0));
+
+        const response = await axios.post(
+            `${process.env.EXPO_PUBLIC_API_URL}/statistic/device/${feedId}`,
+            {
+                start: startDate.toISOString(),
+                end: endDate.toISOString(),
+            },
+            headers
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching statistic:', error);
+        throw error;
+    }
+}
+
+/////////////////////////////////////////// Summary Statistic ///////////////////////////////////////////
+
+export const getDeviceKindTotaltimeService = async (roomId: number | null, deviceType: string, endDate: Date): Promise<{ total: number }> => {
+    try {
+        if (roomId === null) return { total: 0 };
+        const headers = await getAuthHeaders();
+        endDate = new Date(endDate.setHours(6, 59, 59, 999));
+        const startDate = new Date(subDays(endDate, 7).setHours(7, 0, 0, 0));
+        // if (roomId === -1) {
+        //     const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/statistic/rooms/${roomId}/${deviceType}`,
+        //         {
+        //             start: startDate.toISOString(),
+        //             end: endDate.toISOString(),
+        //         },
+        //         headers);
+        //     return response.data;
+        // }
+        const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/statistic/rooms/${roomId}/${deviceType}`,
+            {
+                start: startDate.toISOString(),
+                end: endDate.toISOString(),
+            },
+            headers);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching statistic:', error);
+        throw error;
+    }
+}
+
+export const getRunningTimeAllDeviceService = async (roomId: number, endDate: Date): Promise<runningTimeDeviceType> => {
+    try {
+        const headers = await getAuthHeaders();
+        endDate = new Date(endDate.setHours(6, 59, 59, 999));
+        const startDate = new Date(subDays(endDate, 7).setHours(7, 0, 0, 0));
+
+        const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/statistic/rooms/${roomId}`, 
+            {
+                start: startDate.toISOString(),
+                end: endDate.toISOString(),
+            },
+            headers);
+        return response.data;
+        // const response = runningTimeDeviceData;
+        // return response;
+    } catch (error) {
+        console.error('Error fetching statistic:', error);
+        throw error;
+    }
+}
+
+export const getRoomsUptimeService = async (roomId: number, type: string, endDate: Date): Promise<summaryStatisticType> => {
     try {
         // const headers = await getAuthHeaders();
         // const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/statistic/rooms`, headers);
         const response = summaryStatisticData;
-        console.log('response', response);
         return response;
     } catch (error) {
         console.error('Error fetching statistic:', error);

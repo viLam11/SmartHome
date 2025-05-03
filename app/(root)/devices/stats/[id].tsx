@@ -1,33 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ScrollView, View, Text, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import DeviceHeader from '@/components/device/DeviceHeader';
-import { getStatisticService } from '@/services/statisticService';
-import { runningTimeDeviceType, runningTimeOneDeviceType } from '@/types/statistic.type';
+import { getRunningTimeOneDeviceService, getTotaltimeOneDeviceService } from '@/services/statisticService';
+import { runningTimeDeviceType } from '@/types/statistic.type';
 import { useLoading } from '@/contexts/LoadingContext';
 import Navigation from '@/components/Navigation';
 import { BarChartAnimated } from '@/components/chart/BarChartAnimated';
 import ChooseCalendar from '@/components/chart/ChooseCalendar';
-import { DatePickerModal } from 'react-native-paper-dates';
-import { currentTime } from '@/constants/statistic';
+import { currentTime, endDateData } from '@/constants/statistic';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import dayjs from 'dayjs';
 
 export default function Statistic() {
-  const feedId = useLocalSearchParams().id;
+  const feedId = useLocalSearchParams().id as string;
   const { setLoading } = useLoading();
   const [deviceData, setDeviceData] = useState<runningTimeDeviceType | null>(null);
   const [deviceType, setDeviceType] = useState<string | null>(null);
   const [deviceTitle, setDeviceTitle] = useState<string | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const [open, setOpen] = useState(false);
-  
+  const [runningTime, setRunningTime] = useState<string>("0");
+  const [endDate, setEndDate] = useState<Date>(endDateData);
 
-  const fetchStatistic = async (id: string, endDate: Date | null) => {
+  
+  const outStand = [
+    { key: "Total Run Time Of Device:", value: runningTime + " Hours" },
+    { key: "Most Active Day:", value: "no1" },
+    { key: "Least Active Day:", value: "no2" },
+  ];
+
+  const fetchDeviceSummary = async (feedId: string, endDate: Date) => {
     setLoading(true);
     try {
-      const response = await getStatisticService(id, endDate);
-      // console.log('transformedData', transformedData);
+      const response = await getRunningTimeOneDeviceService(feedId, endDate);
       const fetchedDeviceType = await AsyncStorage.getItem('deviceType');
       const fetchedDeviceTitle = await AsyncStorage.getItem('deviceTitle');
       
@@ -52,61 +55,63 @@ export default function Statistic() {
     }
   };
 
-
   
+  const fetchDeviceTotaltime = useCallback(
+    async (feedId: string, endDate: Date) => {
+      try {
+        const deviceData = await getTotaltimeOneDeviceService(feedId, endDate);
+        setRunningTime(deviceData.total.toString());
+      } catch (err) {
+        console.error('Error fetching device uptime:', err);
+        setRunningTime('0');
+      }
+    },
+    [deviceType, endDate]
+  );
+
   useEffect(() => {
-    if (!feedId) return;
-    fetchStatistic(feedId as string, null);
-  }, [feedId]);
+    const fetchData = async () => {
+      try {
+        if (feedId && endDate) {
+          await Promise.all([
+            fetchDeviceSummary(feedId, endDate),
+            fetchDeviceTotaltime(feedId, endDate)
+          ]);
+        }
+      } catch (error) {
+        console.error("Error in useEffect fetchData:", error);
+      }
+    };
 
-  useEffect(() => {
-    if (feedId && endDate) {
-      fetchStatistic(feedId as string, endDate);
-    }
-  }, [endDate]);
+    fetchData();
+  }, [feedId, endDate]);
 
-  const onDismiss = () => {
-    setOpen(false);
-  };
-  
-  const onConfirm = ({ date }: { date: Date | undefined }) => {
-    const newEnd = dayjs(date).endOf('day').toDate();
-  
-    setEndDate(newEnd);
-    setOpen(false);
-  };
 
   return (
     <View className="flex-1 bg-white">
-      <ScrollView>
+      <ScrollView className='p-2'>
         <DeviceHeader
           status={3}
           feedId={+feedId}
           title={deviceData ? `${deviceType} ${deviceTitle}` : null}
         />
         <ChooseCalendar 
-          startDate={deviceData ? Object.keys(deviceData[Object.keys(deviceData)[0]])[0] : null} 
-          endDate={deviceData ? Object.keys(deviceData[Object.keys(deviceData)[0]]).slice(-1)[0] : null} 
-          setOpen={setOpen} 
+          endDate={endDate}
+          setEndDate={setEndDate}
         />
-        
-        <View className="flex flex-col w-9/12 mt-4 mx-auto p-1 bg-white justify-center items-center">
-         <Text className="text-2xl color-black">{currentTime.hour} Giờ, {currentTime.minute} Phút</Text>
-         <Text className="text-lg color-black-200">{currentTime.dayOfWeek}, {currentTime.day} {currentTime.month}</Text>
+
+        <BarChartAnimated roomOptions={[]} setRoomOptionBar={() => {}} barData={deviceData ?? {}} />
+
+        <View className="w-full mt-4 bg-green-100 p-2 rounded-md shadow-lg">
+        {outStand.map((item, index) => (
+          <View key={index} className='flex flex-col items-center mt-2'>
+            <Text className="text-sm">{item.key}</Text>
+            <Text className='text-lg font-semibold'>{item.value}</Text>
+          </View>
+        ))}
         </View>
-        <BarChartAnimated setRoom={() => {}} barData={deviceData ?? {}} />
+
       </ScrollView>
-
-      <DatePickerModal
-        locale="en"
-        mode="single"
-        visible={open}
-        onDismiss={onDismiss}
-        date={endDate ?? new Date()}
-        onConfirm={onConfirm}
-        validRange={{ endDate: dayjs().subtract(2, 'day').toDate() }}
-      />
-
 
       <View className="absolute bottom-2 w-full">
         <Navigation current={2} />
