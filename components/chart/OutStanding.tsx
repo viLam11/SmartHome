@@ -5,7 +5,7 @@ import { deviceRatioWColorType } from '@/types/statistic.type';
 import { PieChartAnimated } from '@/components/chart/BarChartAnimated';
 
 const deviceTypeOptions = [
-    { title: 'All', value: 'all' },
+    { title: 'All devices', value: '-1' },
     { title: 'Light', value: 'light' },
     { title: 'Fan', value: 'fan' },
 ];

@@ -52,15 +52,15 @@ export const getDeviceKindTotaltimeService = async (roomId: number | null, devic
         const headers = await getAuthHeaders();
         endDate = new Date(endDate.setHours(6, 59, 59, 999));
         const startDate = new Date(subDays(endDate, 7).setHours(7, 0, 0, 0));
-        // if (roomId === -1) {
-        //     const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/statistic/rooms/${roomId}/${deviceType}`,
-        //         {
-        //             start: startDate.toISOString(),
-        //             end: endDate.toISOString(),
-        //         },
-        //         headers);
-        //     return response.data;
-        // }
+        if (roomId === -1) {
+            const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/statistic/rooms/total`,
+                {
+                    start: startDate.toISOString(),
+                    end: endDate.toISOString(),
+                },
+                headers);
+            return response.data;
+        }
         const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/statistic/rooms/${roomId}/${deviceType}`,
             {
                 start: startDate.toISOString(),
@@ -79,7 +79,16 @@ export const getRunningTimeAllDeviceService = async (roomId: number, endDate: Da
         const headers = await getAuthHeaders();
         endDate = new Date(endDate.setHours(6, 59, 59, 999));
         const startDate = new Date(subDays(endDate, 7).setHours(7, 0, 0, 0));
-
+        
+        if (roomId === -1) {
+            const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/statistic/rooms`,
+                {
+                    start: startDate.toISOString(),
+                    end: endDate.toISOString(),
+                },
+                headers);
+            return response.data;
+        }
         const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/statistic/rooms/${roomId}`, 
             {
                 start: startDate.toISOString(),
@@ -100,7 +109,7 @@ export const getRoomsUptimeService = async (type: string, endDate: Date): Promis
         const headers = await getAuthHeaders();
         endDate = new Date(endDate.setHours(6, 59, 59, 999));
         const startDate = new Date(subDays(endDate, 7).setHours(7, 0, 0, 0));
-        if (type === 'all') type = 'total';
+        if (type === '-1') type = 'total';
         const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/statistic/graph/${type}`, 
             {
                 start: startDate.toISOString(),

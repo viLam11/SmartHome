@@ -11,12 +11,11 @@ import { deviceRatioWColorType, runningTimeDeviceType } from '@/types/statistic.
 import { getAllRoomService } from '@/services/roomService';
 import { Outstanding } from '@/components/chart/OutStanding';
 import { formatPieData } from '@/components/CaculateData';
-import { set } from 'date-fns';
 
 export default function StatisticSummary() {
   const { setLoading } = useLoading();
-  const [deviceType, setDeviceType] = useState<{ title: string, value: string}>({ title: 'All', value: 'all' });
-  const [roomOptionBar, setRoomOptionBar] = useState<{ title: string; id: number }>({ title: '', id: 0 });
+  const [deviceType, setDeviceType] = useState<{ title: string, value: string}>({ title: 'All devices', value: '-1' });
+  const [roomOptionBar, setRoomOptionBar] = useState<{ title: string; id: number }>({ title: 'All rooms', id: -1 });
   const [deviceData, setDeviceData] = useState<runningTimeDeviceType | null>(null);
   const [runningTime, setRunningTime] = useState<string>("");
   const [deviceRatio, setDeviceRatio] = useState<deviceRatioWColorType[]>([]);
@@ -24,7 +23,7 @@ export default function StatisticSummary() {
   const [roomOptions, setRoomOptions] = useState<{ title: string; id: number }[]>([]);
   
   const fetchDeviceSummary = useCallback(
-    async ( endDate: Date) => {
+    async (roomOptionBar: { title: string; id: number }, endDate: Date) => {
       try {
         const deviceRunningTime = await getRunningTimeAllDeviceService(roomOptionBar.id, endDate);
         setDeviceData(deviceRunningTime);
@@ -73,8 +72,8 @@ export default function StatisticSummary() {
   );
   
   const fetchStatistic = useCallback(
-    async (roomsOptionData : { title: string; id: number }[] , deviceType: { title: string, value: string}, endDate: Date) => {
-      await Promise.all([fetchDeviceSummary(endDate), fetchDeviceTotaltime(deviceType, endDate), fetchRoomsUptime( roomsOptionData, deviceType, endDate)]);
+    async (roomsOptionData : { title: string; id: number }[], roomOptionBar: { title: string; id: number }, deviceType: { title: string, value: string}, endDate: Date) => {
+      await Promise.all([fetchDeviceSummary(roomOptionBar, endDate), fetchDeviceTotaltime(deviceType, endDate), fetchRoomsUptime( roomsOptionData, deviceType, endDate)]);
     },
     [fetchDeviceSummary, fetchDeviceTotaltime, fetchRoomsUptime]
   );
@@ -84,7 +83,8 @@ export default function StatisticSummary() {
       const response = await getAllRoomService();
       if (!response) throw new Error("Failed to fetch image");
       const data = response.map((roomOption) => ({ title: roomOption.title, id: roomOption.id }));
-      setRoomOptions(data);
+      const updatedData = [{ title: 'All rooms', id: -1 }, ...data];
+      setRoomOptions(updatedData);
       setRoomOptionBar({ title: response[0].title, id: response[0].id });
       return data;
     } catch (error) {
@@ -98,7 +98,7 @@ export default function StatisticSummary() {
       try {
         const roomsOptionData = await fetchRoomData();
         if (!roomsOptionData) return;
-        await fetchStatistic( roomsOptionData, deviceType, endDateData);
+        await fetchStatistic(roomsOptionData, roomOptionBar, deviceType, endDateData);
       } catch (error) {
         console.error('Error in fetchData:', error);
       } finally {
@@ -111,8 +111,18 @@ export default function StatisticSummary() {
 
   useEffect(() => {
     if (endDate) {
-      fetchStatistic(roomOptions, deviceType, endDate);
+      fetchDeviceSummary(roomOptionBar, endDate);
     }
+  }, [roomOptionBar, endDate]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (endDate) {
+        if (roomOptions.length === 0) return;
+        await Promise.all([fetchDeviceTotaltime(deviceType, endDate), fetchRoomsUptime(roomOptions, deviceType, endDate)]);
+      }
+    };
+    fetchData();
   }, [deviceType, endDate]);
 
   return (

@@ -8,7 +8,7 @@ export default function ChooseCalendar({ endDate, setEndDate }: {endDate: Date, 
   const [isPickerVisible, setPickerVisible] = useState(false);
   const adjustedEndDate = endDate ? dayjs(endDate).subtract(7, 'hour').toDate() : null;
   const onConfirm = ({ date }: { date: Date | undefined }) => {
-    const newEnd = dayjs(date).endOf('day').toDate();
+    const newEnd = dayjs(date).add(1, 'day').set('hour', 6).set('minute', 59).set('second', 59).set('millisecond', 999).toDate();
     setEndDate(newEnd);
     setPickerVisible(false);
   };

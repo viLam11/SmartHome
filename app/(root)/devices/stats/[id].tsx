@@ -10,21 +10,24 @@ import { BarChartAnimated } from '@/components/chart/BarChartAnimated';
 import ChooseCalendar from '@/components/chart/ChooseCalendar';
 import { currentTime, endDateData } from '@/constants/statistic';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { caculateMostAndLeastActiveDevice } from '@/components/CaculateData';
 
 export default function Statistic() {
   const feedId = useLocalSearchParams().id as string;
   const { setLoading } = useLoading();
-  const [deviceData, setDeviceData] = useState<runningTimeDeviceType | null>(null);
+  const [deviceData, setDeviceData] = useState<runningTimeDeviceType>({});
   const [deviceType, setDeviceType] = useState<string | null>(null);
   const [deviceTitle, setDeviceTitle] = useState<string | null>(null);
   const [runningTime, setRunningTime] = useState<string>("0");
+  const [mostActive, setMostActive] = useState<string>("0");
+  const [leastActive, setLeastActive] = useState<string>("0");
   const [endDate, setEndDate] = useState<Date>(endDateData);
 
   
   const outStand = [
     { key: "Total Run Time Of Device:", value: runningTime + " Hours" },
-    { key: "Most Active Day:", value: "no1" },
-    { key: "Least Active Day:", value: "no2" },
+    { key: "Most Active Day:", value: mostActive },
+    { key: "Least Active Day:", value: leastActive },
   ];
 
   const fetchDeviceSummary = async (feedId: string, endDate: Date) => {
@@ -86,6 +89,19 @@ export default function Statistic() {
     fetchData();
   }, [feedId, endDate]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { mostActiveDevice, leastActiveDevice } = caculateMostAndLeastActiveDevice(deviceData.light || deviceData.fan);
+        console.log("Most Active Device:", mostActiveDevice);
+        setMostActive(mostActiveDevice);
+        setLeastActive(leastActiveDevice);
+      } catch (error) {
+        console.error("Error in useEffect fetchData:", error);
+      }
+    };
+    fetchData();
+  }, [deviceData]);
 
   return (
     <View className="flex-1 bg-white">

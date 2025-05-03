@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { deviceActiveWColorType, runningTimeDeviceType, summaryStatisticType } from "@/types/statistic.type";
 import { deviceListObject, DEVICE_FORMAT, deviceStatusObject } from "@/types/device.type";
+import { de } from "react-native-paper-dates";
 
 const DEVICE_COLORS: Record<string, string> = {
   light: "bg-yellow",
@@ -157,3 +158,21 @@ export const formatPieData = (data: summaryStatisticType) => {
 
   return formattedData;
 };
+
+export const caculateMostAndLeastActiveDevice = (deviceData: {[date: string]: number}) => {
+  if (!deviceData) return { mostActiveDevice: 'None', leastActiveDevice: 'None' };
+
+  let mostActive: { device: string; value: number } = { device: '', value: 0 };
+  let leastActive: { device: string; value: number } = { device: '', value: Infinity };
+
+  for (const [device, value] of Object.entries(deviceData)) {
+    if (value > mostActive.value) {
+      mostActive = { device, value };
+    }
+    if (value < leastActive.value) {
+      leastActive = { device, value };
+    }
+  }
+
+  return { mostActiveDevice: mostActive.device, leastActiveDevice: leastActive.device };
+}
