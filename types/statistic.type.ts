@@ -10,7 +10,7 @@ export type runningTimeOneDeviceType = {
 };
 
 export type summaryStatisticType = {
-    deviceRatioType: deviceRatioType[]
+    [roomId: string]: number
 };
 export type deviceRatioType = {
     value: number,

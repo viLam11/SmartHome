@@ -10,6 +10,8 @@ import { endDateData } from '@/constants/statistic';
 import { deviceRatioWColorType, runningTimeDeviceType } from '@/types/statistic.type';
 import { getAllRoomService } from '@/services/roomService';
 import { Outstanding } from '@/components/chart/OutStanding';
+import { formatPieData } from '@/components/CaculateData';
+import { set } from 'date-fns';
 
 export default function StatisticSummary() {
   const { setLoading } = useLoading();
@@ -48,16 +50,20 @@ export default function StatisticSummary() {
   );
 
   const fetchRoomsUptime = useCallback(
-    async (deviceType: { title: string, value: string}, endDate: Date) => {
+    async (roomOptionData : { title: string; id: number }[], deviceType: {title: string, value: string}, endDate: Date) => {
       try {
-        const roomsUptime = await getRoomsUptimeService(-1, deviceType.value, endDate);
-        setDeviceRatio(
-          roomsUptime.deviceRatioType.map((item, index) => ({
-            ...item,
-            color: ['#009FFF', '#93FCF8', '#BDB2FA'][index % 3],
-            gradientCenterColor: ['#006DFF', '#3BE9DE', '#8F80F3'][index % 3],
-          }))
-        );
+        const roomsUptime = await getRoomsUptimeService(deviceType.value, endDate);
+        const sortedRoomsUptime = formatPieData(roomsUptime)
+        const formatRoomsUptime = sortedRoomsUptime.map(([roomId, value], index) => {
+          const room = roomOptionData.find((roomOption) => roomOption.id === +roomId);
+          return {
+            label: room ? room.title : "Unknown Room",
+            value,
+            color: ['#009FFF', '#93FCF8', '#BDB2FA', '#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#9D4EDD'][index % 8],
+            gradientCenterColor: ['#006DFF', '#3BE9DE', '#8F80F3', '#FF4C4C', '#FFC300', '#4CAF50', '#1E90FF', '#7B2CBF'][index % 8],
+          };
+        });
+        setDeviceRatio(formatRoomsUptime);
       } catch (err) {
         console.error('Error fetching rooms uptime:', err);
         setDeviceRatio([]);
@@ -67,8 +73,8 @@ export default function StatisticSummary() {
   );
   
   const fetchStatistic = useCallback(
-    async (deviceType: { title: string, value: string}, endDate: Date) => {
-      await Promise.all([fetchDeviceSummary(endDate), fetchDeviceTotaltime(deviceType, endDate), fetchRoomsUptime(deviceType, endDate)]);
+    async (roomsOptionData : { title: string; id: number }[] , deviceType: { title: string, value: string}, endDate: Date) => {
+      await Promise.all([fetchDeviceSummary(endDate), fetchDeviceTotaltime(deviceType, endDate), fetchRoomsUptime( roomsOptionData, deviceType, endDate)]);
     },
     [fetchDeviceSummary, fetchDeviceTotaltime, fetchRoomsUptime]
   );
@@ -77,8 +83,10 @@ export default function StatisticSummary() {
     try {
       const response = await getAllRoomService();
       if (!response) throw new Error("Failed to fetch image");
-      setRoomOptions(response.map((roomOption) => ({ title: roomOption.title, id: roomOption.id })));
+      const data = response.map((roomOption) => ({ title: roomOption.title, id: roomOption.id }));
+      setRoomOptions(data);
       setRoomOptionBar({ title: response[0].title, id: response[0].id });
+      return data;
     } catch (error) {
       console.error("Error fetching roomOption data:", error);
     }
@@ -88,8 +96,9 @@ export default function StatisticSummary() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        await fetchRoomData();
-        await fetchStatistic(deviceType, endDateData);
+        const roomsOptionData = await fetchRoomData();
+        if (!roomsOptionData) return;
+        await fetchStatistic( roomsOptionData, deviceType, endDateData);
       } catch (error) {
         console.error('Error in fetchData:', error);
       } finally {
@@ -102,7 +111,7 @@ export default function StatisticSummary() {
 
   useEffect(() => {
     if (endDate) {
-      fetchStatistic(deviceType, endDate);
+      fetchStatistic(roomOptions, deviceType, endDate);
     }
   }, [deviceType, endDate]);
 

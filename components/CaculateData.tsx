@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { deviceActiveWColorType, runningTimeDeviceType } from "@/types/statistic.type";
+import { deviceActiveWColorType, runningTimeDeviceType, summaryStatisticType } from "@/types/statistic.type";
 import { deviceListObject, DEVICE_FORMAT, deviceStatusObject } from "@/types/device.type";
 
 const DEVICE_COLORS: Record<string, string> = {
@@ -142,4 +142,18 @@ export const formatBarData = (OriginData: runningTimeDeviceType) => {
       }),
     };
   });
+};
+
+
+export const formatPieData = (data: summaryStatisticType) => {
+  const total = Object.values(data).reduce((sum, value) => sum + value, 0);
+  if (total === 0) return [];
+
+  const formattedData: [string, number][] = Object.entries(data)
+    .map(([key, value]) => [key, parseFloat((value / total).toFixed(2))] as [string, number])
+    .sort((a, b) => {
+      return b[1] - a[1];
+    });
+
+  return formattedData;
 };

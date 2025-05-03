@@ -45,7 +45,7 @@ export const getRunningTimeOneDeviceService = async (feedId: string, endDate: Da
 }
 
 /////////////////////////////////////////// Summary Statistic ///////////////////////////////////////////
-
+// totaltime
 export const getDeviceKindTotaltimeService = async (roomId: number | null, deviceType: string, endDate: Date): Promise<{ total: number }> => {
     try {
         if (roomId === null) return { total: 0 };
@@ -73,7 +73,7 @@ export const getDeviceKindTotaltimeService = async (roomId: number | null, devic
         throw error;
     }
 }
-
+// bar chart
 export const getRunningTimeAllDeviceService = async (roomId: number, endDate: Date): Promise<runningTimeDeviceType> => {
     try {
         const headers = await getAuthHeaders();
@@ -94,13 +94,21 @@ export const getRunningTimeAllDeviceService = async (roomId: number, endDate: Da
         throw error;
     }
 }
-
-export const getRoomsUptimeService = async (roomId: number, type: string, endDate: Date): Promise<summaryStatisticType> => {
+// pie chart
+export const getRoomsUptimeService = async (type: string, endDate: Date): Promise<summaryStatisticType> => {
     try {
-        // const headers = await getAuthHeaders();
-        // const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/statistic/rooms`, headers);
-        const response = summaryStatisticData;
-        return response;
+        const headers = await getAuthHeaders();
+        endDate = new Date(endDate.setHours(6, 59, 59, 999));
+        const startDate = new Date(subDays(endDate, 7).setHours(7, 0, 0, 0));
+        if (type === 'all') type = 'total';
+        const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/statistic/graph/${type}`, 
+            {
+                start: startDate.toISOString(),
+                end: endDate.toISOString(),
+            },
+            headers);
+        // const response = summaryStatisticData;
+        return response.data;
     } catch (error) {
         console.error('Error fetching statistic:', error);
         throw error;

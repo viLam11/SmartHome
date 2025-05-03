@@ -20,11 +20,10 @@ export function Outstanding({
     setDeviceType: (option: { title: string; value: string }) => void;
 }) {
     const [deviceTypeTitle, setDeviceTypeTitle] = useState<string>(deviceTypeOptions[0].title);
-        
     const outStand = [
         { key: "Total Run Time Of Indoor Device:", value: runningTime + " Hours" },
         { key: "Most used:", value: deviceRatio[0]?.label },
-        { key: "Least used:", value: deviceRatio[1]?.label },
+        { key: "Least used:", value: deviceRatio[deviceRatio.length-1]?.label },
     ];
     const [showDropdown, setShowDropdown] = useState(false);
     

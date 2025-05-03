@@ -37,11 +37,9 @@ export const currentTime = {
 };
 
 export const summaryStatisticData: summaryStatisticType = {
-  deviceRatioType: [
-    { value: 0.488, label: 'Living Room' },
-    { value: 0.242, label: 'Garage' },
-    { value: 0.27, label: 'Bedroom' },
-  ],
+  "1": 1.6666666666666665,
+  "2": 15.395555555555555,
+  "3": 0
 }
 
 export const deviceActive = [
