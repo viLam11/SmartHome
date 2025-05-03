@@ -115,7 +115,6 @@ export default function StatisticMockUI() {
           </View>
           <View className="grid grid-cols-2 gap-2 mt-5 mb-16">
             {deviceActive.map((device, index) => (
-              
               <View key={index} className={`rounded-2xl shadow-md ${device.color} `}>
                 <View className={`items-center`}>
                   <Text className="text-lg font-semibold text-white">{device.type}</Text>

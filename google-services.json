@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "551908986330",
+    "project_id": "smarthome-fc5a0",
+    "storage_bucket": "smarthome-fc5a0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:551908986330:android:c0bcb17abb82c89b6c44e3",
+        "android_client_info": {
+          "package_name": "com.vilam.smarthome"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDxXqx6EGBLF1Mf4sA7MhRHGg4CNwhlsY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
