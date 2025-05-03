@@ -35,7 +35,10 @@ module.exports = {
          300: "#191D31"
         },
         danger: '#F755555',
-        yellow: "#FBBC05",
+        yellow: {
+          DEFAULT: "#FBBC05",
+          100: "#F2D476", 
+        },
         background: '#E7EDF4',
         disable: "#EDEDED",
         enable: "#FFD700"

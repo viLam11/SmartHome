@@ -25,7 +25,7 @@ export default function Navigation({ current }: { current: number }) {
   const renderTab = (tab: any) => (
     <View
       key={tab.index}
-      className={tab.index === currentTab ? 'w-1/2 items-center justify-center' : 'w-1/4 bg-black'}
+      className={tab.index === currentTab ? 'w-1/2 items-center justify-center' : 'w-1/4 bg-black '}
     >
       <TouchableOpacity
         onPress={() => handleClick(tab.index, tab.route)}
