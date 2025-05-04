@@ -29,25 +29,25 @@ export const DEVICE_FORMAT: Record<string, Record<string, string>> = {
     "doorList": {
         "img": images.door,
         "type": "door",
-        "displayTittle": 'Door',
+        "displayTittle": 'Cửa',
         "router": "devices/doors/"
     },
     "fanList": {
         "img": images.fan,
         "type": "fan",
-        "displayTittle": 'Fan',
+        "displayTittle": 'Quạt',
         "router": "devices/fans/"
     },
     "lightList": {
         "img": images.lightbulb,
         "type": "light",
-        "displayTittle": 'Light',
+        "displayTittle": 'Đèn',
         "router": "devices/lights/"
     },
     "sensorList": {
         "img": images.sensor,
         "type": "sensor",
-        "displayTittle": 'Sensor',
+        "displayTittle": 'Cảm biến',
         "router": "devices/sensors/"
     }
 };

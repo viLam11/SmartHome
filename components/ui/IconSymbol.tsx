@@ -32,6 +32,7 @@ const MAPPING = {
   "temperature": "ac-unit",
   "wind": "air",
   "warning": "warning", 
+  "down": "keyboard-arrow-down",
 } as const;
   // } as Partial<
 //   Record<

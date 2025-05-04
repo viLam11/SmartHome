@@ -10,8 +10,8 @@ export function SelectDayRange({ selectedDates, setSelectedDates, onCancel, onCo
 
     return (
         <View>
-            <View className='flex flex-row w-11/12 mx-auto border rounded-lg items-center max-h-12'>
-                <View className=" w-4/5 rounded-lg p-3 flex flex-row  mx-autoitems-center justify-center">
+            <View className='flex flex-row w-11/12 mx-auto border rounded-lg items-center max-h-12 bg-white overflow-hidden'>
+                <View className=" w-4/5 rounded-lg p-3 flex flex-row  mx-autoitems-center justify-center ">
                     <View className="text-center ">
                         <Text className="text-center">{selectedDates.startDate.format('DD MMM, YYYY')}</Text>
                     </View>

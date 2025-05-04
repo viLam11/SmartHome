@@ -6,18 +6,18 @@ import { DTOBarData, formatBarData } from '../CaculateData';
 
 const roomOptions = ['All', 'room1', 'room2', 'room3'];
 
-export function BarChartAnimated({ 
+export function BarChartAnimated({
   setRoom,
   barData
-}: { 
-  setRoom:(room: string) => void,
+}: {
+  setRoom: (room: string) => void,
   barData: runningTimeDeviceType
 }) {
   const maxHeight = 160;
   const [selectedRoom, setSelectedRoom] = useState('All');
   const [option, setOption] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
-  
+
   const handleSelectRoom = (room: string) => {
     setSelectedRoom(room);
     setRoom?.(room);
@@ -30,7 +30,7 @@ export function BarChartAnimated({
         <View className='flex flex-row w-full items-end mb-2'>
           <View className='w-1/2'>
             <View className='flex flex-row'>
-              <Pressable onPress={() => {setShowDropdown(true); setOption('room')}} className='ml-2'>
+              <Pressable onPress={() => { setShowDropdown(true); setOption('room') }} className='ml-2'>
                 <Text className="text-md text-white font-semibold">{selectedRoom} ▼</Text>
               </Pressable>
             </View>
@@ -42,7 +42,7 @@ export function BarChartAnimated({
                 onPressOut={() => setShowDropdown(false)}
               >
                 <View className="bg-white rounded-md w-40">
-                  {option==='room' && roomOptions.map((room) => (
+                  {option === 'room' && roomOptions.map((room) => (
                     <TouchableOpacity
                       key={room}
                       onPress={() => handleSelectRoom(room)}
@@ -79,13 +79,22 @@ export function BarChartAnimated({
 }
 
 export function PieChartAnimated({ pieData }: { pieData: deviceRatioWColorType[] }) {
-  const formattedPieData = pieData.map((item, index) => ({
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  let formattedPieData = pieData.map((item, index) => ({
     value: item.value,
     color: item.color,
     label: item.label,
     gradientCenterColor: item.gradientCenterColor || item.color,
     focused: index === 0,
   }));
+   formattedPieData = formattedPieData.map((item, index) => ({
+    ...item,
+    focused: index === selectedIndex,
+    onPress: () => setSelectedIndex(index), // gán sự kiện click
+  }));
+
+
+  const selectedItem = pieData[selectedIndex];
 
   const focusedItem = formattedPieData.find((item) => item.focused) || formattedPieData[0] || { value: 0, label: '' };
 
@@ -94,56 +103,64 @@ export function PieChartAnimated({ pieData }: { pieData: deviceRatioWColorType[]
   );
 
   const renderLegendComponent = () => {
-    const pairs = [];
-    for (let i = 0; i < formattedPieData.length; i += 2) {
-      pairs.push(formattedPieData.slice(i, i + 2));
-    }
+    // const pairs = [];
+    // for (let i = 0; i < formattedPieData.length; i += 2) {
+    //   pairs.push(formattedPieData.slice(i, i + 2));
+    // }
 
     return (
       <>
-        {pairs.map((pair, index) => (
-          <View key={index} className="flex-row justify-start mb-2.5">
-            {pair.map((item, idx) => (
-                <View
-                key={idx}
-                className={`flex-row items-center ${idx === 0 && pair.length > 1 ? 'mr-5' : ''} w-30`}
-                >
+        {formattedPieData.map((item, index) => (
+              <View
+                key={index}
+                className={`flex-row items-center`}
+              >
                 {renderDot(item.gradientCenterColor)}
-                <Text className="text-white">{`${item.label}: ${(item.value * 100).toFixed(0)}%`}</Text>
+                <Text className="text-black">{`${item.label}: ${(item.value).toFixed(0)} h`}</Text>
               </View>
-            ))}
-          </View>
         ))}
       </>
     );
   };
 
   return (
-    <View className="rounded-2xl bg-[#34448B] flex-1 mt-4 p-2 shadow-md">
-      <View className="m-5 p-4 rounded-2xl bg-[#232B5D]">
-        <Text className="text-white text-lg font-bold">Total Room Uptime</Text>
-        <View className="p-5 items-center">
-          <PieChart
-            data={formattedPieData}
-            donut
-            showGradient
-            sectionAutoFocus
-            radius={90}
-            innerRadius={60}
-            innerCircleColor="#232B5D"
-            showText
-            textColor="white"
-            textSize={12}
-            focusOnPress
-            centerLabelComponent={() => (
-              <View className="justify-center items-center">
-                <Text className="text-white text-2xl font-bold">{(focusedItem.value * 100).toFixed(0)}%</Text>
-                <Text className="text-white text-sm">{focusedItem.label}</Text>
-              </View>
-            )}
-          />
+    <View className='rounded-2xl bg-white flex-1 mt-4 p-2 shadow-md'>
+      <Text className="text-black  text-center text-xl font-bold m-2">Nổi bật</Text>
+      <View className=" flex flex-row">
+        <View className="w-5/12 flex justify-between ">
+          <View className=''>
+            <Text className='text-left'>Đã dùng:</Text>
+            <Text className='text-right uppercase font-bold  text-2xl'>120 giờ</Text>
+            <Text>Dự tính:</Text>
+            <Text className='text-right uppercase font-bold italic text-2xl'>200.000 VND</Text>
+          </View>
+            <View className='bottom-0'>
+              {renderLegendComponent()}
+            </View>
         </View>
-        {renderLegendComponent()}
+        <View className="m-5 rounded-2xl bg-white w-7/12">
+          <View className=" items-center">
+            <PieChart
+              data={formattedPieData}
+              donut
+              showGradient
+              sectionAutoFocus
+              radius={80}
+              innerRadius={40}
+              innerCircleColor="white"
+              showText
+              textColor="black"
+              textSize={12}
+              centerLabelComponent={() => (
+                <View className="justify-center items-center">
+                  <Text className="text-black text-2xl font-bold">{(selectedItem.value).toFixed(0)} h</Text>
+                  <Text className="text-black text-sm">{selectedItem.label}</Text>
+                </View>
+              )}
+            />
+          </View>
+
+        </View>
       </View>
     </View>
   );
