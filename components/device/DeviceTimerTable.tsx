@@ -30,7 +30,7 @@ const tableData = [
 //   return <Text>{data}</Text>;
 // };
 
-export default function DeviceTimerTable( {setModal, feedId}: {setModal: (status: boolean) => void, feedId: number} ) {
+export default function DeviceTimerTable( {modal, setModal, feedId}: {modal: boolean, setModal: (status: boolean) => void, feedId: number} ) {
 
   return (
     <View>
@@ -43,7 +43,7 @@ export default function DeviceTimerTable( {setModal, feedId}: {setModal: (status
         </TouchableOpacity>
       </View>
       <View className='mt-2'>
-        <ScheduleTable tableData={tableData} />
+        <ScheduleTable modal={modal} feedId={feedId} />
       </View>
   </View>
   );

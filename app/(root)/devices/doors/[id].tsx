@@ -103,7 +103,7 @@ export default function Door() {
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} className='min-h-screen flex-1 m-2'>
             <View className="flex-1">            
-                <DeviceHeader status={1} feedId={+feedId} title="Door" />
+                <DeviceHeader type="door" status={1} feedId={+feedId} title="Door" />
 
                 <View className="mt-6">
                     <View className="flex flex-row mt-6">

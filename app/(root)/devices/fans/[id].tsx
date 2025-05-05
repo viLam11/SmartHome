@@ -18,6 +18,7 @@ import { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useLoading } from '@/contexts/LoadingContext';
 import SchedulePicker from '@/components/SchedulePicker';
 import ScheduleTable from '@/components/ScheduleTable';
+import { set } from 'date-fns';
 
 
 const formatTime = (date: Date) => {
@@ -40,40 +41,82 @@ export default function Fan() {
   const [modal, setModal] = useState(false);
   const { setLoading } = useLoading();
 
+  // useEffect(() => {
+  //   const fetchCurrentStatus = async () => {
+  //     console.log("feed ID: ", feedId);
+  //     // setLoading(true);
+  //     try {
+  //       const response = await getDeviceData(feedId as string);
+  //       setDeviceData(response);
+  //       const level = response?.value;
+  //       const levelSpeedMap = [0, 150, 100, 25];
+  //       setSpeed(levelSpeedMap[+level] || 0);
+  //       (+level > 0) ? setStatus(true) : setStatus(false);
+  //     } catch (error) {
+  //       console.error("Error fetching device data:", error);
+  //     } finally {
+  //       // setLoading(false);
+  //     }
+  //   };
+  //   fetchCurrentStatus();
+  //   const interval = setInterval(() => {
+  //     fetchCurrentStatus(); 
+  //   } , 10000); // Fetch every 10 seconds
+  //   return () => clearInterval(interval);
+  // }, [feedId]);
   useEffect(() => {
     const fetchCurrentStatus = async () => {
-      console.log("feed ID: ", feedId);
-      setLoading(true);
-      try {
         const response = await getDeviceData(feedId as string);
         setDeviceData(response);
-        const level = response?.value;
-        const levelSpeedMap = [0, 150, 100, 25];
-        setSpeed(levelSpeedMap[+level] || 0);
-        setStatus(+level > 0);
-      } catch (error) {
-        console.error("Error fetching device data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+        const fanTemp = response;
+        if (+fanTemp.value == 50) {
+            setSpeed(150);
+            setStatus(true);
+        } else if (+fanTemp.value == 75) {
+            setSpeed(100);
+            setStatus(true);
+        } else if (+fanTemp.value == 100) {
+            setSpeed(25);
+            setStatus(true);
+        }
+    }
     fetchCurrentStatus();
-  }, [feedId]);
+    const interval = setInterval(() => {
+      fetchCurrentStatus(); 
+    } , 10000); 
+    return () => clearInterval(interval);
+}, []);
+
+  async function hanldelPower() {
+    if (status) {
+      setLoading(true);
+      const respnose = await controlDevice(feedId as string, '0');  
+      setStatus(false);
+      setSpeed(0);
+      setLoading(false);
+    } else {
+      setLoading(true);
+      const respnose = await controlDevice(feedId as string, '1');  
+      setStatus(true);
+      setSpeed(150);
+      setLoading(false);
+    }
+  }
 
   async function handleFanSpeed(level: number) {
-    if (!status && level === 0) return;
+    if ( !status || level == 0) return;
     try {
       await controlDevice(feedId as string, level.toString());
       const levelSpeedMap = [0, 150, 100, 25];
       setSpeed(levelSpeedMap[level]);
-      setStatus(!!level);
+      setStatus(true);
     } catch (e) {
       console.log('Error: ', e);
     }
   }
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="min-h-screen flex flex-col m-2">
-      <DeviceHeader status={1} feedId={+feedId} title={deviceData ? `${deviceData.title}` : null} />
+      <DeviceHeader type="fan" status={1} feedId={+feedId} title={deviceData ? `${deviceData.title}` : null} />
 
       <View className="flex flex-row mt-10">
         <View className="w-1/2">
@@ -94,7 +137,7 @@ export default function Fan() {
         <View className="w-1/2 flex flex-col items-end px-4">
           <View className="flex flex-row">
             <Text className="px-2 w-20 font-semibold">{status ? 'Bật' : 'Tắt'}</Text>
-            <TouchableOpacity onPress={() => handleFanSpeed(status ? 0 : 1)}>
+            <TouchableOpacity onPress={() => hanldelPower()}>
               <Image source={status ? images.auto_on : images.auto_off} />
             </TouchableOpacity>
           </View>
@@ -110,7 +153,7 @@ export default function Fan() {
             <Image source={statusAuto ? images.auto_on : images.auto_off} />
           </TouchableOpacity>
         </View>
-        <ScheduleTable modal={modal} feedId={feedId}/>
+        <DeviceTimerTable modal={modal} setModal={setModal} feedId={+feedId}/>
       </View>
 
       <View className="flex-grow" />

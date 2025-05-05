@@ -3,7 +3,9 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import DeviceNav from './DeviceNav';
-export default function DeviceHeader ({status, feedId, title}: {feedId: number, title: string | null, status: number}) {
+
+type DeviceType = "light" | "fan" | "sensor" | "door";
+export default function DeviceHeader ({status, feedId, title, type}: {feedId: number, title: string | null, status: number, type: DeviceType}) {
     const router = useRouter();
     return (<>
         <View className='flex flex-row justify-between'>
@@ -17,6 +19,6 @@ export default function DeviceHeader ({status, feedId, title}: {feedId: number, 
             </View>
         </View>
 
-        <DeviceNav status={status}  feedId={+feedId} type={"light"} />
+        <DeviceNav status={status}  feedId={+feedId} type={type} />
     </>);
 }

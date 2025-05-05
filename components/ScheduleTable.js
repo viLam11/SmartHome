@@ -11,7 +11,7 @@ const widthArr = [25, 20, 30, 25]
 export default function ScheduleTable({ modal, feedId }) {
   const [tableData, setTableData] = useState([]); 
   async function handleDeleteSchedule(index) {
-      cosnole.log("Delete schedule with id: ", index);  
+      console.log("Delete schedule with id: ", index);  
       response = await deleteSchedule(index);
       if (response.status == 200) {
         console.log("Delete schedule successfully");
@@ -23,6 +23,7 @@ export default function ScheduleTable({ modal, feedId }) {
   useEffect(() => {
     const fetchScheduleTable = async () => {
       const response = await getSchedule(+feedId);
+      console.log("check schedule table: ", response);  
       if (response.status == 200) {
         const newSchedules = response.data.map((item) => {
           let formatedDays = item.repeatDays.split(',').map((day) => {

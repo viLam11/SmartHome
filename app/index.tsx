@@ -20,19 +20,19 @@ export default function WelcomeScreen() {
         loadToken();
     }, [])
     
-    useEffect(() => {
-        const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
-          console.log(
-            "🔔 Notification Response: ",
-            JSON.stringify(response.notification.request.content.data, null, 2)
-          );
+    // useEffect(() => {
+    //     const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+    //       console.log(
+    //         "🔔 Notification Response: ",
+    //         JSON.stringify(response.notification.request.content.data, null, 2)
+    //       );
           
-          // Điều hướng khi người dùng bấm vào thông báo
-          router.push('/(root)/profile/notification');
-        });
+    //       // Điều hướng khi người dùng bấm vào thông báo
+    //       router.push('/(root)/profile/notification');
+    //     });
       
-        return () => subscription.remove();
-      }, []);
+    //     return () => subscription.remove();
+    //   }, []);
 
     return (
         <SafeAreaView className="flex-1 bg-white items-center justify-center">

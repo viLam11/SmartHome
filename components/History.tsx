@@ -4,7 +4,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Table, Row } from "react-native-table-component";
 import Navigation from '@/components/Navigation';
-import DeviceNav from '@/components/DeviceNav';
+// import DeviceNav from '@/components/DeviceNav';
+import DeviceNav from './device/DeviceNav';
 
 const renderCell = (data, index) => {
     if (index === 3) {

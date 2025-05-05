@@ -84,7 +84,7 @@ export default function Sensor() {
                     if (data.value > 30) {
                         data.image = images.day
                         data.message = "Nóng"
-                    } else if (data.value > 20) {
+                    } else {
                         data.image = images.sun_cloud
                         data.message = "Mát mẻ"
                     }
@@ -92,7 +92,7 @@ export default function Sensor() {
                     if (data.value > 30) {
                         data.image = images.night
                         data.message = "Nóng"
-                    } else if (data.value > 20) {
+                    } else {
                         data.image = images.night_humid
                         data.message = "Mát mẻ"
                     }

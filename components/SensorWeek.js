@@ -57,7 +57,7 @@ export default function SensorWeek({feedId}) {
             endTime: selectedDates.endDate.toISOString(), 
             feedId: +feedId 
         });
-        console.log('Sensor data 2:', sensorData);   
+        console.log('SENSOR DATA 2:', sensorData);   
         setLineData(sensorData);    
         setLoading(false);   
         setIsVisible(false);

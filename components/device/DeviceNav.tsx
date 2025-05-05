@@ -13,7 +13,7 @@ interface DeviceNavProps {
     roomId?: number;    
 }
 
-export default function DeviceNav({status, feedId = 1, type, roomId }: DeviceNavProps) {
+export default function DeviceNav({status, feedId, type, roomId }: DeviceNavProps) {
     const router = useRouter();
     // const [status, setStatus] = useState(1);
     function hanldeNav(index: number) {
@@ -34,6 +34,8 @@ export default function DeviceNav({status, feedId = 1, type, roomId }: DeviceNav
                 break;
         }
     }   
+
+
 
     return (
         <View>

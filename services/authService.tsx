@@ -28,7 +28,7 @@ export const signInService = async (credentials: { email: string, password: stri
         
         // Lưu token vào AsyncStorage
         await AsyncStorage.setItem('authToken', token);
-
+        console.log("ĐĂNG NHẬP THÀNH CÔNG")
         return response;
     } catch (error: any) {
         if (error.response.status == 400) {
@@ -64,3 +64,18 @@ export const signOutService = async () => {
         console.error('Lỗi khi đăng xuất:', error);
     }
 };
+
+export const postDevicIP = async (token: string) => {
+    try {
+        console.log("TOKEN: ", token);  
+        const header = await getAuthHeaders();
+        console.log("Header: ", header);
+        const response = await axios.post(`${API_URL}/noti-ip`, {
+            "ip": token
+        }, header);
+        console.log("Token successfully posted to backend:", response.data);
+        return response
+    } catch (error) {
+        console.error('Error posting token to backend:', error);
+    }
+}

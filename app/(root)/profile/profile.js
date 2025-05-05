@@ -33,11 +33,11 @@ export default function Profile() {
       setUserData(response.data);
     }
     fetchUserData();
-  }, [])
+  }, [token])
 
   async function hanldeLogout() {
     await AsyncStorage.removeItem("authToken");
-    router.push('/')
+    router.push('/(root)/auth/sign-in')
   }
 
   return (
@@ -46,7 +46,7 @@ export default function Profile() {
         <Text className="font-bold text-2xl p-2 mb-4">Profile</Text>
         <View className="flex justify-between items-center">
           <Image
-              source={{ uri: `https://ui-avatars.com/api/?name=${userData ? userData.firstName + '+' + userData.lastName : 'John'}&background=random` }}
+              source={{ uri: `https://ui-avatars.com/api/?name=${userData ? userData.lastName + '+' + userData.firstName : 'John'}&background=random` }}
               style={{ width: 100, height: 100, borderRadius: 50 }}
             />
         </View>
@@ -86,9 +86,7 @@ export default function Profile() {
               <Text className='text-black text-2xl font-semibold ml-4'>
                 Hỗ trợ
               </Text>
-              <Link href="/(root)/profile/noti" className="absolute right-4"> 
-                 <Text>THÔNG BÁO</Text>
-              </Link>
+             
             </View>
             <View className="my-2">
               <View className="bg-white mx-2 p-4 shadow-transparent my-2 flex flex-row align-middle items-center border rounded-3xl">

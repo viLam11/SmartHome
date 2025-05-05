@@ -50,7 +50,7 @@ export function SelectDayRange({ selectedDates, setSelectedDates, onCancel, onCo
                             });
                             console.log('Selected range:', startDate, '-', endDate);
                         }}
-                        onConfirm={() => setIsVisible(false)}
+                        onConfirm={() => { onConfirm(), setIsVisible(false)}}
                         locale='vi'
                         timeZone="Asia/Ho_Chi_Minh"
                         styles={{
@@ -94,7 +94,7 @@ export function SelectDayRange({ selectedDates, setSelectedDates, onCancel, onCo
                             </TouchableOpacity>
                         </View>
                         <View className=" bg-blue-500 p-2 ml-2 w-20 items-center ">
-                            <TouchableOpacity onPress={onConfirm}>
+                            <TouchableOpacity onPress={() => {onConfirm(), setIsVisible(false)}}> 
                                 <Text className='text-white font-bold text-md uppercase'>Lưu</Text>
                             </TouchableOpacity>
                         </View>

@@ -30,6 +30,7 @@ export const setSchedule = async ( payload: any) => {
 
 export const deleteSchedule = async (scheduleId: number) => {
     try {
+        console.log("DELETE SCHEDULE: ", scheduleId)
         const response = await axios.delete(`${API_URL}/schedules/${scheduleId}`);
         return response;
     } catch (error) {

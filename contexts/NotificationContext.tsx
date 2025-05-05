@@ -10,6 +10,7 @@ import * as Notifications from "expo-notifications";
 import { Subscription } from "expo-modules-core";
 import { registerForPushNotificationsAsync } from "@/utils/registerForPushNotificationsAsync";
 import { useRouter } from "expo-router";
+import { getAuthHeaders, postDevicIP } from "@/services/authService";
 interface NotificationContextType {
   expoPushToken: string | null;
   notification: Notifications.Notification | null;
@@ -42,6 +43,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   const [notification, setNotification] =
     useState<Notifications.Notification | null>(null);
   const [error, setError] = useState<Error | null>(null);
+  const [token, setToken] = useState<string | null>(null);  
 
   const notificationListener = useRef<Subscription>();
   const responseListener = useRef<Subscription>();
@@ -49,7 +51,10 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   const router = useRouter();
   useEffect(() => {
     registerForPushNotificationsAsync().then(
-      (token) => setExpoPushToken(token),
+      (token) =>{
+        setExpoPushToken(token);
+        console.log("Expo Push Token: ", token);
+      },
       (error) => setError(error)
     );
 
@@ -82,18 +87,20 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   }, []);
 
   useEffect(() => {
+    const getHeader = async () => {
+      const response = await getAuthHeaders();
+      console.log("Header: ", response.headers.Authorization);
+      setToken(response.headers.Authorization);
+    }
+    getHeader();  
+  }, [])
+
+  useEffect(() => {
     if (expoPushToken) {
       const postToken = async () => {
         try {
-          const response = await fetch(
-            'https://nearby-colleen-quanghia-3bfec3a0.koyeb.app/api/v1/devices/room/1',
-            {
-              method: 'GET',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            }
-          );
+          await getAuthHeaders();
+          const response = await postDevicIP(expoPushToken);
           console.log('hello: ', expoPushToken);
           console.log('Response:', response);
         } catch (error) {

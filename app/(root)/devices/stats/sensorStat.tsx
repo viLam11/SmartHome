@@ -22,12 +22,12 @@ export default function SensorStatis({ feedKey }: { feedKey: string }) {
 
     useEffect(() => {
         if (!startTime) return;
-        // console.log("Start time: ", startTime);
-        // console.log("End time: ", new Date().toISOString());
+        console.log("Start time: ", startTime);
+        console.log("End time: ", new Date().toISOString());
         const fetchSensorData = async () => {
             let endTime = new Date().toISOString()
             const response = await fetchSensorDataByTime({ startTime, endTime, feedKey });
-            // console.log("Sensor data: ", response)
+            console.log("Sensor data: ", response)
             setLineData(response);
         }
 

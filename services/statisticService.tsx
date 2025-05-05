@@ -134,47 +134,39 @@ export const getRoomStatis = async (roomId: string, startDate: string, endDate: 
 
 export const getAllRoomStat = async (startDate: string, endDate: string) => {
     try {
-        const allRoom = await getAllRoom();
-        // console.log("ALL ROOM: ", allRoom); 
-        const allAPIs = allRoom.map((room: any) => getRoomStatis(room.id, startDate, endDate)); // gọi ngay
-        const responses = await Promise.all(allAPIs); // đợi tất cả hoàn thành
+        const headers = await getAuthHeaders(); 
+        const response = await axios.post(`${base_url}/statistic/rooms`, {
+            "start": startDate,
+            "end": endDate
+        }, headers);    
 
-        // console.log(JSON.stringify(responses, null, 2));
+        // console.log("RESPONSE: ", response.data);
 
-        const lightMap: { [label: string]: number[] } = {};
-        const fanMap: { [label: string]: number[] } = {};
+        let fanData = response.data.fan;
+        fanData = Object.entries(fanData).map(([key, value]) => {   
+            const [year, month, day] = key.split("-");
+            return {
+                label: `${day}/${month}`, // Định dạng dd/MM
+                value: parseFloat(value.toFixed(2)), // Chuyển đổi thành số và làm tròn đến 2 chữ số thập phân
+                dataPointText: parseFloat(value.toFixed(2)).toString(), 
+                hidden: value == 0.0 ? true : false
+            };  
+        })
 
-        responses.forEach((response: any) => {
-            response.light.forEach((item: any) => {
-                if (!lightMap[item.label]) lightMap[item.label] = [];
-                lightMap[item.label].push(item.value);
-            });
-
-            response.fan.forEach((item: any) => {
-                if (!fanMap[item.label]) fanMap[item.label] = [];
-                fanMap[item.label].push(item.value);
-            });
-        });
-        const calcSum = (map: { [label: string]: number[] }) => {
-            return Object.entries(map).map(([label, values]) => {
-                const sum = values.reduce((acc, val) => acc + val, 0);
-                
-                return {
-                    label: label,
-                    value: sum,
-                    dataPointText: sum.toString(),
-                    dataPointTextColor: "black",
-                    hidden: sum === 0.0
-                };
-            });
-        };
-
-        const sumLight = calcSum(lightMap);
-        const sumFan = calcSum(fanMap);
+        let lightData = response.data.light;
+        lightData = Object.entries(lightData).map(([key, value]) => {
+            const [year, month, day] = key.split("-");
+            return {
+                label: `${day}/${month}`, // Định dạng dd/MM
+                value: parseFloat(value.toFixed(2)), // Chuyển đổi thành số và làm tròn đến 2 chữ số thập phân
+                dataPointText: parseFloat(value.toFixed(2)).toString(), 
+                hidden: value == 0.0 ? true : false
+            };
+        })
 
         return {
-            light: sumLight,
-            fan: sumFan
+            light: lightData,
+            fan: fanData    
         };
     } catch (error) {
         return error;

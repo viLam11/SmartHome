@@ -5,30 +5,33 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import axios from 'axios'
 import NotiCard from "../../../components/NotiCard";
 import { useRouter, useSearchParams } from "expo-router";
+import { getNotifications } from '@/services/notiService';
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Navigation from "@/components/Navigation";
 
 const base_url = process.env.EXPO_PUBLIC_API_URL;
 
 export default function Notification() {
     const router = useRouter()
-    const [token, setToken] = useState(null)
-    const [pass, setPass] = useState(null)
+    const [notis, setNotis] = useState([])  
 
     useEffect(() => {
-        const fetchToken = async () => {
-            const token = await AsyncStorage.getItem("authToken")
-            setToken(token)
+        const fetchNoti = async () => {
+            const response = await getNotifications()
+            console.log(response.data)
+            setNotis(response.data)
         }
-        fetchToken()
+        fetchNoti()
     }, [])
 
 
     return (
-        <KeyboardAvoidingView
+        <View className="flex-1 bg-white"
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={{ flex: 1 }}
         >
-            <View className="min-h-screen w-11/12 mx-auto ">
+            <ScrollView  className="flex-grow w-11/12 mx-auto ">
                 <View className="flex flex-row my-4 items-center">
                     <TouchableOpacity onPress={() => router.back()} className="mr-4">
                         <IconSymbol name="back" color="black" />
@@ -39,21 +42,22 @@ export default function Notification() {
                     <Text className="text-3xl font-bold">Thông báo</Text>
 
                     <FlatList
-                        data={Array.from({ length: 50 })}
+                        data={notis}
                         keyExtractor={(_, index) => index.toString()}
                         renderItem={({ item, index }) => (
                             <NotiCard
                                 key={index}
-                                time="12:00 12/04/2021"
-                                message="Thông báo mẫu"
+                                time={item.createdAt}
+                                message={item.message}
                             />
                         )}
                     />
 
                 </View>
+            </ScrollView>
+            <View className="h-20">
+                <Navigation current={3} />
             </View>
-
-
-        </KeyboardAvoidingView>
+        </View>
     )
 }

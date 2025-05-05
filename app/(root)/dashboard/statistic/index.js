@@ -180,7 +180,19 @@ export default function StatisticMockUI() {
         console.log("maxY: ", maxY);
     }, [dumLineData, dumLineData2, dumLineData3]);
 
-
+    async function handleSelectDate() {
+        setLoading(true);
+        console.log("selectedDates: ", selectedDates);  
+        const respose = await getAllRoomStat(selectedDates.startDate.toISOString(), selectedDates.endDate.toISOString());
+        console.log("RESPONSE: ", JSON.stringify(respose.light), JSON.stringify(respose.fan));
+        setBarData1(respose.light);
+        setBarData2(respose.fan);
+        let data = combineData(respose.light, respose.fan);    
+        
+        setBarData(data);
+        console.log("DATA: ", barData   );    
+        setLoading(false);
+    }
 
     return (
         <View className="flex-1 bg-slate-100">
@@ -195,7 +207,7 @@ export default function StatisticMockUI() {
                 </View>
 
                 <View className="mt-4">
-                    <SelectDayRange selectedDates={selectedDates} setSelectedDates={setSelectedDates} onCancel={() => { }} onConfirm={() => { }} />
+                    <SelectDayRange selectedDates={selectedDates} setSelectedDates={setSelectedDates} onCancel={() => { }} onConfirm={handleSelectDate} />
                 </View>
 
                 <View className='bg-white mt-4 p-2 rounded-md'>

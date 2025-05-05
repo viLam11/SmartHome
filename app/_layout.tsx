@@ -77,6 +77,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+      console.log("🔔 Notification Response: ", response);
       router.push('/(root)/profile/notification');
     });
   
@@ -84,10 +85,11 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <NotificationProvider>
+    
       <LoadingProvider>
+        <NotificationProvider>
         <AppLayout />
+        </NotificationProvider>
       </LoadingProvider>
-    </NotificationProvider>
   );
 }

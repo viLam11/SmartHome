@@ -8,6 +8,7 @@ export const fetchSensorDataByTime = async ({ startTime, endTime, feedKey }: { s
         console.log("End time: ", endTime);
         console.log("Feed key: ", feedKey); 
         console.log("ADA USER: ", ADA_USER);    
+        console.log("API: ", `https://io.adafruit.com/api/v2/ThuanTrinh7845/feeds/${feedKey}/data/chart`);
         const response = await axios.get(`https://io.adafruit.com/api/v2/${ADA_USER}/feeds/${feedKey}/data/chart`, {
             params: {
                 start_time: startTime,
@@ -25,6 +26,8 @@ export const fetchSensorDataByTime = async ({ startTime, endTime, feedKey }: { s
                 minute: '2-digit',
                 hour12: false,
             });
+
+            console.log("DATA BY TIME: ", sensorData    )
 
             return {
                 value: value,
@@ -49,10 +52,11 @@ export const fetchSensorDataByDay = async ({ startTime, endTime, feedId }: { sta
             "start": startTime,
             "end": endTime
         })
-        const response = await axios.post(`${base_url}/statistic/sensor/3014285`, {
+        const response = await axios.post(`${base_url}/statistic/sensor/${feedId}`, {
             "start": startTime,
             "end": endTime
         })
+        console.log("RESPONSE: ", response.data);   
         const data : Record<string, number> = response.data;
         const result = Object.entries(data).map(([key, value]) => {
             const [year, month, day] = key.split("-");

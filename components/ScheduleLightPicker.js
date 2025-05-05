@@ -7,6 +7,10 @@ import { IconSymbol } from "./ui/IconSymbol";
 import { setSchedule } from "@/services/scheduleService";
 import { LoadingProvider } from "@/contexts/LoadingContext";
 import RNDateTimePicker from '@react-native-community/datetimepicker';
+import dayjs from "dayjs";
+import { ColorPicker } from 'react-native-wheel-color-picker';
+
+
 const formatTime = (date) => {
     let hours = date.getHours();
     const minutes = date.getMinutes().toString().padStart(2, '0');
@@ -17,17 +21,18 @@ const formatTime = (date) => {
     return `${hourString}:${minutes} ${ampm}`;
 }
 
-export default function SchedulePicker({ setModal, feedID }) {
+export default function ScheduleLightPicker({ setModal, feedID }) {
     const [startTime, setStartTime] = useState(new Date());
     const [endTime, setEndTime] = useState(new Date())
     const [timer, setTimer] = useState(0);
     const [scheduleLevel, setScheduleLevel] = useState(0)
     const [showPicker, setShowPicker] = useState(false)
     const [scheduleDays, setScheduleDays] = useState([])
-    const onChange = (event, selectedTime) => {
+    const [color, setColor] = useState('#00ff00');
     
+    const onChange = (event, selectedTime) => {
         setShowPicker(false);
-        console.log("Selected time: ", selectedTime)    
+        console.log("Selected time: ", selectedTime)
         if (timer == 0) {
             setStartTime(selectedTime);
         } else {
@@ -49,7 +54,7 @@ export default function SchedulePicker({ setModal, feedID }) {
         console.log("check schedule time: ", startTime)
         let time = formatTime(startTime);
         time = time.split(" ")[0] + ":00";
-    
+
         let days = [];
         days = scheduleDays.map((item) => {
             if (item == 2) return "Mon"
@@ -68,7 +73,7 @@ export default function SchedulePicker({ setModal, feedID }) {
         const payload = {
             deviceId: +feedID,
             action: scheduleLevel.toString(),
-            scheduledTime: startTime.getHours() + ":" + startTime.getMinutes() + ":00", 
+            scheduledTime: startTime.getHours() + ":" + startTime.getMinutes() + ":00",
             repeatDays: Sdays
         }
         console.log("payload: ", payload)
@@ -119,31 +124,28 @@ export default function SchedulePicker({ setModal, feedID }) {
                     <View className='flex flex-row items-center justify-center w-full mx-auto mt-6'>
                         <View>
                             <TouchableOpacity onPress={() => { setTimer(0); setShowPicker(true) }} className="bg-white p-3 rounded-lg shadow">
-                                <Text className='font-bold text-3xl'>{startTime.toISOString()}</Text>
+                                <Text className='font-bold text-3xl'>{dayjs(startTime).format("HH:MM")}</Text>
                             </TouchableOpacity>
                         </View>
-                        {/* <Text className='font-bold text-3xl'>  -  </Text>
-                            <View>
-                                <TouchableOpacity onPress={() => { setTimer(1); setShowPicker(true) }} className="bg-white p-3 rounded-lg shadow">
-                                    <Text className='font-bold text-3xl'>{formatTime(endTime)}</Text>
-                                </TouchableOpacity>
-                            </View> */}
-                            {showPicker && (
-                                // <DateTimePicker
-                                //     value={startTime}
-                                //     mode="time"
-                                //     is24Hour={true}
-                                //     display="spinner"
-                                //     onChange={onChange}
-                                //     timeZoneName={'Asia/Ho_Chi_Minh'}
-                                // />
-                                <RNDateTimePicker value={new Date()} mode="time" timeZoneName={'Asia/Ho_Chi_Minh'} onChange={onChange} />
-
-                            )}
+                        {
+                            showPicker && <RNDateTimePicker display="inline" value={new Date()} mode="time" timeZoneName={'Asia/Ho_Chi_Minh'} onChange={onChange} />
+                        }
                     </View>
                     <View className='w-full flex flex-row mt-2'>
-                        <Text className='text-lg font-bold text-white text-left ' >Mức độ:</Text>
-                        <TouchableOpacity onPress={() => setScheduleLevel(1)}>
+                        <Text className='text-lg font-bold text-white text-left ' >Chọn màu:</Text>
+                        <View style={{ flex: 1, padding: 20, justifyContent: 'center' }}>
+                            <ColorPicker
+                                color={color}
+                                onColorChangeComplete={(newColor) => setColor(newColor)}
+                                thumbSize={30}
+                                sliderSize={30}
+                                noSnap={true}
+                                row={false}
+                            />
+                            <Text style={{ marginTop: 20 }}>Mã màu HEX: {color}</Text>
+                        </View>
+
+                        {/* <TouchableOpacity onPress={() => setScheduleLevel(1)}>
                             <Text className={` rounded-full mx-2 h-8 w-8 items-center text-center font-bold ${(scheduleLevel == 1) ? 'bg-yellow' : 'bg-white'} `}>1</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => setScheduleLevel(2)}>
@@ -151,7 +153,7 @@ export default function SchedulePicker({ setModal, feedID }) {
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => setScheduleLevel(3)}>
                             <Text className={` rounded-full mx-2 h-8 w-8 items-center text-center font-bold ${(scheduleLevel == 3) ? 'bg-yellow' : 'bg-white'} `}>3</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
                     <View className='w-full flex flex-row mt-2'>
                         <Text className='text-lg font-bold text-white text-left ' >Ngày lặp lại:</Text>

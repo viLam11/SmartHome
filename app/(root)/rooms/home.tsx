@@ -36,7 +36,6 @@ export default function HomeIndex() {
     // }
 
     useEffect(() => {
-        
         const fetchRoomData = async () => {
             setLoading(true);
             try {

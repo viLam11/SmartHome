@@ -21,11 +21,11 @@ export const getRoomDevices = async (roomID: string): Promise<deviceListObject> 
 export const getDeviceData = async (feedId: string): Promise<deviceStatusObject> => {
     try {
         const headers = await getAuthHeaders();
+        console.log("API: ", `${API_URL}/devices/${feedId}` )
+        console.log("HEADERS: ", headers)   
         const response = await axios.get(`${API_URL}/devices/${feedId}`, headers);
-        await AsyncStorage.setItem('deviceType', response.data.type);
-        await AsyncStorage.setItem('deviceTitle', response.data.title);
+        console.log("Device data:" , response.data);    
         return response.data;
-        // return deviceData;
     } catch (error) {
         console.error('Error fetching device data:', error);
         throw error;
@@ -35,7 +35,11 @@ export const getDeviceData = async (feedId: string): Promise<deviceStatusObject>
 export const controlDevice = async (feedId: string, value: string) => {
     try {
         const headers = await getAuthHeaders();
-        const response = await axios.post(`${API_URL}/devices/${feedId}`, { value }, headers);
+        console.log("Headers: ", headers);
+        console.log("Control device: ", feedId, value);
+        const response = await axios.post(`${API_URL}/devices/${feedId}`, { 
+            value: value    
+         }, headers);
         return response.data;
     } catch (error) {
         console.error('Error controlling device:', error);
