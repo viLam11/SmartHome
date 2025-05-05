@@ -38,7 +38,7 @@ export default function StatisticSummary() {
   const fetchDeviceTotaltime = useCallback(
     async (deviceType: { title: string, value: string}, endDate: Date) => {
       try {
-        const deviceData = await getDeviceKindTotaltimeService(-1, deviceType.value, endDate);
+        const deviceData = await getDeviceKindTotaltimeService(deviceType.value, endDate);
         setRunningTime(deviceData.total.toString());
       } catch (err) {
         console.error('Error fetching device uptime:', err);

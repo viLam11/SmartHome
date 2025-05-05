@@ -16,7 +16,7 @@ export const getTotaltimeOneDeviceService = async (feedId: string, endDate: Date
                 end: endDate ? endDate.toISOString() : new Date().toISOString(),
             },
             headers);
-        return response.data;
+        return {total: parseFloat(response.data.total.toFixed(2)) };
     } catch (error) {
         console.error('Error fetching statistic:', error);
         throw error;
@@ -46,28 +46,27 @@ export const getRunningTimeOneDeviceService = async (feedId: string, endDate: Da
 
 /////////////////////////////////////////// Summary Statistic ///////////////////////////////////////////
 // totaltime
-export const getDeviceKindTotaltimeService = async (roomId: number | null, deviceType: string, endDate: Date): Promise<{ total: number }> => {
+export const getDeviceKindTotaltimeService = async ( deviceType: string, endDate: Date): Promise<{ total: number }> => {
     try {
-        if (roomId === null) return { total: 0 };
         const headers = await getAuthHeaders();
         endDate = new Date(endDate.setHours(6, 59, 59, 999));
         const startDate = new Date(subDays(endDate, 7).setHours(7, 0, 0, 0));
-        if (roomId === -1) {
-            const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/statistic/rooms/total`,
+        if (deviceType === '-1') {
+            const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/statistic/type/total`,
                 {
                     start: startDate.toISOString(),
                     end: endDate.toISOString(),
                 },
                 headers);
-            return response.data;
+            return {total: parseFloat(response.data.total.toFixed(2)) };
         }
-        const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/statistic/rooms/${roomId}/${deviceType}`,
+        const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/statistic/type/${deviceType}`,
             {
                 start: startDate.toISOString(),
                 end: endDate.toISOString(),
             },
             headers);
-        return response.data;
+        return {total: parseFloat(response.data.total.toFixed(2)) };
     } catch (error) {
         console.error('Error fetching statistic:', error);
         throw error;
