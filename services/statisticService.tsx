@@ -4,6 +4,7 @@ import { runningTimeDeviceType, runningTimeOneDeviceType, summaryStatisticType }
 import { getAuthHeaders } from './authService';
 import { subDays } from 'date-fns';
 import { RoomObject } from '@/types/room.type';
+import { room } from '@/constants/data';
 
 const base_url = process.env.EXPO_PUBLIC_API_URL;
 
@@ -95,8 +96,8 @@ export const getAllRoom  = async () => {
 export const getRoomStatis = async (roomId: string, startDate: string, endDate: string) => {
     try {
         const response = await axios.post(`${base_url}/statistic/rooms/${roomId}`, {
-            "start": "2025-04-20T00:00:00Z",
-            "end": "2025-05-03T23:59:59Z"
+            "start": startDate  ,
+            "end": endDate  
         })
         let lightData = response.data.light;
         lightData = Object.entries(lightData).map(([key, value]) => {
@@ -172,3 +173,74 @@ export const getAllRoomStat = async (startDate: string, endDate: string) => {
         return error;
     }
 };
+
+export const getDeviceStat = async (deviceId: string, startDate: string, endDate: string) => {  
+    try {
+        const headers = await getAuthHeaders(); 
+        const response = await axios.post(`${base_url}/statistic/device/${deviceId}`, {
+            "start": startDate,
+            "end": endDate
+        }, headers);    
+
+        let data = Object.entries(response.data).map(([key, value]) => {
+            const [year, month, day] = key.split("-");
+            return {
+                label: `${day}/${month}`, // Định dạng dd/MM
+                value: parseFloat(value.toFixed(2)), // Chuyển đổi thành số và làm tròn đến 2 chữ số thập phân
+                dataPointText: parseFloat(value.toFixed(2)).toString(), 
+                hidden: value == 0.0 ? true : false
+            };
+        })
+        console.log("DEVICE DATA: ", data);
+        return data;
+    } catch (error) {
+        return error;
+    }
+}
+
+export const getTotalUseByRoomId = async ({roomId, startDate, endDate}: {roomId: string, startDate: string, endDate: string}) => {
+    try {
+        console.log("Start date: ", startDate); 
+        console.log("End date: ", endDate);
+        let newStartDate = new Date(startDate + "T00:01:00Z"); 
+        const [lightTotal, fanTotal] = await Promise.all([ 
+            axios.post(`${base_url}/statistic/rooms/${roomId}/light`, {
+                "start": newStartDate,
+                "end": endDate
+            }),
+            axios.post(`${base_url}/statistic/rooms/${roomId}/fan`, {
+                "start": newStartDate,
+                "end": endDate
+            })
+         ])
+        return {
+            lightSum: lightTotal.data.total,
+            fanSum: fanTotal.data.total
+        }
+    } catch (error) {
+        return error;
+    }   
+}
+
+export const totalHome = async ({startDate, endDate}: {startDate: string, endDate: string}) => {
+    try {
+        const allRooms = await getAllRoom();    
+        const roomIds = allRooms.map((room: RoomObject) => room.id);
+        const totalUseByRoomIdPromises = roomIds.map((roomId: string) => {
+            return getTotalUseByRoomId({roomId, startDate, endDate});
+        });
+        const totalUseByRoomIdResults = await Promise.all(totalUseByRoomIdPromises);
+        let result = allRooms.map((room: any, index: number) => {  
+            return {
+                roomId: room.id,
+                roomName: room.title,
+                lightSum: totalUseByRoomIdResults[index].lightSum,
+                fanSum: totalUseByRoomIdResults[index].fanSum
+            }
+         })
+        console.log("TOTAL USE BY ROOM ID RESULTS: ", result);
+        return result;
+    } catch (error) {
+        return error;
+    }
+}

@@ -4,11 +4,11 @@ import { Table, TableWrapper, Row, Cell } from 'react-native-table-component';
 
 
 const tableHead = ['Hoạt động', 'Thời gian']
-const  widthArr =  [60, 40]
+const  widthArr =  [56, 44]
 
 export default function TableHistory({ tableData }) {
     return (
-          <View className='h-full' style={{ borderRadius: 8, overflow: 'hidden', margin: 10 }}>
+          <View className='h-full overflow-hidden' style={{ borderRadius: 8, overflow: 'hidden', margin: 10 }}>
             <Table className="w-10/12 mx-auto text-xl text-black rounded-md" style={styles.header} borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
               <Row data={tableHead}  className="h-10 align-middle text-center " flexArr={widthArr} textStyle={styles.textHead} />
             </Table>

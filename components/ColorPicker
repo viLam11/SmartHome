@@ -1,0 +1,32 @@
+import { Component } from 'react'
+import { View, Text, ActivityIndicator } from 'react-native'
+
+import ColorPicker from 'react-native-wheel-color-picker'
+
+export default class ColorPickerComponent extends Component {
+    render() {
+        return (
+            <View style={[]}>
+                <ColorPicker
+                    ref={r => { this.picker = r }}
+                    color={this.state.currentColor}
+                    swatchesOnly={this.state.swatchesOnly}
+                    onColorChange={this.onColorChange}
+                    onColorChangeComplete={this.onColorChangeComplete}
+                    thumbSize={40}
+                    sliderSize={40}
+                    noSnap={true}
+                    row={false}
+                    swatchesLast={this.state.swatchesLast}
+                    swatches={this.state.swatchesEnabled}
+                    discrete={this.state.disc}
+                    wheelLodingIndicator={<ActivityIndicator size={40} />}
+                    sliderLodingIndicator={<ActivityIndicator size={20} />}
+                    useNativeDriver={false}
+                    useNativeLayout={false}
+                />
+                <SomeButton onPress={() => this.picker.revert()} />
+            </View>
+        )
+    }
+}

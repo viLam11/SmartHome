@@ -9,6 +9,13 @@ export const fetchSensorDataByTime = async ({ startTime, endTime, feedKey }: { s
         console.log("Feed key: ", feedKey); 
         console.log("ADA USER: ", ADA_USER);    
         console.log("API: ", `https://io.adafruit.com/api/v2/ThuanTrinh7845/feeds/${feedKey}/data/chart`);
+        console.log("payload: ", {
+            params: {
+                start_time: startTime,
+                end_time: endTime,
+                resolution: 1
+            }
+        })
         const response = await axios.get(`https://io.adafruit.com/api/v2/${ADA_USER}/feeds/${feedKey}/data/chart`, {
             params: {
                 start_time: startTime,
@@ -58,13 +65,13 @@ export const fetchSensorDataByDay = async ({ startTime, endTime, feedId }: { sta
         })
         console.log("RESPONSE: ", response.data);   
         const data : Record<string, number> = response.data;
-        const result = Object.entries(data).map(([key, value]) => {
+        const result = Object.entries(data).slice(1).map(([key, value]) => {
             const [year, month, day] = key.split("-");
             return {
-                label: `${day}/${month}`, // Định dạng dd/MM
-                value: parseFloat(value.toFixed(2)), // Làm tròn còn 2 chữ số
-                dataPointText: parseFloat(value.toFixed(2)).toString(), // Giá trị hiển thị trên điểm dữ liệu
-                dataPointTextColor: "black", // Màu chữ hiển thị trên điểm dữ liệu
+                label: `${day}/${month}`, 
+                value: parseFloat(value.toFixed(2)), 
+                dataPointText: parseFloat(value.toFixed(2)).toString(), 
+                dataPointTextColor: "black", 
                 hidden: parseFloat(value.toFixed(2)) == 0.0 ? true : false
             };
         });
@@ -75,5 +82,39 @@ export const fetchSensorDataByDay = async ({ startTime, endTime, feedId }: { sta
         status: 400,
         data: error,  
         }
+    }
+}
+
+export const fetchCurrentSensorData = async (feedId: number) => {
+    try {
+        const response = await axios.get(`${base_url}/sensors/${feedId}`)
+        return response.data;   
+    } catch (error) {
+        return {
+            status: 400,
+            data: error,  
+        }
+    }
+
+}
+
+// 3014285, brightness 3017352, humidity 3017353 
+export const getAllSensorSat = async (startDate: string, endDate: string) => { 
+    try {
+        const [data1, data2, data3] = await Promise.all([
+            fetchSensorDataByDay({ startTime: startDate, endTime: endDate, feedId: 3014285 }),
+            fetchSensorDataByDay({ startTime: startDate, endTime: endDate, feedId: 3017352 }),
+            fetchSensorDataByDay({ startTime: startDate, endTime: endDate, feedId: 3017353 })
+        ])
+        const result = {
+            temperature: data1,
+            brightness: data2,
+            humidity: data3
+        }
+        console.log("RESULT: ", result);
+        return result;
+        
+    } catch (error) {
+        return error;
     }
 }

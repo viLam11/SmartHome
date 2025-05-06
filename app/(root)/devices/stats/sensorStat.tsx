@@ -6,10 +6,10 @@ import axios from "axios";
 import { fetchSensorDataByTime } from "@/services/sensorService";
 import { DateTime } from "luxon";
 
-export default function SensorStatis({ feedKey }: { feedKey: string }) {
+export default function SensorStatis({sensorInfo, type, feedKey }: {sensorInfo: any, type: string, feedKey: string }) {
     const [lineData, setLineData] = useState([]);
     const [startTime, setStartTime] = useState<string | null>(null);
-
+    const [textObj, setTextObj] = useState<{ [key: string]: string }>({})
     useEffect(() => {
         const vietnamMidnight = DateTime.now()
             .setZone("Asia/Ho_Chi_Minh")
@@ -36,12 +36,25 @@ export default function SensorStatis({ feedKey }: { feedKey: string }) {
         return () => clearInterval(interval);
     }, [startTime])
 
+    useEffect(() => {
+        if (!sensorInfo) return;
+        if (sensorInfo.type == "temperature") { 
+            setTextObj({ typeName: "nhiệt độ", unit: "°C" })
+
+        } else if (sensorInfo.type == "humidity") {
+            setTextObj({ typeName: "độ ẩm", unit: "%" })    
+        }
+        else if (sensorInfo.type == "brightness") {
+            setTextObj({ typeName: "độ sáng", unit: "lux" })
+        }
+    }, [sensorInfo])
+
     return (
         <View className="w-11/12 mx-auto">
             {lineData.length > 0 && (
                 <>
                     <View className="mt-4">
-                        <Text className="text-center text-lg font-bold ">Biểu đồ nhiệt độ hôm nay</Text>
+                        <Text className="text-center text-lg font-bold ">Biểu đồ {textObj ? textObj.typeName : ""} hôm nay</Text>
                     </View>
                     <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
                         <LineChart

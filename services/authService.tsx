@@ -1,6 +1,6 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useNotification } from '@/contexts/NotificationContext';
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 console.log(API_URL)
 
@@ -36,6 +36,7 @@ export const signInService = async (credentials: { email: string, password: stri
         }
         throw("Email hoặc mật khẩu không đúng")
     }
+
 };
 
 export const getAuthToken = async () => {

@@ -31,10 +31,10 @@ export default function Room() {
 
     const roomId = useLocalSearchParams().id;
 
-    async function handleDelele(feedId: number) { 
+    async function handleDelele(feedId: number) {
         console.log("Delete device with feedId:", feedId);
         const response = await deleteDevice(feedId);
-        if (response.status === 200) {  
+        if (response.status === 200) {
             setEditMode(false);
             setDeleteMode(false);
         } else {
@@ -46,7 +46,7 @@ export default function Room() {
         if (!roomId) return;
         const fetchDevices = (async () => {
             try {
-                setLoading(true);
+                // setLoading(true);
                 const response = await getRoomDevices(roomId as string);
                 setDeviceList(response);
                 setActivesDevice(calculateActiveDevice(response));
@@ -62,25 +62,20 @@ export default function Room() {
             catch (error) {
                 console.error("Error fetching room data:", error);
             }
-            finally {
-                setLoading(false);
-            }
-
         });
         fetchDevices();
-
-        //    const interval = setInterval(() => {fetchDevices();}, 10000);
-        //    return (() => clearInterval(interval));
+        const interval = setInterval(() => { fetchDevices(); }, 10000);
+        return (() => clearInterval(interval));
     }, [roomId, editMode, modal]);
 
 
     return (
-        <View className="min-h-screen">
+        <View className="flex-1">
             <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="mt-1 mx-2 min-h-screen">
                 {modal || deleteMode ? <View className="absolute top-0 left-0 z-20 w-full h-full bg-black/50" /> : null}
-                {deleteMode && 
-                <View className='absolute top-1/3 mx-auto w-full bg-white z-20 rounded-lg p-4 m-4 '>     
-                    <ConfirmDelete onClose={() => {setDeleteMode(false); setEditMode(false)}} onConfirm={handleDelele} isOpen={deleteMode} deviceName={deleteDeviceId} deleteDeviceId={deleteDeviceId} />
+                {deleteMode &&
+                    <View className='absolute top-1/3 mx-auto w-full bg-white z-20 rounded-lg p-4 m-4 '>
+                        <ConfirmDelete onClose={() => { setDeleteMode(false); setEditMode(false) }} onConfirm={handleDelele} isOpen={deleteMode} deviceName={deleteDeviceId} deleteDeviceId={deleteDeviceId} />
                     </View>}
                 <View className='flex flex-row justify-between'>
                     <View className="mx -2">
@@ -152,7 +147,7 @@ export default function Room() {
                                                 <>
                                                     {editMode ?
                                                         <View key={index}>
-                                                            <TouchableOpacity onPress={() => {setDeleteMode(true); setDeleteDeviceId(device.feedId)}} className='absolute top-0 right-0 bg-red-300 z-10 rounded-full p-1'>
+                                                            <TouchableOpacity onPress={() => { setDeleteMode(true); setDeleteDeviceId(device.feedId) }} className='absolute top-0 right-0 bg-red-300 z-10 rounded-full p-1'>
                                                                 <IconSymbol name="close" size={20} color="black" />
                                                             </TouchableOpacity>
                                                             <View className='bg-gray-100 p-2 rounded-xl mt-2'>
@@ -161,12 +156,12 @@ export default function Room() {
                                                         </View>
                                                         :
                                                         <View key={index} className={`mt-2 p-2 ${device.value == '0' || device.value == '#000000' ? "bg-disable" : "bg-enable"} rounded-xl `}>
-                                                        <TouchableOpacity key={index} onPress={() => router.push({
+                                                            <TouchableOpacity key={index} onPress={() => router.push({
                                                                 pathname: `/${devicesRouter}/${device.feedId}` as any,
                                                                 params: { roomName: room?.title }
-                                                        })}>
-                                                            <Text className="font-semibold">{device.title}</Text>
-                                                        </TouchableOpacity>
+                                                            })}>
+                                                                <Text className="font-semibold">{device.title}</Text>
+                                                            </TouchableOpacity>
                                                         </View>
                                                     }
                                                 </>

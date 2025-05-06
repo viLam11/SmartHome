@@ -37,7 +37,7 @@ export default function HomeIndex() {
 
     useEffect(() => {
         const fetchRoomData = async () => {
-            setLoading(true);
+            // setLoading(true);
             try {
                 const response = await getAllRoomService();
                 if (!response) throw new Error("Failed to fetch image");
@@ -48,7 +48,7 @@ export default function HomeIndex() {
             } catch (error) {
               console.error("Error fetching room data:", error);
             } finally {
-              setLoading(false);
+            //   setLoading(false);
             }
           };
         fetchRoomData();

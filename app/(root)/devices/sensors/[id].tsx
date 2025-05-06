@@ -25,6 +25,12 @@ const timeToSeconds = (time: string) => {
     return hours * 3600 + minutes * 60 + seconds;
 };
 
+const mapNameType = [
+    { type: 'temperature', name: 'Nhiệt độ' },
+    { type: 'brightness', name: 'Độ sáng' },
+    { type: 'humidity', name: 'Độ ẩm' }
+]
+
 export default function Sensor() {
     const router = useRouter();
     const id = useLocalSearchParams().id;
@@ -97,7 +103,26 @@ export default function Sensor() {
                         data.message = "Mát mẻ"
                     }
                 }
-            } 
+            } else if (data.type == "brightness") {
+                data.unit = 'lux'
+                if (currentTime && timeToSeconds(currentTime) < timeToSeconds('10:00:00') && timeToSeconds(currentTime) > timeToSeconds('6:00:00')) {
+                    if (data.value > 30) {
+                        data.image = images.day
+                        data.message = "Sáng"
+                    } else {
+                        data.image = images.sun_cloud
+                        data.message = "Tối"
+                    }
+                } else {
+                    if (data.value > 30) {
+                        data.image = images.night
+                        data.message = "Sáng"
+                    } else {
+                        data.image = images.night_humid
+                        data.message = "Tối"
+                    }
+                }   
+            }
             setSensorData(data)
         }
         fetchData()
@@ -126,14 +151,14 @@ export default function Sensor() {
                         {sensorData && sensorData.image && <Image source={sensorData.image} className="mx-auto" style={{ width: 160, height: 100 }} />}
                     </View>
                     <Text className="text-center text-xl font-bold">{sensorData ? sensorData.message : ''}</Text>
-                    <Text className="text-center text-4xl font-bold m-2"> {sensorData ? sensorData.value : ''} °C</Text>
+                    <Text className="text-center text-4xl font-bold m-2"> {sensorData ? sensorData.value : ''} {sensorData ? sensorData.unit : ''}</Text>
                     <Text className="text-center italic">Vị trí: {roomName}</Text>
                     <Text className="text-center italic">Thời gian: {currentTime} {currentDate} </Text>
                 </View>
 
-                <SensorStatis feedKey={sensorData.feedKey} />
+                <SensorStatis type={sensorData.type} sensorInfo={sensorData} feedKey={sensorData.feedKey} />
 
-                <SensorWeek feedId={id} />
+                <SensorWeek feedId={id} sensorInfo={sensorData} />
                 
             </ScrollView>
             <View className=" bottom-0 h-28">

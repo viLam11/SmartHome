@@ -7,16 +7,21 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Link, useRouter } from 'expo-router';
 const base_url = process.env.EXPO_PUBLIC_API_URL;
+import { useLoading } from '@/contexts/LoadingContext';
 
 export default function Profile() {
+  const {setLoading} = useLoading(); 
   const [token, setToken] = useState(null);
   const [userData, setUserData] = useState(null);
 
   const router = useRouter();
   useEffect(() => {
+   
     const fetchUserData = async () => {
+      setLoading(true);
       const authToken = await AsyncStorage.getItem("authToken");
       setToken(authToken);
+      setLoading(false);
     }
     fetchUserData();
   }, [])
@@ -24,6 +29,7 @@ export default function Profile() {
   useEffect(() => {
     if (!token) return;
     const fetchUserData = async () => {
+      // setLoading(true);
       const response = await axios.get(`${base_url}/profile`, {
         headers: {
           "Authorization": token
@@ -31,6 +37,7 @@ export default function Profile() {
       })
       console.log("### RESPONSE : ", response.data);
       setUserData(response.data);
+      // setLoading(false);
     }
     fetchUserData();
   }, [token])

@@ -3,6 +3,7 @@ import { View, Text, Pressable, Modal, TouchableOpacity, FlatList } from 'react-
 import { BarChart, PieChart } from 'react-native-gifted-charts';
 import { deviceRatioWColorType, runningTimeDeviceType } from '@/types/statistic.type';
 import { DTOBarData, formatBarData } from '../CaculateData';
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 const roomOptions = ['All', 'room1', 'room2', 'room3'];
 
@@ -78,13 +79,15 @@ export function BarChartAnimated({
   );
 }
 
-export function PieChartAnimated({ pieData }: { pieData: deviceRatioWColorType[] }) {
+
+export function PieChartAnimated({ pieData }: { pieData: any[] }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [totalValue, setTotalValue] = useState(0);
   let formattedPieData = pieData.map((item, index) => ({
     value: item.value,
-    color: item.color,
     label: item.label,
-    gradientCenterColor: item.gradientCenterColor || item.color,
+    color: item.color,
+    // gradientCenterColor: item.gradientCenterColor || item.color,
     focused: index === 0,
   }));
    formattedPieData = formattedPieData.map((item, index) => ({
@@ -92,15 +95,17 @@ export function PieChartAnimated({ pieData }: { pieData: deviceRatioWColorType[]
     focused: index === selectedIndex,
     onPress: () => setSelectedIndex(index), // gán sự kiện click
   }));
+  const total = formattedPieData.reduce((acc, item) => acc + item.value, 0);
+  setTotalValue(total);
 
 
   const selectedItem = pieData[selectedIndex];
 
   const focusedItem = formattedPieData.find((item) => item.focused) || formattedPieData[0] || { value: 0, label: '' };
 
-  const renderDot = (color: string) => (
-    <View className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color, marginRight: 10 }} />
-  );
+  // const renderDot = (color: string) => (
+  //   <View className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color, marginRight: 10 }} />
+  // );
 
   const renderLegendComponent = () => {
     // const pairs = [];
@@ -115,7 +120,7 @@ export function PieChartAnimated({ pieData }: { pieData: deviceRatioWColorType[]
                 key={index}
                 className={`flex-row items-center`}
               >
-                {renderDot(item.gradientCenterColor)}
+                {/* {renderDot(item.gradientCenterColor)} */}
                 <Text className="text-black">{`${item.label}: ${(item.value).toFixed(0)} h`}</Text>
               </View>
         ))}
@@ -130,9 +135,9 @@ export function PieChartAnimated({ pieData }: { pieData: deviceRatioWColorType[]
         <View className="w-5/12 flex justify-between ">
           <View className=''>
             <Text className='text-left'>Đã dùng:</Text>
-            <Text className='text-right uppercase font-bold  text-2xl'>120 giờ</Text>
-            <Text>Dự tính:</Text>
-            <Text className='text-right uppercase font-bold italic text-2xl'>200.000 VND</Text>
+            <Text className='text-right uppercase font-bold  text-2xl'>{totalValue} giờ</Text>
+            {/* <Text>Dự tính:</Text>
+            <Text className='text-right uppercase font-bold italic text-2xl'>200.000 VND</Text> */}
           </View>
             <View className='bottom-0'>
               {renderLegendComponent()}

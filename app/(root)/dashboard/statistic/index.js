@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, Image } from 'react-native';
 import { ScrollView, TouchableOpacity, Modal, Pressable } from 'react-native';
-import { getSummaryDeviceStatisticService, getDeviceKindUptimeService, getRoomsUptimeService, getRoomStatis, getAllRoomStat } from '@/services/statisticService';
+import { getSummaryDeviceStatisticService, getDeviceKindUptimeService, getRoomsUptimeService, getRoomStatis, getAllRoomStat, totalHome } from '@/services/statisticService';
 import { BarChartAnimated, PieChartAnimated } from '@/components/chart/BarChartAnimated';
 import { useLoading } from '@/contexts/LoadingContext';
 import { DatePickerModal, de } from 'react-native-paper-dates';
@@ -16,6 +16,8 @@ import dayjs from 'dayjs';
 import { BarChart, LineChart } from 'react-native-gifted-charts';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { set } from 'date-fns';
+import { getAllSensorSat } from '@/services/sensorService';
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 
 const dumLineData = [
@@ -45,36 +47,50 @@ const dumPieData = [
         label: 'Device A',
         color: '#FF5733', // main color
         gradientCenterColor: '#C70039', // border color or gradient center
-      },
-      {
+    },
+    {
         value: 420,
         label: 'Device B',
         color: '#33FF57',
         gradientCenterColor: '#00C853',
-      },
-      {
+    },
+    {
         value: 567,
         label: 'Device C',
         color: '#3357FF',
         gradientCenterColor: '#2962FF',
-      },
+    },
 ]
+
+
+function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 
 export default function StatisticMockUI() {
     const { setLoading } = useLoading();
     const [selectedDates, setSelectedDates] = useState({
         startDate: dayjs(),
-        endDate: dayjs().add(2, 'day'),
+        endDate: dayjs()
     });
     const [barData1, setBarData1] = useState([]);
     const [barData2, setBarData2] = useState([]);
     const [barData, setBarData] = useState([]);
+    const [lineData1, setLineData1] = useState([]);
+    const [lineData2, setLineData2] = useState([]);
+    const [lineData3, setLineData3] = useState([]);
     const [options, setOptions] = useState([]);
     const [selectRoom, setSelectRoom] = useState(null);
     const [showOption, setShowOption] = useState(false);
+    const [pieData, setPieData] = useState([]);
     const [initDates, setInitDates] = useState({
         startDate: dayjs(),
-        endDate: dayjs().add(2, 'day')
+        endDate: dayjs()
     })
     const [maxLineY, setMaxLineY] = useState(300);
 
@@ -107,27 +123,46 @@ export default function StatisticMockUI() {
                 frontColor: '#ED6665',
             });
         }
-        return barDataCombined;
+        return barDataCombined.slice(2);
     }
 
     useEffect(() => {
-
         const now = new Date();
         const vnDateStr = now.toLocaleDateString("en-CA", { timeZone: "Asia/Ho_Chi_Minh" });
         const vnMidnight = new Date(`${vnDateStr}T00:00:00+07:00`);
         const sevenDaysAgoVN = new Date(vnMidnight);
-        sevenDaysAgoVN.setUTCDate(sevenDaysAgoVN.getUTCDate() - 20);
+        sevenDaysAgoVN.setUTCDate(sevenDaysAgoVN.getUTCDate() - 7);
         const vnEndOfDay = new Date(`${vnDateStr}T23:59:59+07:00`);
         // console.log("7 days ago: " , sevenDaysAgoVN);
         // console.log("vnEndOfDay: " , vnEndOfDay);
         const fetchInitData = async () => {
             setLoading(true);
-            const response = await getAllRoomStat(initDates.startDate.toISOString(), initDates.endDate.toISOString());
+            const response = await getAllRoomStat(sevenDaysAgoVN.toISOString(), vnEndOfDay.toISOString());
             // console.log("RESPONSE: ", JSON.stringify(response.light), JSON.stringify(response.fan));
             setBarData1(response.light);
             setBarData2(response.fan);
             const allRoom = await getAllRoomService();
-            setOptions(allRoom);
+            console.log("allRoom: ", allRoom);
+            setOptions([...allRoom, { id: -1, title: "Tất cả" }]);
+            const sensorData = await getAllSensorSat(sevenDaysAgoVN.toISOString(), vnEndOfDay.toISOString());
+            console.log("sensorData: ", sensorData);
+            setLineData1(sensorData.temperature);
+            setLineData2(sensorData.brightness);
+            setLineData3(sensorData.humidity);
+            const COLORS = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
+
+            const mainFeature = await totalHome({ startDate: sevenDaysAgoVN.toISOString(), endDate: vnEndOfDay.toISOString() });
+            console.log("mainFeature: ", mainFeature);
+            const newPieData = mainFeature.map((item) => {
+                    return {
+                        value: item.fanSum + item.lightSum,
+                        label: item.roomName,
+                        color: COLORS[index % COLORS.length],
+                    }
+                }
+            );
+            console.log("newPieData: ", newPieData);
+            setPieData(newPieData);
             setLoading(false);
         }
         setInitDates({
@@ -154,43 +189,31 @@ export default function StatisticMockUI() {
         console.log("room: ", room);
         setSelectRoom(room);
         setShowOption(false);
-        // setLoading(true);
-        // const response = await getRoomStatis(initDates.startDate.toISOString(), initDates.endDate.toISOString(), roomID);
-        // setBarData1(response.light);
-        // setBarData2(response.fan);
-        // const data = combineData(response.light, response.fan);
-        // setBarData(data);
-        // setLoading(false);  
-    }
-
-    useEffect(() => {
-        if (!Array.isArray(dumLineData) || !Array.isArray(dumLineData2) || !Array.isArray(dumLineData3)) {
-            console.warn('useEffect received undefined or non-array input', { dumLineData, dumLineData2, dumLineData3 });
-            return; // tránh lỗi nếu 1 trong 3 thiếu
+        setLoading(true);
+        let response;
+        if (room.id === -1) {
+            response = await getAllRoomStat(selectedDates.startDate.toISOString(), selectedDates.endDate.toISOString());
+        } else {
+            response = await getRoomStatis(room.id, selectedDates.startDate.toISOString(), selectedDates.endDate.toISOString());
         }
-        const allValues = [
-            ...dumLineData.map(item => item.value),
-            ...dumLineData2.map(item => item.value),
-            ...dumLineData3.map(item => item.value),
-        ];
-
-        const maxYRaw = Math.max(...allValues) + 5;
-        const maxY = Math.ceil(maxYRaw / 10) * 10;
-        setMaxLineY(maxY);
-        console.log("maxY: ", maxY);
-    }, [dumLineData, dumLineData2, dumLineData3]);
+        setBarData1(response.light);
+        setBarData2(response.fan);
+        const data = combineData(response.light, response.fan);
+        setBarData(data);
+        setLoading(false);
+    }
 
     async function handleSelectDate() {
         setLoading(true);
-        console.log("selectedDates: ", selectedDates);  
         const respose = await getAllRoomStat(selectedDates.startDate.toISOString(), selectedDates.endDate.toISOString());
-        console.log("RESPONSE: ", JSON.stringify(respose.light), JSON.stringify(respose.fan));
         setBarData1(respose.light);
         setBarData2(respose.fan);
-        let data = combineData(respose.light, respose.fan);    
-        
+        let data = combineData(respose.light, respose.fan);
         setBarData(data);
-        console.log("DATA: ", barData   );    
+        const sensorData = await getAllSensorSat(selectedDates.startDate.toISOString(), selectedDates.endDate.toISOString());
+        setLineData1(sensorData.temperature);
+        setLineData2(sensorData.brightness);
+        setLineData3(sensorData.humidity);
         setLoading(false);
     }
 
@@ -236,7 +259,7 @@ export default function StatisticMockUI() {
                         <Text className='font-bold text-lg text-center'>Biểu đồ thời gian sử dụng</Text>
                     </View>
                     <ScrollView horizontal={true} className="bg-white mt-2 py-2">
-                        <BarChart
+                        {barData.length > 0 && <BarChart
                             barWidth={20}
                             noOfSections={10}
                             data={barData}
@@ -252,7 +275,7 @@ export default function StatisticMockUI() {
                             }}
                             showValuesAsTopLabel={true}
 
-                        />
+                        />}
                     </ScrollView>
                     <View className="flex flex-row items-center bg-white">
                         <View className="flex flex-row mx-2 items-center">
@@ -272,40 +295,40 @@ export default function StatisticMockUI() {
                     </View>
 
                     <ScrollView horizontal={true} className="bg-white mt-2 py-2">
-                        <LineChart
-                            data={dumLineData}
-                            data2={dumLineData2}
-                            data3={dumLineData3}
+                        {lineData1.length > 0 && lineData2.length > 0 && lineData3.length > 0 && <LineChart
+                            data={lineData1}
+                            data2={lineData2}
+                            data3={lineData3}
                             showVerticalLines
                             spacing={60}
                             initialSpacing={30}
-                            color1="blue"
-                            color2="orange"
+                            color1="red"
+                            color2="blue"
                             color3="green"
-                            textColor1="blue"
-                            textColor2='red'
+                            textColor1="red"
+                            textColor2='blue'
                             textColor3='green'
                             dataPointsHeight={6}
                             dataPointsWidth={6}
-                            dataPointsColor1="blue"
-                            dataPointsColor2="red"
+                            dataPointsColor1="red"
+                            dataPointsColor2="blue"
                             dataPointsColor3="green"
                             textShiftY={0}
                             textShiftX={5}
                             textFontSize={13}
-                            maxValue={maxLineY}
                             stepValue={10}
-                        />
+                        />}
                     </ScrollView>
                     <View className="flex-row items-center p-4">
-                        <View className="flex-row items-center mx-2">
-                            <View className="w-4 h-4 bg-blue-500 rounded-full mr-2" />
-                            <Text className="text-gray-700">Ánh sáng</Text>
-                        </View>
                         <View className="flex-row items-center mx-2">
                             <View className="w-4 h-4 bg-orange-500 rounded-full mr-2" />
                             <Text className="text-gray-700">Nhiệt độ</Text>
                         </View>
+                        <View className="flex-row items-center mx-2">
+                            <View className="w-4 h-4 bg-blue-500 rounded-full mr-2" />
+                            <Text className="text-gray-700">Ánh sáng</Text>
+                        </View>
+
                         <View className="flex-row items-center mx-2">
                             <View className="w-4 h-4 bg-green-500 rounded-full mr-2" />
                             <Text className="text-gray-700">Độ ẩm</Text>
@@ -317,7 +340,7 @@ export default function StatisticMockUI() {
 
 
                 <View className='mb-4'>
-                    <PieChartAnimated pieData={dumPieData} />
+                    {pieData.length > 0 && <PieChartAnimated pieData={pieData} />}
                 </View>
             </ScrollView>
 

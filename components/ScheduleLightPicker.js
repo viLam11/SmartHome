@@ -7,9 +7,8 @@ import { IconSymbol } from "./ui/IconSymbol";
 import { setSchedule } from "@/services/scheduleService";
 import { LoadingProvider } from "@/contexts/LoadingContext";
 import RNDateTimePicker from '@react-native-community/datetimepicker';
+import { ColorPicker } from 'react-native-color-picker'
 import dayjs from "dayjs";
-import { ColorPicker } from 'react-native-wheel-color-picker';
-
 
 const formatTime = (date) => {
     let hours = date.getHours();
@@ -21,16 +20,15 @@ const formatTime = (date) => {
     return `${hourString}:${minutes} ${ampm}`;
 }
 
-export default function ScheduleLightPicker({ setModal, feedID }) {
+export default function SchedulePicker({ setModal, feedID }) {
     const [startTime, setStartTime] = useState(new Date());
     const [endTime, setEndTime] = useState(new Date())
     const [timer, setTimer] = useState(0);
     const [scheduleLevel, setScheduleLevel] = useState(0)
     const [showPicker, setShowPicker] = useState(false)
     const [scheduleDays, setScheduleDays] = useState([])
-    const [color, setColor] = useState('#00ff00');
-    
     const onChange = (event, selectedTime) => {
+
         setShowPicker(false);
         console.log("Selected time: ", selectedTime)
         if (timer == 0) {
@@ -127,33 +125,17 @@ export default function ScheduleLightPicker({ setModal, feedID }) {
                                 <Text className='font-bold text-3xl'>{dayjs(startTime).format("HH:MM")}</Text>
                             </TouchableOpacity>
                         </View>
-                        {
-                            showPicker && <RNDateTimePicker display="inline" value={new Date()} mode="time" timeZoneName={'Asia/Ho_Chi_Minh'} onChange={onChange} />
-                        }
+                        {showPicker && (
+                            <RNDateTimePicker value={new Date()} mode="time" timeZoneName={'Asia/Ho_Chi_Minh'} onChange={onChange} />
+
+                        )}
                     </View>
                     <View className='w-full flex flex-row mt-2'>
                         <Text className='text-lg font-bold text-white text-left ' >Chọn màu:</Text>
-                        <View style={{ flex: 1, padding: 20, justifyContent: 'center' }}>
-                            <ColorPicker
-                                color={color}
-                                onColorChangeComplete={(newColor) => setColor(newColor)}
-                                thumbSize={30}
-                                sliderSize={30}
-                                noSnap={true}
-                                row={false}
-                            />
-                            <Text style={{ marginTop: 20 }}>Mã màu HEX: {color}</Text>
-                        </View>
-
-                        {/* <TouchableOpacity onPress={() => setScheduleLevel(1)}>
-                            <Text className={` rounded-full mx-2 h-8 w-8 items-center text-center font-bold ${(scheduleLevel == 1) ? 'bg-yellow' : 'bg-white'} `}>1</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => setScheduleLevel(2)}>
-                            <Text className={` rounded-full mx-2 h-8 w-8 items-center text-center font-bold ${(scheduleLevel == 2) ? 'bg-yellow' : 'bg-white'} `}>2</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => setScheduleLevel(3)}>
-                            <Text className={` rounded-full mx-2 h-8 w-8 items-center text-center font-bold ${(scheduleLevel == 3) ? 'bg-yellow' : 'bg-white'} `}>3</Text>
-                        </TouchableOpacity> */}
+                        <ColorPicker
+                            onColorSelected={color => alert(`Color selected: ${color}`)}
+                            style={{ flex: 1 }}
+                        />
                     </View>
                     <View className='w-full flex flex-row mt-2'>
                         <Text className='text-lg font-bold text-white text-left ' >Ngày lặp lại:</Text>

@@ -88,9 +88,9 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
 
   useEffect(() => {
     const getHeader = async () => {
-      const response = await getAuthHeaders();
-      console.log("Header: ", response.headers.Authorization);
-      setToken(response.headers.Authorization);
+      const headers = await getAuthHeaders();
+      console.log("Header: ", headers);
+      setToken(headers.headers.Authorization);
     }
     getHeader();  
   }, [])
