@@ -42,7 +42,7 @@ In the output, you'll find options to open the app in a
 - [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-## Contributor:
+## Contributors:
 1. Huỳnh Bảo Ngọc: Front-end
 2. Trần Phước Nhật: Front-end
 3. Trương Quang Nghĩa: Back-end
