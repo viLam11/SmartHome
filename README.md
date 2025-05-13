@@ -1,8 +1,11 @@
-# Welcome to your Expo app 👋
-check 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+# PHẦN MỀM QUẢN LÝ NHÀ THÔNG MINH MOBILE APP: SMART HOME
+## App demo
+<img src="https://drive.google.com/file/d/16Z_XDWHZ17XOEsfS8qutyQu2zpnRz9H4/view?usp=drive_link" alt="Ảnh demo" width="300"/>
+<img src="https://drive.google.com/file/d/1zD7FfKWlavdtLTdyiuyDoVW5fWIGWvTs/view?usp=drive_link" alt="Ảnh demo" width="300"/>
+<img src="https://drive.google.com/file/d/1G555lshVppnW_c0qlDIq0DoD3ALjlmdm/view?usp=drive_link" alt="Ảnh demo" width="300"/>
 
-## Get started
+
+## Installation
 
 1. Install dependencies
 
